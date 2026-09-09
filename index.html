@@ -22,6 +22,8 @@
   html,body{margin:0;height:100%;}
   body{background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.55;}
   .app{display:flex;height:100dvh;max-width:1080px;margin:0 auto;background:var(--bg);}
+  /* 顶部 App 标题栏（桌面隐藏，手机端显示，占住灵动岛安全区） */
+  .appbar{display:none;}
   /* 侧边栏 */
   .sidebar{width:230px;flex:none;background:linear-gradient(180deg,#3a4ed8,#22b8a6);color:#fff;display:flex;flex-direction:column;padding:22px 16px;}
   .brand{display:flex;align-items:center;gap:11px;margin-bottom:26px;}
@@ -116,6 +118,11 @@
     .nav .ic{font-size:18px;}
     .nav .lb{font-size:10px;}
     .side-foot{display:none;}
+    /* 顶部标题栏：占住灵动岛安全区，把下面那排 tab 压到岛下方 */
+    .appbar{display:flex;align-items:center;justify-content:center;gap:8px;
+      padding:calc(8px + env(safe-area-inset-top)) 12px 9px;
+      background:linear-gradient(90deg,#3a4ed8,#22b8a6);color:#fff;
+      font-weight:700;font-size:16px;letter-spacing:.5px;position:sticky;top:0;z-index:20;}
     .main{padding-bottom:0;}
     .tab{padding-bottom:0;}
     .inputbar{padding-bottom:calc(12px + env(safe-area-inset-bottom));}
@@ -124,6 +131,7 @@
 </head>
 <body>
 <div class="app">
+  <div class="appbar">🤝 秋招陪跑 · 小陪</div>
   <aside class="sidebar">
     <div class="brand">
       <div class="logo">陪</div>
