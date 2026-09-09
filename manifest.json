@@ -1,0 +1,13 @@
+{
+  "name": "刘雪·秋招每日陪跑",
+  "short_name": "秋招陪跑",
+  "description": "每日执行陪跑：实时重排、情绪安慰、越用越准",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f6f8",
+  "theme_color": "#2f6df0",
+  "start_url": "index.html",
+  "icons": [
+    { "src": "icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

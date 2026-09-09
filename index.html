@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>刘雪·秋招陪跑</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="秋招陪跑">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#4f6ef7">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+  :root{
+    --bg:#eef1f8; --card:#ffffff; --ink:#1f2430; --sub:#8a93a6; --line:#e7eaf2;
+    --accent:#4f6ef7; --accent2:#22b8a6;
+    --硬技能:#4f6ef7; --简历:#f0883e; --投递:#16a34a; --行测:#9333ea; --测评:#e11d48;
+    --面试:#0891b2; --英语:#ca8a04; --fixed:#94a3b8; --done:#aab2c0;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.55;}
+  .app{display:flex;height:100dvh;max-width:1080px;margin:0 auto;background:var(--bg);}
+  /* 侧边栏 */
+  .sidebar{width:230px;flex:none;background:linear-gradient(180deg,#3a4ed8,#22b8a6);color:#fff;display:flex;flex-direction:column;padding:22px 16px;}
+  .brand{display:flex;align-items:center;gap:11px;margin-bottom:26px;}
+  .logo{width:42px;height:42px;border-radius:13px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;}
+  .brand-name{font-size:17px;font-weight:700;}
+  .brand-sub{font-size:11px;opacity:.8;}
+  nav{display:flex;flex-direction:column;gap:6px;flex:1;}
+  .nav{display:flex;align-items:center;gap:10px;padding:12px 14px;border:none;background:transparent;color:#fff;font-size:15px;text-align:left;border-radius:12px;cursor:pointer;opacity:.82;transition:.15s;}
+  .nav .ic{font-size:18px;width:22px;text-align:center;}
+  .nav:active{transform:scale(.97);}
+  .nav.active{background:rgba(255,255,255,.20);opacity:1;font-weight:600;}
+  .side-foot{font-size:11px;opacity:.8;line-height:1.6;border-top:1px solid rgba(255,255,255,.2);padding-top:12px;}
+  .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle;}
+  .dot.on{background:#7CFFB2;} .dot.off{background:#ffd479;}
+  /* 主区 */
+  .main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg);}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#fff;border-bottom:1px solid var(--line);}
+  .topbar .ttl{font-size:17px;font-weight:700;}
+  .topbar .tmeta{font-size:12px;color:var(--sub);}
+  .tab{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-height:0;}
+  .tab.hidden{display:none;}
+  .pad{padding:16px 18px;flex:1;}
+  /* 今日日程 */
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .btn{font-size:13px;padding:8px 13px;border:1px solid var(--line);background:#fff;border-radius:10px;color:#334155;cursor:pointer;}
+  .btn:active{background:#eef1f8;}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .pbar{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--sub);margin-bottom:7px;}
+  .pbar .nm{width:48px;flex:none;}
+  .pbar .tr{flex:1;height:7px;background:#eef1f4;border-radius:5px;overflow:hidden;}
+  .pbar .fl{height:100%;border-radius:5px;}
+  .pbar .ct{width:34px;text-align:right;flex:none;color:#475569;font-weight:600;}
+  .tl{position:relative;margin-top:8px;padding-left:18px;}
+  .tl::before{content:'';position:absolute;left:5px;top:4px;bottom:4px;width:2px;background:var(--line);}
+  .blk{position:relative;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:11px 13px;margin:10px 0;box-shadow:0 1px 3px rgba(30,40,80,.04);}
+  .blk::before{content:'';position:absolute;left:-15px;top:16px;width:11px;height:11px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 0 0 2px var(--line);}
+  .blk .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .blk .time{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;}
+  .blk .st{font-size:11px;padding:2px 9px;border-radius:7px;color:#fff;}
+  .blk .ti{font-size:15px;font-weight:600;margin:5px 0 3px;}
+  .blk .pp{font-size:12px;color:#66707f;}
+  .blk .ac{font-size:11px;color:#9aa3b0;margin-top:2px;}
+  .blk.done{opacity:.6;}
+  .blk.done .ti{text-decoration:line-through;}
+  .blk.done::before{background:var(--done);}
+  .blk.fixed{border-left:3px solid var(--fixed);}
+  .blk.fixed::before{background:var(--fixed);}
+  .blk.deferred{border-style:dashed;background:#fafbfc;}
+  .blk.deferred::before{background:#cbd2dd;}
+  .tag{font-size:10px;padding:1px 7px;border-radius:6px;background:#eef1f4;color:#64748b;margin-left:6px;}
+  .tag.warn{background:#fee2e2;color:#b91c1c;}
+  /* 陪跑对话 */
+  .chat{flex:1;overflow-y:auto;padding:16px 16px 6px;display:flex;flex-direction:column;}
+  .bub{margin:7px 0;padding:10px 13px;border-radius:15px;font-size:14.5px;max-width:88%;white-space:pre-wrap;word-break:break-word;line-height:1.6;}
+  .bub.me{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:5px;}
+  .bub.ai{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:5px;}
+  .bub.ai b{color:#0f766e;}
+  .inputbar{display:flex;gap:9px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line);}
+  .inputbar input{flex:1;border:1px solid var(--line);border-radius:13px;padding:12px 14px;font-size:15px;background:#f7f9fc;outline:none;}
+  .inputbar input:focus{background:#fff;border-color:var(--accent);}
+  .inputbar button{background:var(--accent);color:#fff;border:none;border-radius:13px;padding:0 18px;font-size:15px;font-weight:600;}
+  .inputbar button:active{background:#3a57d8;}
+  .quick{display:flex;gap:7px;flex-wrap:wrap;padding:0 14px 10px;background:#fff;}
+  .chip{font-size:12px;padding:6px 11px;border-radius:999px;background:#eef1f8;color:#4a5468;border:none;cursor:pointer;}
+  .chip:active{background:#e1e6f5;}
+  .empty{color:var(--sub);text-align:center;padding:40px 20px;font-size:14px;}
+  /* 规律 / 岗位 */
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px;margin-bottom:13px;box-shadow:0 1px 3px rgba(30,40,80,.04);}
+  .panel h3{margin:0 0 10px;font-size:15px;}
+  .panel p{margin:6px 0;font-size:13.5px;color:#4a5468;line-height:1.7;}
+  .note{font-size:12.5px;color:#66707f;line-height:1.7;}
+  .job{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 13px;border:1px solid var(--line);border-radius:12px;margin-bottom:9px;background:#fff;}
+  .job .c{font-weight:600;font-size:14px;}
+  .job .m{font-size:11.5px;color:var(--sub);margin-top:2px;}
+  .pill{font-size:11px;padding:3px 10px;border-radius:999px;white-space:nowrap;}
+  .pill.todo{background:#eef1f4;color:#64748b;}
+  .pill.applied{background:#dcfce7;color:#15803d;}
+  .pill.interview{background:#fef3c7;color:#b45309;}
+  .field{margin-bottom:13px;}
+  .field label{display:block;font-size:13px;color:#4a5468;margin-bottom:6px;font-weight:600;}
+  .field input,.field select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:11px;font-size:14px;background:#f7f9fc;outline:none;}
+  .field input:focus{background:#fff;border-color:var(--accent);}
+  .hintbox{background:#f1f4fd;border:1px solid #dde4fb;border-radius:12px;padding:12px 14px;font-size:12.5px;color:#48557a;line-height:1.7;margin-top:10px;}
+  .warnbox{background:#fff4e5;border:1px solid #ffe0a3;border-radius:12px;padding:11px 14px;font-size:12.5px;color:#8a5a00;line-height:1.7;margin-top:10px;}
+  /* 移动端：侧边栏变底部导航 */
+  @media (max-width:720px){
+    .app{flex-direction:column;}
+    .sidebar{width:auto;flex-direction:row;padding:8px 6px;align-items:center;gap:4px;}
+    .brand{display:none;}
+    nav{flex-direction:row;flex:1;justify-content:space-around;gap:2px;}
+    .nav{flex-direction:column;gap:2px;padding:6px 4px;font-size:10px;border-radius:10px;}
+    .nav .ic{font-size:18px;}
+    .nav .lb{font-size:10px;}
+    .side-foot{display:none;}
+    .main{padding-bottom:0;}
+    .tab{padding-bottom:0;}
+    .inputbar{padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">陪</div>
+      <div><div class="brand-name">秋招陪跑</div><div class="brand-sub">小陪 · 你的求职搭子</div></div>
+    </div>
+    <nav>
+      <button class="nav active" data-tab="chat" onclick="switchTab('chat')"><span class="ic">💬</span><span class="lb">陪跑</span></button>
+      <button class="nav" data-tab="today" onclick="switchTab('today')"><span class="ic">📅</span><span class="lb">今日日程</span></button>
+      <button class="nav" data-tab="learn" onclick="switchTab('learn')"><span class="ic">📊</span><span class="lb">我的规律</span></button>
+      <button class="nav" data-tab="jobs" onclick="switchTab('jobs')"><span class="ic">📁</span><span class="lb">岗位库</span></button>
+      <button class="nav" data-tab="set" onclick="switchTab('set')"><span class="ic">⚙️</span><span class="lb">设置</span></button>
+    </nav>
+    <div class="side-foot" id="sideStatus"></div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <span class="ttl" id="topTitle">陪跑</span>
+      <span class="tmeta" id="topMeta"></span>
+    </div>
+
+    <!-- 陪跑对话 -->
+    <section class="tab" id="tab-chat">
+      <div class="chat" id="chatlog"></div>
+      <div class="quick" id="quick">
+        <button class="chip" onclick="quick('今天该干嘛')">今天该干嘛</button>
+        <button class="chip" onclick="quick('我英语学了一个小时')">英语学1小时</button>
+        <button class="chip" onclick="quick('下午3点去超市，一小时')">下午去超市</button>
+        <button class="chip" onclick="quick('今天好压抑')">今天好压抑</button>
+        <button class="chip" onclick="quick('资料分析速算时间太短了')">资料分析太短</button>
+        <button class="chip" onclick="quick('刚才那条撤销')">撤销</button>
+      </div>
+      <div class="inputbar">
+        <input id="msg" placeholder="随便说，说人话就行…" onkeydown="if(event.key==='Enter')send()">
+        <button onclick="send()">发送</button>
+      </div>
+    </section>
+
+    <!-- 今日日程 -->
+    <section class="tab hidden" id="tab-today">
+      <div class="pad">
+        <div class="actions">
+          <button class="btn primary" onclick="doAct('newplan')">↻ 重新规划今天</button>
+          <button class="btn" onclick="doAct('newday')">🌅 新的一天</button>
+          <button class="btn" onclick="doAct('review')">📝 复盘</button>
+        </div>
+        <div id="progress"></div>
+        <div class="tl" id="schedule"></div>
+      </div>
+    </section>
+
+    <!-- 我的规律 -->
+    <section class="tab hidden" id="tab-learn">
+      <div class="pad">
+        <div class="panel" id="learnings"></div>
+        <div class="panel">
+          <h3>🕐 作息观察</h3>
+          <div class="note" id="rhythmBox"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 岗位库 -->
+    <section class="tab hidden" id="tab-jobs">
+      <div class="pad">
+        <div class="panel">
+          <h3>📁 岗位库</h3>
+          <div class="note">在「陪跑」里直接说「记岗位 字节跳动 用户运营 北京」「投了字节」就能增删，不用手填。</div>
+          <div id="positions" style="margin-top:12px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 设置 -->
+    <section class="tab hidden" id="tab-set">
+      <div class="pad">
+        <div class="panel">
+          <h3>🤖 AI 接入（关键）</h3>
+          <div class="field">
+            <label>服务商</label>
+            <select id="setProvider" onchange="onProviderChange()">
+              <option value="openrouter">OpenRouter（推荐，Claude/Gemini/GPT 都能用）</option>
+              <option value="siliconflow">硅基流动（DeepSeek/Qwen/GLM 等国产便宜模型）</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>API Key（存在你手机本地，不会上传）</label>
+            <input id="setKey" type="password" placeholder="sk-or-... / sk-...">
+          </div>
+          <div class="field">
+            <label>模型名</label>
+            <input id="setModel" placeholder="openai/gpt-4o-mini">
+            <div class="note" id="modelHint"></div>
+          </div>
+          <button class="btn primary" onclick="saveSettings()">💾 保存设置</button>
+          <div class="hintbox" id="aiState"></div>
+        </div>
+
+        <div class="panel">
+          <h3>⏰ 学习窗口（实验）</h3>
+          <div style="display:flex;gap:10px;">
+            <div class="field" style="flex:1;margin:0;"><label>开始</label><input id="setStart" placeholder="08:30"></div>
+            <div class="field" style="flex:1;margin:0;"><label>结束</label><input id="setEnd" placeholder="21:30"></div>
+          </div>
+          <button class="btn" onclick="saveWindow()">保存窗口</button>
+        </div>
+
+        <div class="panel">
+          <h3>📦 数据</h3>
+          <div class="actions" style="margin:0;">
+            <button class="btn" onclick="exportState()">⬇ 导出进度</button>
+            <button class="btn" onclick="document.getElementById('imp').click()">⬆ 导入进度</button>
+            <button class="btn" onclick="resetAll()">🗑 重置全部</button>
+            <input id="imp" type="file" accept="application/json" style="display:none" onchange="importState(event)">
+          </div>
+          <div class="warnbox">没填 Key 也能用，但只是「规则版」——能听懂固定句式，听不懂口语吐槽。填了 Key 才是真·活人 AI，随便说都接得住。</div>
+        </div>
+
+        <div class="panel">
+          <h3>☁️ 云端同步（防丢 · 跨设备）</h3>
+          <div class="note" style="margin-bottom:10px;">把进度自动存到你的 <b>GitHub 私有 Gist</b>（免费、只有你能看）。开启后<b>换手机 / 清缓存都不丢</b>，换设备填同一个 Token 即恢复全部进度。</div>
+          <div class="field">
+            <label>GitHub Token（只需填一次，存在你手机本地）</label>
+            <input id="setCloudToken" type="password" placeholder="ghp_... 或 github_pat_...">
+          </div>
+          <div class="actions" style="margin:0 0 8px;">
+            <button class="btn primary" onclick="connectCloud()">☁ 开启云端同步</button>
+            <button class="btn" onclick="disconnectCloud()">断开</button>
+          </div>
+          <div class="note" id="cloudStatus">⚪ 未开启云端同步</div>
+          <details style="margin-top:10px;">
+            <summary style="cursor:pointer;font-size:12.5px;color:#48557a;">怎么拿 Token？（30秒，免费）</summary>
+            <div class="note" style="margin-top:8px;line-height:1.9;">
+              1. 打开 <b>github.com</b> → 登录或注册（邮箱即可）<br>
+              2. 右上角头像 → <b>Settings</b> → 最下方 <b>Developer settings</b><br>
+              3. <b>Personal access tokens</b> → <b>Tokens (classic)</b> → <b>Generate new token</b><br>
+              4. Note 随便写；<b>Expiration 选 No expiration</b><br>
+              5. 权限只勾 <b>gist</b> 一项 → <b>Generate token</b><br>
+              6. 复制 <b>ghp_...</b> 那串 → 粘到上面框 → 点「开启云端同步」
+            </div>
+          </details>
+        </div>
+        <div class="hintbox">
+          <b>怎么拿 Key（免费额度都够用）：</b><br>
+          · OpenRouter：openrouter.ai → Sign Up → Keys 里创建，默认送免费额度。<br>
+          · 硅基流动：siliconflow.cn → 控制台 → API 密钥，注册送额度。<br>
+          拿到后粘进上面「API Key」即可。
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+/* ============ 课程数据（高段位运营向） ============ */
+const UNITS = {
+  U01:{stream:'硬技能',title:'Excel 函数 VLOOKUP/XLOOKUP/SUMIFS',min:60,light:false,purpose:'数据运营取数硬门槛',accept:'多条件汇总一张表',kw:['excel','函数','vlookup','xlookup','sumifs']},
+  U02:{stream:'硬技能',title:'Excel 透视表+图表',min:60,light:false,purpose:'数据呈现硬门槛',accept:'交互汇总图',kw:['透视','图表','pivot']},
+  U03:{stream:'硬技能',title:'SQL 查询 SELECT/JOIN/GROUP BY',min:90,light:false,purpose:'取数入门',accept:'关联聚合查询',kw:['sql','查询','join','select','group']},
+  U04:{stream:'硬技能',title:'SQL 窗口函数+子查询',min:90,light:false,purpose:'笔试高频难点',accept:'窗口函数算排名',kw:['窗口','子查询','window']},
+  U05:{stream:'硬技能',title:'SQL 刷题 (SQLZoo/牛客)',min:90,light:false,purpose:'数据分析笔试硬门槛',accept:'10+题',kw:['刷题','sqlzoo','牛客']},
+  U06:{stream:'硬技能',title:'增长漏斗/留存/北极星指标',min:60,light:false,purpose:'增长运营方法论',accept:'能画用户漏斗',kw:['漏斗','留存','北极星','增长']},
+  U07:{stream:'硬技能',title:'A/B 测试基础',min:60,light:false,purpose:'策略/增长运营核心',accept:'讲清一次AB实验设计',kw:['ab','ab测试','显著性','分流']},
+  U08:{stream:'硬技能',title:'Python pandas 数据清洗',min:90,light:false,purpose:'自动化取数加分',accept:'脏表→规范表',kw:['pandas','python','清洗']},
+  U09:{stream:'硬技能',title:'项目：增长/留存分析报告',min:120,light:false,purpose:'简历项目/面试谈资',accept:'一份分析报告',kw:['项目','分析报告','eda']},
+  U10:{stream:'硬技能',title:'行业研究：拆解1个产品的增长路径',min:60,light:false,purpose:'高段位运营业务sense',accept:'画增长路径图',kw:['行业','拆解','增长路径','产品','商业']},
+  U11:{stream:'硬技能',title:'BI工具(Tableau/帆软)入门',min:90,light:false,purpose:'数据运营加分项',accept:'连表出图',kw:['bi','tableau','帆软','powerbi','可视化']},
+  U20:{stream:'简历',title:'看"简历一百问"自评，列3个待改点',min:60,light:false,purpose:'避坑',accept:'改点清单',kw:['简历一百问','简历自评','简历','一百问']},
+  U21:{stream:'简历',title:'产出数据/增长运营简历初稿',min:120,light:false,purpose:'投递门槛',accept:'完整版',kw:['简历初稿','写简历','resume','初稿']},
+  U22:{stream:'简历',title:'按投递岗位微调简历',min:60,light:false,purpose:'匹配度',accept:'JD关键词对齐',kw:['微调','改简历','对齐']},
+  U24:{stream:'简历',title:'产出1份运营方案/活动策划作品',min:120,light:false,purpose:'作品集/面试谈资',accept:'一份方案',kw:['运营方案','活动策划','作品','方案']},
+  U30:{stream:'投递',title:'挑岗+投递（外企运营+央国企×5）',min:45,light:false,purpose:'拿面试',accept:'当日投递记录',kw:['挑岗','投递','投简历','投出','岗位']},
+  U31:{stream:'投递',title:'研究1家公司（业务/笔面流程）',min:30,light:false,purpose:'面试谈资',accept:'公司速记卡',kw:['研究公司','公司速记','公司']},
+  U32:{stream:'投递',title:'更新投递追踪表(公司-岗位-进度)',min:15,light:false,purpose:'不漏笔面',accept:'表已更新',kw:['追踪表','投递表','进度表']},
+  U33:{stream:'投递',title:'搭建网申素材库(自我介绍/开放题)',min:60,light:false,purpose:'网申提速',accept:'素材就绪',kw:['网申','素材库','开放题','自我介绍']},
+  U40:{stream:'行测',title:'资料分析速算',min:45,light:false,purpose:'央国企笔试提速',accept:'限时5道',kw:['资料分析','速算','资料']},
+  U41:{stream:'行测',title:'言语理解',min:45,light:false,purpose:'笔试通过',accept:'小节练习',kw:['言语']},
+  U42:{stream:'行测',title:'判断推理/数量关系',min:45,light:false,purpose:'笔试通过',accept:'小节练习',kw:['判断','推理','数量']},
+  U43:{stream:'行测',title:'套卷模考',min:90,light:false,purpose:'适应节奏',accept:'一套卷',kw:['套卷','模考','行测卷']},
+  U50:{stream:'测评',title:'行测类测评模拟',min:60,light:false,purpose:'测评通过',accept:'一套模拟',kw:['测评模拟','测评']},
+  U51:{stream:'测评',title:'性格/职业测评策略',min:60,light:false,purpose:'不踩雷',accept:'答题策略总结',kw:['性格','职业测评']},
+  U52:{stream:'测评',title:'【紧急】收到公司测评链接→48-72h完成',min:60,light:false,purpose:'进下一轮',accept:'提交截图',kw:['测评','链接','截止','紧急'],urgent:true},
+  U60:{stream:'面试',title:'行为面 BQ：1个STAR故事',min:60,light:false,purpose:'行为面',accept:'2分钟可讲',kw:['行为面','star','bq','故事']},
+  U61:{stream:'面试',title:'技术面 SQL/Excel 现场题模拟',min:60,light:false,purpose:'技术面通过',accept:'限时3题',kw:['技术面','现场题','模拟面']},
+  U62:{stream:'面试',title:'无领导小组讨论角色(破冰/总结/时间官)',min:60,light:false,purpose:'群面不懵',accept:'说清3种角色',kw:['无领导','群面','讨论','角色']},
+  U63:{stream:'面试',title:'无领导模拟(自言自语1题+复盘)',min:45,light:false,purpose:'表达流畅',accept:'2分钟陈述',kw:['无领导模拟','群面模拟','复盘']},
+  U64:{stream:'面试',title:'表达训练：PREP讲清一件事',min:60,light:false,purpose:'面试表达',accept:'PREP讲1件事',kw:['表达','prep','讲清楚']},
+  U65:{stream:'面试',title:'商业案例拆解练习(1题+复盘)',min:60,light:false,purpose:'高段位运营面',accept:'拆解1案例',kw:['商业案例','案例','拆解练习']},
+  U66:{stream:'投递',title:'岗位广度：看1个非主方向岗JD(销售/行政/文员等)',min:20,light:true,purpose:'不排斥其他机会',accept:'速记1岗职责',kw:['销售','行政','文员','其他岗','广度','非主方向']},
+  U_ENG:{stream:'英语',title:'英语练习（听力30+口语20+阅读10）',min:60,light:false,purpose:'外企沟通基础+面试英语',accept:'听懂1段+说1分钟+概括1段',kw:['英语','english','听力','口语','阅读','技术文档']},
+  L1:{stream:'面试',title:'轻松：看1个运营面经视频',min:30,light:true,purpose:'保持手感',accept:'看完1个',kw:['面经','视频']},
+  L2:{stream:'投递',title:'轻松：整理今日投递记录',min:15,light:true,purpose:'不漏投',accept:'记录更新',kw:['整理','记录']},
+  L3:{stream:'英语',title:'轻松：英语听力泛听',min:30,light:true,purpose:'语感',accept:'泛听1段',kw:['泛听']},
+  L4:{stream:'硬技能',title:'轻松：复习SQL/Excel笔记',min:30,light:true,purpose:'巩固',accept:'过一遍笔记',kw:['复习','笔记']},
+  L5:{stream:'行测',title:'轻松：看1个行测技巧短视频/读1篇方法论',min:30,light:true,purpose:'保持手感',accept:'看完1个',kw:['行测技巧','技巧视频']},
+  L6:{stream:'简历',title:'轻松：翻看自己简历1遍找1个可优化点',min:20,light:true,purpose:'不荒废',accept:'找到1点',kw:['翻简历','看简历']},
+};
+const STREAMS=['硬技能','简历','投递','行测','测评','面试','英语'];
+const COLOR={硬技能:'#4f6ef7',简历:'#f0883e',投递:'#16a34a',行测:'#9333ea',测评:'#e11d48',面试:'#0891b2',英语:'#ca8a04',fixed:'#94a3b8'};
+const LOW_MAP={硬技能:'L4',英语:'L3',面试:'L1',投递:'L2',行测:'L5',简历:'L6'};
+
+/* ============ 状态 ============ */
+const KEY='liuxue_coach_v2';
+let S=null;
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function toMin(hm){const [h,m]=hm.split(':').map(Number);return h*60+m;}
+function toHM(m){m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
+function uid(){return Math.random().toString(36).slice(2,9);}
+function stripTags(s){return (s||'').replace(/<[^>]*>/g,'');}
+
+function initState(){
+  S={date:todayStr(),dayStart:'08:30',dayEnd:'21:30',energy:'normal',
+     fixed:[],done:[],remaining:[],deferred:[],pointers:{},totals:{},log:[],rhythm:{meals:[]},
+     history:[],learnings:{capacityFactor:1,notes:[],totalDays:0,lastReviewed:null,lastSummary:null},positions:[],
+     undoStack:[],unitOverrides:{},chat:[],settings:{provider:'openrouter',apiKey:'',model:'openai/gpt-4o-mini'},cloud:{enabled:false,token:'',gistId:'',lastSync:null}};
+  STREAMS.forEach(s=>{S.pointers[s]=0;S.totals[s]=0;});
+  buildRemaining();
+  reconcile();
+}
+function getUnit(id){
+  const u=UNITS[id];
+  if(!u)return u;
+  const ov=(S&&S.unitOverrides)?S.unitOverrides[id]:null;
+  if(!ov)return u;
+  return {...u,...ov};
+}
+function pushUndo(label){
+  if(!S.undoStack)S.undoStack=[];
+  S.undoStack.push({label:label.slice(0,30),snap:JSON.parse(JSON.stringify({
+    remaining:S.remaining,done:S.done,plan:S.plan,fixed:S.fixed,
+    totals:S.totals,energy:S.energy,deferred:S.deferred,history:S.history||[],unitOverrides:S.unitOverrides||{}
+  }))});
+  if(S.undoStack.length>10)S.undoStack.shift();
+}
+function handleUndo(){
+  if(!S.undoStack||!S.undoStack.length)return '没有可以撤销的操作。';
+  const last=S.undoStack.pop();
+  const k=last.snap;
+  S.remaining=k.remaining;S.done=k.done;S.plan=k.plan;S.fixed=k.fixed;
+  S.totals=k.totals;S.energy=k.energy;S.deferred=k.deferred;S.history=k.history;S.unitOverrides=k.unitOverrides;
+  reconcile();
+  return '好的，我撤回了上一步（'+last.label+'）。刚才识别错了对不起 🙏 时间表已经恢复。';
+}
+function handleFeedback(t){
+  pushUndo('调整任务时长');
+  const unitId=matchUnit(t);
+  if(!unitId){
+    if(/少|短|不够|多一点|延长|加|增加/.test(t))return '你想给哪个任务多排点时间？直接说"资料分析速算多一点"就行。';
+    if(/多|长|少一点|缩短|减|减少/.test(t))return '你想给哪个任务少排点时间？直接说"英语少一点"就行。';
+    return '你想调整什么？说具体任务+多/少/长/短，比如"资料分析速算延长到60分钟"。';
+  }
+  const u=getUnit(unitId);
+  let newMin=u.min;
+  const explicit=t.match(/(\d+)\s*(?:分钟|min)/i);
+  if(explicit){newMin=parseInt(explicit[1]);}
+  else if(/延|长|多|加|增加|多一点|放大|扩/.test(t)){newMin=u.min+15;}
+  else if(/缩|短|少|减|减少|小一点|少一点|压/.test(t)){newMin=u.min-15;}
+  else return '你想让"'+u.title+'"时间长一点还是短一点？';
+  newMin=Math.max(15,newMin);
+  if(!S.unitOverrides)S.unitOverrides={};
+  S.unitOverrides[unitId]={...(S.unitOverrides[unitId]||{}),min:newMin};
+  pushHistory({date:S.date,type:'feedback',unitId,stream:u.stream,planned:u.min,actual:newMin,note:t.slice(0,80)});
+  reconcile();
+  return '收到 🫡 我把 <b>'+u.title+'</b> 从 '+u.min+' 分钟调成 '+newMin+' 分钟，后面已经重新顺延。以后默认也按 '+newMin+' 分钟排，你可以随时说"恢复默认"或"撤销"改回来。';
+}
+function pushHistory(h){
+  S.history=S.history||[];
+  const dup=S.history.find(x=>x.date===h.date&&x.type===h.type&&x.unitId===h.unitId&&x.stream===h.stream);
+  if(dup)return;
+  S.history.push(h);
+}
+function cycleStream(stream,n){
+  const pool=Object.keys(UNITS).filter(id=>{const u=getUnit(id);return u.stream===stream&&!u.light;});
+  const doneIds=new Set(S.done.map(d=>d.unitId));
+  const res=[];let p=S.pointers[stream]||0;let guard=0;
+  while(res.length<n&&guard<pool.length+8){
+    const u=pool[p%pool.length];p++;
+    if(!doneIds.has(u))res.push(u);
+    guard++;
+  }
+  S.pointers[stream]=p;return res;
+}
+function buildRemaining(){
+  const r=[];
+  if(S.energy==='low'){
+    STREAMS.forEach(s=>{const id=LOW_MAP[s];if(id&&UNITS[id])r.push(id);});
+  }else{
+    cycleStream('硬技能',2).forEach(x=>r.push(x));
+    r.push(...cycleStream('英语',1));
+    r.push(...cycleStream('行测',1));
+    r.push(...cycleStream('投递',1));
+    r.push(...cycleStream('简历',1));
+    r.push(...cycleStream('面试',1));
+  }
+  S.remaining=r;
+}
+function freeWindows(){
+  let wins=[{start:toMin(S.dayStart),end:toMin(S.dayEnd)}];
+  const anchors=[...S.fixed,...S.done].map(a=>({start:toMin(a.start),end:toMin(a.end)}))
+                  .sort((a,b)=>a.start-b.start);
+  for(const a of anchors){
+    const nw=[];
+    for(const w of wins){
+      if(a.end<=w.start||a.start>=w.end){nw.push(w);continue;}
+      if(a.start>w.start)nw.push({start:w.start,end:a.start});
+      if(a.end<w.end)nw.push({start:a.end,end:w.end});
+    }
+    wins=nw;
+  }
+  return wins;
+}
+function reconcile(){
+  let wins=freeWindows();
+  const plan=[];const deferred=[];
+  const cf=S.learnings.capacityFactor||1;
+  for(const id of S.remaining){
+    const u=getUnit(id);let placed=false;
+    const eff=Math.round(u.min*cf);
+    for(let i=0;i<wins.length;i++){
+      if(wins[i].end-wins[i].start>=eff){
+        const st=wins[i].start;plan.push({unitId:id,start:toHM(st),end:toHM(st+eff)});
+        wins[i]={start:st+eff,end:wins[i].end};placed=true;break;
+      }
+    }
+    if(!placed)deferred.push(id);
+  }
+  S.plan=plan;S.deferred=deferred;
+  S.deferred.forEach(id=>pushHistory({date:S.date,type:'deferred',unitId:id,stream:UNITS[id].stream}));
+  save();render();
+}
+function parseMinutes(t){
+  let m=t.match(/(\d+(?:\.\d+)?)\s*(?:个)?\s*(小时|钟头|h\b|hr)/i);
+  if(m)return Math.round(parseFloat(m[1])*60);
+  const cn={'一':1,'二':2,'两':2,'三':3,'四':4,'五':5,'半':0.5};
+  m=t.match(/([一二两三四五半])\s*个?\s*小时/);
+  if(m)return Math.round((cn[m[1]]||1)*60);
+  m=t.match(/(\d+)\s*(?:分钟|min)/i);if(m)return parseInt(m[1]);
+  if(/半小时/.test(t))return 30;
+  return null;
+}
+function parseTime(t){
+  let m=t.match(/(\d{1,2})\s*[:：]\s*(\d{2})/);if(m)return m[1]*1*60+m[2]*1;
+  const ap=(t.match(/(上午|早上|中午|下午|晚上|傍晚)/)||[])[1]||'';
+  m=t.match(/(\d{1,2})\s*点(?:半)?/);if(!m)return null;
+  let h=m[1]*1;const half=/半/.test(t)?30:0;
+  if(ap==='下午'||ap==='晚上'||ap==='傍晚'){if(h<12)h+=12;}
+  if(ap==='中午'&&h===12)h=12;if((ap==='上午'||ap==='早上')&&h===12)h=0;
+  return h*60+half;
+}
+function findTimes(t){
+  const out=[];
+  const re=/(?:上午|早上|中午|下午|晚上|傍晚)?\s*(\d{1,2})\s*[:：]\s*(\d{2})|(上午|早上|中午|下午|晚上|傍晚)?\s*(\d{1,2})\s*点\s*(半)?/g;
+  let m;
+  while((m=re.exec(t))){
+    if(m[1]!==undefined){ out.push(m[1]*60 + (+m[2])); }
+    else{
+      let h=+m[4];const ap=m[3]||'';
+      if((ap==='下午'||ap==='晚上'||ap==='傍晚')&&h<12)h+=12;
+      if((ap==='上午'||ap==='早上')&&h===12)h=0;
+      out.push(h*60 + (m[5]?30:0));
+    }
+  }
+  return out;
+}
+function matchUnit(t){
+  const tl=(t||'').toLowerCase();
+  let best=null,bestScore=0;
+  for(const id in UNITS){
+    const u=UNITS[id];let sc=0;
+    for(const k of u.kw){if(tl.includes(k.toLowerCase()))sc+=k.length;}
+    if(sc>bestScore){bestScore=sc;best=id;}
+  }
+  return bestScore>0?best:null;
+}
+function classify(t){
+  if(isVent(t))return 'vent';
+  if(/撤销|恢复|取消|删掉|删除|弄错了|不是我|(?:我|你)(?:并)?没有(?:完成|做完|做)|我没做|我没完成|我没做完|别记录|别记|撤回|回退|刚才那(?:条|个|句)|不对|错了|去掉|重置/.test(t))return 'undo';
+  if((/觉得|认为|感觉|分配|安排|时间|时长|调|改|加|减|延|缩/).test(t)
+     && (/少|短|长|多|不够|一点|延|缩|调|加|减|改|扩|压/).test(t)
+     && (matchUnit(t)||/时间|时长|计划/.test(t)))return 'feedback';
+  if((/建议|该怎么办|帮我分析|给我点建议|该怎么走|我该怎么办|分析一下|给我出个/).test(t)&&!/测评|笔试/.test(t))return 'advice';
+  if(/测评|笔试/.test(t)&&/来了|收到|链接|截止|要做|通知/.test(t))return 'urgent';
+  if(/超市|吃饭|早餐|午餐|晚餐|夜宵|检查|医院|睡觉|休息|运动|逛|出门|约会|办事|快递|取|理发|洗澡|午休|午睡|不干活|不做了|歇会儿|歇一歇|什么都不做|接下来.*(?:小时|分钟).*(?:不|休息)|我要休息|休息.*(?:小时|分钟)|暂停|放空|摸鱼|暂时不|先不.*了|我不干|我没空/.test(t))return 'interrupt';
+  if(/状态差|累|困|不想动|没精神|效率差|疲惫|乏力/.test(t))return 'energyLow';
+  if(/精神好|状态好|效率高|精力旺|有力气/.test(t))return 'energyHigh';
+  if(/复盘|总结今天|今天总结|每日复盘|今天复盘/.test(t))return 'review';
+  if(/我的规律|越用越准|学习情况|记性|我学得/.test(t))return 'learnings';
+  if(/记岗位|加岗位|添加岗位/.test(t))return 'positionAdd';
+  if(/投了(.+)/.test(t))return 'markApplied';
+  if(/(进面|拿到.{0,6}面试|面试通过|约面|面邀|面了.{1,6})/.test(t))return 'markInterview';
+  if(/^岗位|看岗位|我的岗位|岗位库|列岗位|岗位清单/.test(t))return 'positionList';
+  if(/作息|观察/.test(t))return 'rhythm';
+  if((/睡|起床|起学|醒来/).test(t)&&findTimes(t).length)return 'rhythmLog';
+  if((/学习时间|改成|调整为|开始学|从.*点|到.*点/).test(t)&&findTimes(t).length>0)return 'setwindow';
+  if((/完成|做完了|学(了|完)|练(了|完)|看(了|完)|写(了|完)|投(了|完)|做了|刷了|过(了|完)|搞(了|完)|弄(了|完)|结束|搞定|ok|OK|可以了|对的|是的|搞定了/).test(t)
+     && !/没完成|没做|没学|没练|没看|没写|没投|不想|不想做|不愿意|别|不要|不是|没做完|没搞|没弄/.test(t)
+     && matchUnit(t))return 'log';
+  if(/重新|规划|安排|今天干嘛|该干嘛|排一下|怎么排/.test(t))return 'newplan';
+  return 'unknown';
+}
+function actNewplan(){pushUndo('重新规划今天');buildRemaining();reconcile();return '已按当前状态重新规划今天 ✅<br><br>'+giveAdvice();}
+function actNewday(){
+  pushUndo('新的一天');
+  reviewDay();
+  const carry=[...S.deferred,...S.remaining.filter(id=>!S.done.find(d=>d.unitId===id))];
+  const oldLog=S.log.slice(-20);
+  const keepHistory=S.history,keepLearn=S.learnings,keepPos=S.positions,keepChat=S.chat;
+  initState();
+  S.history=keepHistory;S.learnings=keepLearn;S.positions=keepPos;S.chat=keepChat;
+  S.date=todayStr();
+  if(carry.length){S.remaining=[...carry,...S.remaining];}
+  S.log=oldLog;
+  reconcile();
+  return '🌅 新的一天：昨日未完成已顺延到今天，学习沉淀已保留。';
+}
+function logProgress(t){
+  pushUndo('记录完成：'+t.slice(0,20));
+  const unitId=matchUnit(t);
+  if(!unitId)return '没太懂你做了什么，能说下具体任务名吗？（如"SQL做完了""英语学了一个小时"）';
+  const u=getUnit(unitId);
+  const M=parseMinutes(t)||u.min;
+  const blk=S.plan.find(b=>b.unitId===unitId);
+  pushHistory({date:S.date,type:'done',unitId,stream:u.stream,planned:u.min,actual:M,offplan:!blk});
+  if(blk){
+    const st=toMin(blk.start);
+    S.done.push({unitId,start:blk.start,end:toHM(st+M),actual:M});
+    S.remaining=S.remaining.filter(id=>id!==unitId);
+    S.totals[u.stream]=(S.totals[u.stream]||0)+1;
+    reconcile();
+    const tail = M>u.min ? '顺延' : '重排';
+    return '已记录：<b>'+u.title+'</b> 实际 '+M+' 分钟（计划 '+u.min+' 分钟），后续任务已'+tail+'。';
+  }else{
+    S.done.push({unitId,start:'—',end:'—',actual:M,offplan:true});
+    S.totals[u.stream]=(S.totals[u.stream]||0)+1;
+    reconcile();
+    return '已记录 <b>'+u.title+'</b> 完成（'+M+'分钟），但它不在今日计划时段里，我标注了"已完成"，不影响排期。';
+  }
+}
+function handleInterrupt(t){
+  pushUndo('插入生活块：'+t.slice(0,20));
+  const label=(t.match(/超市|吃饭|早餐|午餐|晚餐|夜宵|检查|医院|睡觉|休息|运动|逛|出门|约会|办事|快递|取|理发|洗澡|午休|午睡|不干活|不做了|歇会儿|歇一歇|什么都不做|接下来.*(?:小时|分钟).*(?:不|休息)|我要休息|休息.*(?:小时|分钟)|暂停|放空|摸鱼|暂时不|先不.*了|我不干|我没空/)||['事务'])[0];
+  let start=parseTime(t);if(start===null)start=toMin(S.dayEnd)-60;
+  let dur=parseMinutes(t)||60;
+  if(start+dur>toMin(S.dayEnd)){dur=toMin(S.dayEnd)-start;if(dur<15)dur=15;}
+  S.fixed.push({id:uid(),label,start:toHM(start),end:toHM(start+dur)});
+  if(/吃饭|早餐|午餐|晚餐|夜宵|午休|午睡/.test(label)){
+    if(!S.rhythm)S.rhythm={meals:[]};
+    S.rhythm.meals.push(start);
+    if(S.rhythm.meals.length>20)S.rhythm.meals.shift();
+  }
+  reconcile();
+  let note='已插入生活块：<b>'+label+'</b> '+toHM(start)+'–'+toHM(start+dur)+'，后续任务已级联后移。';
+  if(/吃饭|早餐|午餐|晚餐|夜宵/.test(label))note+='（已记入作息规律）';
+  return note;
+}
+function setEnergy(e){
+  pushUndo('切换状态');
+  S.energy=e;buildRemaining();reconcile();
+  if(e==='low')return '状态差模式：重任务已替换为轻量任务（看视频/泛听/复习/整理），重活顺延。';
+  if(e==='high')return '状态不错：已按满格节奏排满今天。';
+  return '已恢复为正常节奏。';
+}
+function handleUrgent(t){
+  pushUndo('紧急插队');
+  const isTest=/笔试/.test(t);
+  const id=isTest?'U43':'U52';
+  const u=UNITS[id];
+  S.remaining=[id,...S.remaining.filter(x=>x!==id)];
+  const deadline=/明天|48|今日|今天|紧迫|急/.test(t);
+  reconcile();
+  let note='';
+  if(deadline)note='（你提到紧急，已尽量提前）';
+  if(S.plan.find(b=>b.unitId===id))
+    return '🚨 已插队：<b>'+u.title+'</b> 排入今天空档'+note+'。';
+  return '🚨 <b>'+u.title+'</b> 今天排不下了，已放入"顺延"队列，明天首位处理。建议你尽快手动补做。';
+}
+function setWindow(t){
+  pushUndo('调整学习窗口');
+  const ts=findTimes(t);
+  if(ts.length===0)return '没识别到时间，试试"学习时间8:30到21:30"或"今天从9点开始"。';
+  const changed=[];
+  if(ts.length>=2){
+    S.dayStart=toHM(ts[0]);S.dayEnd=toHM(ts[1]);
+    changed.push('开始'+S.dayStart+' 结束'+S.dayEnd);
+  }else if(ts.length===1){
+    if(/开始|起|从|起床|起学/.test(t)){S.dayStart=toHM(ts[0]);changed.push('开始'+S.dayStart);}
+    else{S.dayEnd=toHM(ts[0]);changed.push('结束'+S.dayEnd);}
+  }
+  reconcile();
+  return '⏰ 已更新学习时间窗口：<b>'+S.dayStart+'–'+S.dayEnd+'</b>。'+(changed.length?'（'+changed.join('，')+'）':'');
+}
+function recordRhythm(t){
+  const ts=findTimes(t);
+  if(!S.rhythm)S.rhythm={meals:[]};
+  if(/睡/.test(t)&&ts.length){S.rhythm.sleep=ts[0];return '🌙 已记录你约 '+toHM(ts[0])+' 入睡，我会在节奏里参考。';}
+  if(/(起床|起学|醒来|起)/.test(t)&&ts.length){S.rhythm.wake=ts[0];return '🌅 已记录你约 '+toHM(ts[0])+' 起床。';}
+  return showRhythm();
+}
+function showRhythm(){
+  if(!S.rhythm)S.rhythm={meals:[]};
+  let s='· 你常在 ';
+  if(S.rhythm.meals&&S.rhythm.meals.length){
+    const freq={};S.rhythm.meals.forEach(m=>{const h=Math.floor(m/60);freq[h]=(freq[h]||0)+1;});
+    const top=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]+'点('+e[1]+'次)').join('、');
+    s+=top+' 左右吃饭<br>';
+  }else{s+='还没记录到吃饭时间，告诉我"12点半吃饭"我来记。<br>';}
+  if(S.rhythm.wake)s+='· 最近起床约 '+toHM(S.rhythm.wake)+'<br>';
+  if(S.rhythm.sleep)s+='· 最近入睡约 '+toHM(S.rhythm.sleep)+'<br>';
+  s+='当前默认学习窗口：'+S.dayStart+'–'+S.dayEnd+'。规律够多了可让我"改成X点到Y点"微调。';
+  return s;
+}
+function isVent(t){
+  return /(好?难受|想哭|崩溃|委屈|emo|丧|摆烂|没动力|学不下去|不想学|刷.*小红书.*焦虑|小红书.*好焦虑|焦虑|压抑|压力|慌|迷茫|不知道自己?要?干嘛|不知道要|想放弃|没有目标|没方向|好难|难过)/.test(t);
+}
+function ventEmotion(t){
+  if(/焦虑|压抑|压力|慌|刷.*小红书|迷茫/.test(t))return 'anxiety';
+  if(/难受|想哭|崩溃|委屈|emo|丧|哭|想放弃|难过/.test(t))return 'sad';
+  if(/学不下去|不想学|没动力|摆烂/.test(t))return 'tired';
+  if(/不知道自己?要?干嘛|不知道要|没有目标|没方向/.test(t))return 'lost';
+  return 'default';
+}
+function handleVent(t){
+  pushUndo('情绪模式');
+  const emo=ventEmotion(t);
+  const lines={
+    anxiety:'先停一下。刷小红书看别人进度最容易焦虑——那是别人的剧本，不是你的。秋招本来就乱，慢一点≠掉队，没人能按标准答案走。',
+    sad:'难受就难受，别憋着。今天允许自己不完美，先让自己缓过来，比硬撑着学有用得多。',
+    tired:'累就歇，硬坐着也没效率。我帮你把今天的重活砍了，留点轻松的，剩下的明天再说。',
+    lost:'不知道要干嘛太正常了，大家都是边投边找的。我们先按"运营 / 数据 / 运维"主方向走，其他机会（销售/行政/文员…）碰到了也不放过——方向是试出来的，不是坐在那儿想出来的。',
+    default:'我听到了。今天先别逼自己，状态比计划重要。'
+  };
+  const msg=lines[emo]||lines.default;
+  setEnergy('low');
+  const ws=toMin(S.dayStart),we=toMin(S.dayEnd);
+  const mid=Math.round((ws+we)/2);
+  S.fixed.push({id:uid(),label:'休息·缓一缓',start:toHM(mid),end:toHM(mid+30)});
+  reconcile();
+  return msg+'<br><br>我已经把今天切成 <b>轻量模式</b>（看视频 / 泛听 / 复习 / 整理），并在中段插了一个 <b>30 分钟休息块</b>。等你缓过来，跟我说"状态好了"我就把重活排回来。想聊的话，我在这儿，不急着学。';
+}
+function giveAdvice(){
+  const tips=[];
+  if(S.deferred.length)tips.push('今天有 '+S.deferred.length+' 项排不下，已顺延到明天首位——别焦虑，这说明你排得满，不是你慢。');
+  const td=S.done.filter(d=>getUnit(d.unitId).stream==='投递').length;
+  if(td===0)tips.push('秋招投递是命脉：今天至少挑 3–5 个岗投出去，投了才有面试、才有后续一切。');
+  if(S.energy==='low')tips.push('你今天状态偏低，已经是轻量模式——允许自己慢，重活明天补，不丢人。');
+  if(!tips.length)tips.push('节奏不错。记住：运营/数据岗都看重"用数据说话"，每个项目尽量带指标和结果。');
+  return '💡 今日建议：<br>· '+tips.join('<br>· ');
+}
+function handleAdvice(){return giveAdvice();}
+function reviewDay(){
+  const day=S.date;
+  const done=S.history.filter(h=>h.date===day&&h.type==='done');
+  if(done.length){
+    const ratio=done.reduce((a,h)=>a+(h.actual/h.planned),0)/done.length;
+    S.learnings.capacityFactor=Math.max(0.8,Math.min(1.6,+ratio.toFixed(2)));
+  }
+  const deferred=S.history.filter(h=>h.date===day&&h.type==='deferred');
+  const byStream={};done.forEach(h=>byStream[h.stream]=(byStream[h.stream]||0)+1);
+  S.learnings.lastSummary={date:day,done:done.length,deferred:deferred.length,byStream};
+  if(S.learnings.lastReviewed!==day){
+    const notes=[];
+    if(deferred.length)notes.push('今日有 '+deferred.length+' 项溢出（排太满），已自动加缓冲，下次同口径少排点。');
+    if(done.length)notes.push('今日完成 '+done.length+' 项，平均耗时约为计划的 '+Math.round(S.learnings.capacityFactor*100)+'%。');
+    if(notes.length)S.learnings.notes=[...notes,...S.learnings.notes].slice(0,5);
+    S.learnings.totalDays=(S.learnings.totalDays||0)+1;
+    S.learnings.lastReviewed=day;
+  }
+}
+function showLearnings(){
+  reviewDay();
+  const L=S.learnings;
+  let s='🧠 <b>我的规律（越用越准）</b><br>';
+  s+='· 累计记录：'+(L.totalDays||0)+' 天<br>';
+  s+='· 时间系数：你实际耗时≈计划的 '+Math.round((L.capacityFactor||1)*100)+'%（&gt;100% 说明常超时，排期已自动加缓冲；&lt;100% 说明你比计划快，会排更满）<br>';
+  if(L.lastSummary){const bs=Object.entries(L.lastSummary.byStream||{}).map(e=>e[0]+' '+e[1]).join('、');s+='· 上次复盘（'+L.lastSummary.date+'）：完成 '+L.lastSummary.done+'，溢出 '+L.lastSummary.deferred+(bs?'，分布：'+bs:'')+'<br>';}
+  if(L.notes&&L.notes.length)s+='· 最近提醒：<br>　· '+L.notes.join('<br>　· ')+'<br>';
+  const pos=S.positions||[];if(pos.length)s+='· 岗位库：'+pos.length+' 个（在「岗位库」查看）<br>';
+  s+='这些会反过来调我的排期——你用得越多，计划越贴合你真实节奏。';
+  return s;
+}
+function handleReview(){
+  reviewDay();
+  let s='📝 <b>今日复盘</b><br>· 完成 '+S.done.length+' 项、溢出 '+S.deferred.length+' 项、状态'+(S.energy==='low'?'偏低（已切轻量）':'正常')+'。';
+  const ov=S.plan.reduce((a,b)=>{const u=UNITS[b.unitId];return a+Math.round(u.min*(S.learnings.capacityFactor||1));},0);
+  s+='<br>· 今日计划总时长约 '+Math.round(ov/60*10)/10+' 小时（含缓冲系数）。<br><br>';
+  s+=showLearnings().replace(/^🧠.*?<br>/,'');
+  return s;
+}
+function handlePositionAdd(t){
+  pushUndo('添加岗位');
+  let r=t.replace(/记岗位|加岗位|添加岗位|岗位[:：]?/g,'').replace(/^[\s：:]*/,'').trim();
+  if(!r)return '说一下岗位，例如"记岗位 字节跳动 用户运营 北京"。多条用换行或分号隔开。';
+  const cityList=['北京','上海','广州','深圳','杭州','成都','南京','武汉','西安','天津','苏州','重庆','青岛','长沙','合肥','石家庄','雄安','廊坊','保定','济南','郑州','宁波','无锡','福州','厦门'];
+  const lines=r.split(/[\n；;]/).map(x=>x.trim()).filter(Boolean);
+  let added=0;
+  lines.forEach(line=>{
+    let city='',role='',company=line;
+    for(const c of cityList){if(line.includes(c)){city=c;company=line.replace(c,'').trim();break;}}
+    const parts=company.split(/[\s\-—]+/).filter(Boolean);
+    if(parts.length>=2){company=parts[0];role=parts.slice(1).join(' ');}else{role='待定';}
+    S.positions.push({id:uid(),company,role,city,status:'todo',created:S.date});
+    added++;
+  });
+  save();
+  return '已记 '+added+' 个岗位到「岗位库」✅（去「岗位库」查看；"投了<公司>"标记已投）。';
+}
+function listPositions(){
+  const ps=S.positions||[];
+  if(!ps.length)return '岗位库还是空的。用"记岗位 公司 岗位 城市"添加，或把高顿/牛客看到的岗位粘贴进来。';
+  let s='📋 <b>岗位库（'+ps.length+'）</b><br>';
+  ps.forEach((p,i)=>{s+=(i+1)+'. '+p.company+' · '+p.role+(p.city?' · '+p.city:'')+' ［'+(p.status==='applied'?'已投':p.status==='interview'?'面试中':'待投')+'］<br>';});
+  return s+'<br>标记已投："投了<公司名>"；标记面试："进面<公司名>"。';
+}
+function markPosition(t,kind){
+  pushUndo('标记岗位状态');
+  let m=t.match(/投了(.+?)(?:的|吗|呢|了|$)/)||t.match(/(?:进面|面试|面了)(.+?)(?:的|吗|呢|了|$)/);
+  if(!m)return '没听清公司名，说"投了字节"或"进面字节"这样。';
+  const name=m[1].trim();
+  const ps=S.positions||[];
+  const hit=ps.filter(p=>p.company.includes(name)||name.includes(p.company));
+  if(!hit.length)return '岗位库里没找到含"'+name+'"的岗位，先"记岗位"一下？';
+  hit.forEach(p=>p.status=kind);
+  save();
+  return '✅ 已将「'+hit.map(p=>p.company).join('、')+'」标记为'+(kind==='applied'?'已投':'面试中')+'。';
+}
+function handleUnknown(){
+  const qs=['你刚完成了某个任务？','接下来有事/想休息一会儿？','想调整某个任务的时间？','今天状态不好，想聊聊？'];
+  return '嗯，我没太 get 到 🤔 直接说人话就行——<br>'+qs.map((q,i)=>(i+1)+') '+q).join('<br>')+'<br>不用按格式，把真实想法打出来。';
+}
+function process(t){
+  t=t.trim();
+  if(!t)return;
+  const c=classify(t);let reply;
+  if(c==='vent')reply=handleVent(t);
+  else if(c==='undo')reply=handleUndo();
+  else if(c==='feedback')reply=handleFeedback(t);
+  else if(c==='advice')reply=handleAdvice(t);
+  else if(c==='urgent')reply=handleUrgent(t);
+  else if(c==='interrupt')reply=handleInterrupt(t);
+  else if(c==='energyLow')reply=setEnergy('low');
+  else if(c==='energyHigh')reply=setEnergy('high');
+  else if(c==='rhythm')reply=showRhythm();
+  else if(c==='rhythmLog')reply=recordRhythm(t);
+  else if(c==='setwindow')reply=setWindow(t);
+  else if(c==='log')reply=logProgress(t);
+  else if(c==='newplan')reply=actNewplan();
+  else if(c==='review')reply=handleReview();
+  else if(c==='learnings')reply=showLearnings();
+  else if(c==='positionAdd')reply=handlePositionAdd(t);
+  else if(c==='positionList')reply=listPositions();
+  else if(c==='markApplied')reply=markPosition(t,'applied');
+  else if(c==='markInterview')reply=markPosition(t,'interview');
+  else reply=handleUnknown();
+  return reply;
+}
+
+/* ============ AI 接入（BYOK） ============ */
+const SYSTEM_PROMPT=`你是「小陪」，刘雪的秋招陪跑搭子，要像真人朋友一样陪她，温暖、自然、会说人话。
+【背景】刘雪：二本软件工程2027届，河北，轻技术背景，不走开发。主方向：用户/数据/策略/增长运营、数据分析、运维（非开发）；其他非开发岗（销售/行政/文员等）也不排斥。外企书面型，京津冀优先。秋招有8条流并行：硬技能(Excel/SQL/Python)、简历、投递、行测(央国企笔试)、测评、面试(含无领导小组)、英语(听力+口语+阅读)、紧急插队(公司发测评/笔试链接)。
+【她讨厌】死模板、听不懂人话的机器人。你要：①接住她的吐槽/焦虑/迷茫，像朋友一样共情回应；②准确理解她口语化的汇报，改对排期。
+【回话规则】
+1) 先用自然、温暖的中文回应（可口语、可共情），像活人，不要列点像机器。
+2) 若她的消息涉及以下操作，在回话【最后】用单独一行发出命令，格式严格为 CMD:{json}（可多行多条，不要在其他地方夹带 CMD）：
+   · 记录完成：{"act":"log","q":"关键词(资料分析速算/英语/SQL/Excel/简历/投递/行测…)","min":实际分钟(可选)}
+   · 调整任务时长：{"act":"feedback","q":"关键词","min":新分钟数}
+   · 撤销上一步：{"act":"undo"}
+   · 插入生活/休息块：{"act":"interrupt","label":"超市/吃饭/检查/休息","start":"15:00(可选)","min":60}
+   · 改学习窗口：{"act":"window","start":"08:30","end":"21:30"} 或只改开始 {"act":"setwindow_start","start":"09:00"}
+   · 切状态：{"act":"energy","level":"low"或"high"或"normal"}
+   · 记岗位：{"act":"position","text":"公司 岗位 城市"}
+   · 标记已投/面试：{"act":"mark","q":"公司名","status":"applied"或"interview"}
+   · 复盘：{"act":"review"}  重排今天：{"act":"newplan"}
+3) 没有操作就不要发 CMD 行。
+【关键理解】
+· "我没做/撤销/刚才那条删了/不是我完成的" = undo。
+· "资料分析时间太短/给我多排点" = feedback 延长。
+· "接下来一小时不干活/我先歇会儿" = interrupt 休息。
+· 她只是焦虑吐槽：先共情，可主动发 {"act":"energy","level":"low"} 帮她减负，但别硬改排期。
+{stateSummary}`;
+function stateSummary(){
+  const L=[];
+  L.push('日期 '+S.date+'，学习窗口 '+S.dayStart+'–'+S.dayEnd+'，状态 '+(S.energy==='low'?'偏低':S.energy==='high'?'满格':'正常'));
+  L.push('今日计划：'+ (S.plan.length? S.plan.map(b=>getUnit(b.unitId).title+'('+b.start+'-'+b.end+')').join('、') :'（空）'));
+  L.push('已完成：'+ (S.done.length? S.done.map(d=>getUnit(d.unitId).title).join('、'):'无'));
+  L.push('顺延：'+ (S.deferred.length? S.deferred.map(id=>getUnit(id).title).join('、'):'无'));
+  L.push('岗位库：'+ (S.positions.length? S.positions.length+'个':'空'));
+  L.push('时间系数：'+ Math.round((S.learnings.capacityFactor||1)*100)+'%');
+  return L.join('\n');
+}
+function execCmd(c){
+  let r='';
+  switch(c.act){
+    case 'log': r=logProgress((c.q||'')+(c.min?(' 用了'+c.min+'分钟'):'')); break;
+    case 'feedback': r=handleFeedback((c.q||'')+' 改到'+(c.min||'')+'分钟'); break;
+    case 'undo': r=handleUndo(); break;
+    case 'interrupt': r=handleInterrupt((c.label||'事务')+(c.start?(' '+c.start):'')+(c.min?(' '+(c.min/60)+'小时'):' 1小时')); break;
+    case 'window': r=setWindow('学习时间'+(c.start||'')+'到'+(c.end||'')); break;
+    case 'setwindow_start': r=setWindow('今天从'+(c.start||'')+'开始'); break;
+    case 'energy': r=setEnergy(c.level||'normal'); break;
+    case 'position': r=handlePositionAdd('记岗位 '+(c.text||'')); break;
+    case 'mark': r=markPosition('投了'+(c.q||''), c.status||'applied'); break;
+    case 'review': r=handleReview(); break;
+    case 'newplan': r=actNewplan(); break;
+  }
+  return r;
+}
+async function callLLM(userText){
+  const st=S.settings||{};
+  const isSF=st.provider==='siliconflow';
+  const url=isSF?'https://api.siliconflow.cn/v1/chat/completions':'https://openrouter.ai/api/v1/chat/completions';
+  const headers={'Content-Type':'application/json','Authorization':'Bearer '+st.apiKey};
+  if(!isSF){headers['HTTP-Referer']='https://liuxue-coach.local';headers['X-Title']='秋招陪跑';}
+  const msgs=[{role:'system',content:SYSTEM_PROMPT.replace('{stateSummary}',stateSummary())}];
+  (S.chat||[]).slice(-16).forEach(m=>msgs.push(m));
+  msgs.push({role:'user',content:userText});
+  const body={model:st.model||'openai/gpt-4o-mini',messages:msgs,temperature:0.7,max_tokens:600};
+  const r=await fetch(url,{method:'POST',headers,body:JSON.stringify(body)});
+  if(!r.ok){const tx=await r.text().catch(()=> '');throw new Error('HTTP '+r.status+' '+tx.slice(0,160));}
+  const j=await r.json();
+  return (j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||'';
+}
+let lastAiEl=null;
+function pushChat(who,text){
+  if(!S.chat)S.chat=[];
+  S.chat.push({role:who==='me'?'user':'assistant',content:text});
+  if(S.chat.length>60)S.chat=S.chat.slice(-60);
+  const el=document.getElementById('chatlog');
+  const d=document.createElement('div');d.className='bub '+(who==='me'?'me':'ai');
+  d.innerHTML=text;el.appendChild(d);
+  el.scrollTop=el.scrollHeight;
+  if(who==='ai')lastAiEl=d;
+}
+function updateLastAi(text){
+  if(lastAiEl){lastAiEl.innerHTML=text;const el=document.getElementById('chatlog');el.scrollTop=el.scrollHeight;}
+  if(S.chat&&S.chat.length){S.chat[S.chat.length-1].content=text;}
+}
+async function sendChat(){
+  const i=document.getElementById('msg');const v=i.value.trim();if(!v)return;i.value='';
+  if(!S.chat||!S.chat.length)renderChat();
+  pushChat('me',v);
+  const st=S.settings||{};
+  if(!st.apiKey){
+    const reply=process(v);
+    pushChat('ai',reply);
+    save();render();
+    return;
+  }
+  pushChat('ai','…');
+  try{
+    const reply=await callLLM(v);
+    const display=reply.replace(/CMD:\{[\s\S]*?\}/g,'').replace(/\n{2,}/g,'\n').replace(/^\s+|\s+$/g,'');
+    const cmds=[...reply.matchAll(/CMD:(\{[\s\S]*?\})/g)].map(m=>{try{return JSON.parse(m[1]);}catch(e){return null;}}).filter(Boolean);
+    let notes=[];
+    cmds.forEach(c=>{const r=execCmd(c);if(r)notes.push('· '+stripTags(r));});
+    let finalText=display || '好嘞，我记下了。';
+    if(notes.length)finalText+='\n\n📌 已帮你：\n'+notes.join('\n');
+    updateLastAi(finalText);
+    save();render();
+  }catch(e){
+    updateLastAi('⚠️ AI 调用失败（多半是 Key 无效，或手机/网络拦了跨域请求）。已切回规则模式帮你处理：\n\n'+process(v));
+    save();render();
+  }
+}
+
+/* ============ 渲染 ============ */
+function pushLog(who,text){ // 非对话型日志（按钮触发）
+  pushChat(who,text);
+}
+function renderHeader(){
+  document.getElementById('topMeta').textContent=S.date+' ｜ '+S.dayStart+'–'+S.dayEnd+' ｜ 完成 '+S.done.length+' 项';
+  const aiOn=(S.settings&&S.settings.apiKey);
+  document.getElementById('sideStatus').innerHTML='<span class="dot '+(aiOn?'on':'off')+'"></span>'+(aiOn?'AI 已接入 · 活人模式':'规则模式 · 去设置填 Key');
+  const aiState=document.getElementById('aiState');
+  if(aiState)aiState.innerHTML=aiOn?'✅ 当前是<b>真·活人 AI</b>模式，随便说人话都接得住。':'⚠️ 还没填 Key，现在用的是规则模式（听不懂口语）。去上面填 Key 解锁活人模式。';
+}
+function renderProgress(){
+  const pr=document.getElementById('progress');if(!pr)return;pr.innerHTML='';
+  STREAMS.forEach(s=>{
+    const total=Object.values(UNITS).filter(u=>u.stream===s).length;
+    const done=S.totals[s]||0;
+    const pct=total?Math.min(100,Math.round(done/total*100)):0;
+    pr.innerHTML+='<div class="pbar"><span class="nm">'+s+'</span><span class="tr"><span class="fl" style="width:'+pct+'%;background:'+COLOR[s]+'"></span></span><span class="ct">'+done+'</span></div>';
+  });
+}
+function renderSchedule(){
+  const sc=document.getElementById('schedule');if(!sc)return;sc.innerHTML='';
+  const items=[];
+  S.fixed.forEach(f=>items.push({type:'fixed',...f}));
+  S.done.forEach(d=>items.push({type:'done',title:getUnit(d.unitId).title,stream:getUnit(d.unitId).stream,start:d.start,end:d.end,actual:d.actual,offplan:d.offplan}));
+  S.plan.forEach(b=>items.push({type:'todo',unitId:b.unitId,title:getUnit(b.unitId).title,stream:getUnit(b.unitId).stream,purpose:getUnit(b.unitId).purpose,accept:getUnit(b.unitId).accept,start:b.start,end:b.end}));
+  S.deferred.forEach(id=>items.push({type:'deferred',title:getUnit(id).title,stream:getUnit(id).stream,start:'顺延',end:''}));
+  items.sort((a,b)=>{const pa=a.start==='顺延'?9999:toMin(a.start);const pb=b.start==='顺延'?9999:toMin(b.start);return pa-pb;});
+  items.forEach(it=>{
+    if(it.type==='fixed'){
+      sc.innerHTML+='<div class="blk fixed"><div class="top"><span class="time">'+it.start+'–'+it.end+'</span><span class="st" style="background:'+COLOR.fixed+'">生活</span></div><div class="ti">'+it.label+'</div></div>';
+    }else if(it.type==='done'){
+      sc.innerHTML+='<div class="blk done"><div class="top"><span class="time">'+it.start+'–'+it.end+'</span><span class="st" style="background:'+COLOR[it.stream]+'">'+it.stream+'</span></div><div class="ti">'+it.title+(it.offplan?' <span class="tag warn">计划外完成</span>':' ✓')+'</div>'+(it.actual?'<div class="pp">实际 '+it.actual+' 分钟</div>':'')+'</div>';
+    }else if(it.type==='todo'){
+      sc.innerHTML+='<div class="blk"><div class="top"><span class="time">'+it.start+'–'+it.end+'</span><span class="st" style="background:'+COLOR[it.stream]+'">'+it.stream+'</span></div><div class="ti">'+it.title+'</div><div class="pp">目的：'+it.purpose+'</div><div class="ac">验收：'+it.accept+'</div></div>';
+    }else{
+      sc.innerHTML+='<div class="blk deferred"><div class="top"><span class="time">顺延</span><span class="st" style="background:'+COLOR[it.stream]+'">'+it.stream+'</span></div><div class="ti">'+it.title+' <span class="tag warn">今日排不下</span></div></div>';
+    }
+  });
+  if(items.length===0)sc.innerHTML='<div class="empty">今天还没安排，点「重新规划今天」或去「陪跑」说点什么。</div>';
+}
+function renderLearnings(){
+  const el=document.getElementById('learnings');if(!el)return;
+  el.innerHTML=showLearnings();
+  const rb=document.getElementById('rhythmBox');if(rb)rb.innerHTML=showRhythm();
+}
+function renderPositions(){
+  const el=document.getElementById('positions');if(!el)return;
+  const ps=S.positions||[];
+  if(!ps.length){el.innerHTML='<div class="empty" style="padding:20px;">空空如也。去「陪跑」说「记岗位 字节跳动 用户运营 北京」。</div>';return;}
+  el.innerHTML=ps.map(p=>{
+    const st=p.status==='applied'?'<span class="pill applied">已投</span>':p.status==='interview'?'<span class="pill interview">面试中</span>':'<span class="pill todo">待投</span>';
+    return '<div class="job"><div><div class="c">'+p.company+' · '+p.role+'</div><div class="m">'+(p.city||'城市未填')+'</div></div>'+st+'</div>';
+  }).join('');
+}
+function render(){
+  renderHeader();renderProgress();renderSchedule();renderLearnings();renderPositions();
+}
+function renderChat(){
+  const el=document.getElementById('chatlog');el.innerHTML='';lastAiEl=null;
+  (S.chat||[]).forEach(m=>{
+    const d=document.createElement('div');d.className='bub '+(m.role==='user'?'me':'ai');
+    d.innerHTML=m.content;el.appendChild(d);
+    if(m.role==='assistant')lastAiEl=d;
+  });
+  el.scrollTop=el.scrollHeight;
+}
+
+/* ============ 持久化 ============ */
+function save_local(){localStorage.setItem(KEY,JSON.stringify(S));}
+function save(){save_local();syncToCloud();}
+function load(){
+  const raw=localStorage.getItem(KEY);
+  if(!raw){initState();return;}
+  try{S=JSON.parse(raw);}catch(e){initState();return;}
+  if(!S.date||!S.plan){initState();return;}
+  if(!S.rhythm)S.rhythm={meals:[]};
+  if(!S.history)S.history=[];
+  if(!S.learnings)S.learnings={capacityFactor:1,notes:[],totalDays:0,lastReviewed:null,lastSummary:null};
+  if(!S.positions)S.positions=[];
+  if(!S.undoStack)S.undoStack=[];
+  if(!S.unitOverrides)S.unitOverrides={};
+  if(!S.chat)S.chat=[];
+  if(!S.cloud)S.cloud={enabled:false,token:'',gistId:'',lastSync:null};
+  if(!S.settings)S.settings={provider:'openrouter',apiKey:'',model:'openai/gpt-4o-mini'};
+  if(S.date!==todayStr()){ actNewday(); }
+}
+function exportState(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='刘雪_陪跑进度_'+S.date+'.json';a.click();
+}
+function importState(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>{try{S=JSON.parse(r.result);if(!S.rhythm)S.rhythm={meals:[]};save();render();renderChat();if(lastAiEl){}pushChat('ai','已导入进度 ✓');}catch(err){alert('导入失败');}};r.readAsText(f);
+}
+function resetAll(){localStorage.removeItem(KEY);initState();renderChat();pushChat('ai','已重置。今天从 08:30–21:30 重新排起（实验时段，随时可改）。');render();}
+
+/* ============ 云端同步（GitHub Gist：免费·私有·跨设备防丢） ============ */
+const GH_API='https://api.github.com';
+const GIST_FILE='liuxue_coach_data.json';
+async function ghReq(method,url,token,body){
+  const headers={'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28'};
+  const r=await fetch(url,{method,headers,body:body?JSON.stringify(body):undefined});
+  if(!r.ok){let m='';try{m=(await r.json()).message;}catch(e){}throw new Error('GitHub '+r.status+(m?': '+m:''));}
+  return r.json();
+}
+async function ensureGist(){
+  if(S.cloud.gistId)return S.cloud.gistId;
+  const data=await ghReq('POST',GH_API+'/gists',S.cloud.token,{description:'刘雪·秋招陪跑 进度云端备份（自动同步，勿删）',public:false,files:{[GIST_FILE]:{content:JSON.stringify(S,null,2)}}});
+  S.cloud.gistId=data.id;S.cloud.lastSync=Date.now();
+  return data.id;
+}
+async function syncToCloud(){
+  try{
+    if(!S||!S.cloud||!S.cloud.enabled||!S.cloud.token)return;
+    const id=await ensureGist();
+    await ghReq('PATCH',GH_API+'/gists/'+id,S.cloud.token,{files:{[GIST_FILE]:{content:JSON.stringify(S,null,2)}}});
+    S.cloud.lastSync=Date.now();showCloudStatus();
+  }catch(e){console.warn('云同步失败(本地已存):',e.message);}
+}
+async function pullFromCloud(){
+  try{
+    if(!S||!S.cloud||!S.cloud.enabled||!S.cloud.token||!S.cloud.gistId)return false;
+    const data=await ghReq('GET',GH_API+'/gists/'+S.cloud.gistId,S.cloud.token);
+    const f=data.files&&data.files[GIST_FILE];
+    if(!f||!f.content)return false;
+    const remote=JSON.parse(f.content);
+    const tk=S.cloud.token,gid=S.cloud.gistId;
+    S=remote;
+    if(!S.cloud)S.cloud={};
+    S.cloud.enabled=true;S.cloud.token=tk;S.cloud.gistId=gid;S.cloud.lastSync=Date.now();
+    save_local();showCloudStatus();
+    return true;
+  }catch(e){console.warn('云拉取失败:',e.message);return false;}
+}
+function showCloudStatus(){
+  const el=document.getElementById('cloudStatus');if(!el)return;
+  if(S.cloud&&S.cloud.enabled&&S.cloud.gistId){
+    const t=S.cloud.lastSync?new Date(S.cloud.lastSync).toLocaleString('zh-CN'):'—';
+    el.innerHTML='✅ 云端同步已开启 · 最后同步：'+t;
+  }else{el.innerHTML='⚪ 未开启云端同步';}
+}
+async function connectCloud(){
+  const token=document.getElementById('setCloudToken').value.trim();
+  if(!token){alert('请先填写 GitHub Token');return;}
+  S.cloud=S.cloud||{};S.cloud.enabled=true;S.cloud.token=token;
+  pushChat('me','开启云端同步');
+  pushChat('ai','正在连接 GitHub 并创建私有备份…');
+  try{
+    await ensureGist();S.cloud.lastSync=Date.now();save_local();showCloudStatus();
+    pushChat('ai','✅ 云端同步已开启！进度现在自动存到 GitHub 私有 Gist，<b>换手机/清缓存都不会丢</b>。新设备只需填同一个 Token 即可恢复全部进度。');
+  }catch(e){
+    S.cloud.enabled=false;save_local();
+    pushChat('ai','❌ 连接失败：'+e.message+'。请确认 Token 勾选了 gist 权限、且未过期。');
+  }
+  switchTab('chat');render();
+}
+function disconnectCloud(){
+  S.cloud.enabled=false;save_local();showCloudStatus();
+  pushChat('me','关闭云端同步');pushChat('ai','已关闭云端同步（本地数据仍在手机里）。');
+  switchTab('chat');render();
+}
+
+/* ============ 交互 ============ */
+const TAB_TITLE={chat:'陪跑',today:'今日日程',learn:'我的规律',jobs:'岗位库',set:'设置'};
+function switchTab(name){
+  document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.tab===name));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.add('hidden'));
+  document.getElementById('tab-'+name).classList.remove('hidden');
+  document.getElementById('topTitle').textContent=TAB_TITLE[name];
+}
+function quick(t){document.getElementById('msg').value=t;send();}
+function send(){sendChat();}
+function doAct(type){
+  if(!S.chat||!S.chat.length)renderChat();
+  if(type==='newplan'){pushChat('me','重新规划今天');pushChat('ai',actNewplan());}
+  if(type==='newday'){pushChat('me','新的一天');pushChat('ai',actNewday());}
+  if(type==='review'){pushChat('me','复盘');pushChat('ai',handleReview());}
+  render();save();
+}
+function onProviderChange(){
+  const p=document.getElementById('setProvider').value;
+  const hint=document.getElementById('modelHint');
+  if(p==='openrouter'){hint.innerHTML='推荐：<b>openai/gpt-4o-mini</b>（便宜好用）｜ 免费可试 <b>meta-llama/llama-3.1-8b-instruct</b> 或 <b>google/gemini-flash-1.5</b>';if(!document.getElementById('setModel').value||document.getElementById('setModel').value.indexOf('deepseek')>=0)document.getElementById('setModel').value='openai/gpt-4o-mini';}
+  else{hint.innerHTML='推荐：<b>deepseek-ai/DeepSeek-V3</b> 或 <b>Qwen/Qwen2.5-72B-Instruct</b>（国产便宜）';if(!document.getElementById('setModel').value||document.getElementById('setModel').value.indexOf('gpt')>=0)document.getElementById('setModel').value='deepseek-ai/DeepSeek-V3';}
+}
+function saveSettings(){
+  S.settings=S.settings||{};
+  S.settings.provider=document.getElementById('setProvider').value;
+  S.settings.apiKey=document.getElementById('setKey').value.trim();
+  S.settings.model=document.getElementById('setModel').value.trim()||'openai/gpt-4o-mini';
+  save();renderHeader();
+  if(S.settings.apiKey)pushChat('ai','✅ Key 已保存，现在我是<b>真·活人 AI</b>了！随便说人话都接得住～');
+  else pushChat('ai','已保存，但还没填 Key，仍是规则模式。');
+  switchTab('chat');
+}
+function saveWindow(){
+  const a=document.getElementById('setStart').value.trim();
+  const b=document.getElementById('setEnd').value.trim();
+  const t='学习时间'+a+'到'+b;
+  if(!findTimes(t).length){alert('时间格式不对，例如 08:30 / 21:30');return;}
+  pushChat('me','改窗口 '+a+'–'+b);
+  pushChat('ai',setWindow(t));
+  render();save();
+}
+function fillSettings(){
+  document.getElementById('setProvider').value=S.settings.provider||'openrouter';
+  document.getElementById('setKey').value=S.settings.apiKey||'';
+  document.getElementById('setModel').value=S.settings.model||'openai/gpt-4o-mini';
+  document.getElementById('setStart').value=S.dayStart;
+  document.getElementById('setEnd').value=S.dayEnd;
+  if(document.getElementById('setCloudToken'))document.getElementById('setCloudToken').value=(S.cloud&&S.cloud.token)||'';
+  showCloudStatus();
+  onProviderChange();
+}
+
+/* ============ 入口 ============ */
+load();
+renderChat();
+if(!S.chat||!S.chat.length){
+  pushChat('ai','嗨，我是小陪，你的秋招陪跑搭子 🤝 主方向：运营 / 数据分析 / 运维（非开发），其他非开发岗也不排斥。默认实验时段 08:30–21:30，随时能改。\n\n你可以随便说人话：做了啥、接下来要去哪、想调哪个任务、状态不好想吐槽，都行。说错了就说"撤销/我没完成"，我改。\n\n👉 想去「设置」里填个 AI Key——填了我就变成真·活人，随便聊都接得住；不填也能用，只是会"听不懂人话"。');
+}
+fillSettings();
+render();
+/* 云端优先：开启同步则拉取最新覆盖本地（换设备/清缓存后恢复） */
+if(S.cloud&&S.cloud.enabled&&S.cloud.token&&S.cloud.gistId){
+  pullFromCloud().then(ok=>{if(ok){save_local();render();renderChat();}});
+}
+</script>
+</body>
+</html>
