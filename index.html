@@ -329,6 +329,7 @@ const UNITS = {
   L4:{stream:'硬技能',title:'轻松：复习SQL/Excel笔记',min:30,light:true,purpose:'巩固',accept:'过一遍笔记',kw:['复习','笔记']},
   L5:{stream:'行测',title:'轻松：看1个行测技巧短视频/读1篇方法论',min:30,light:true,purpose:'保持手感',accept:'看完1个',kw:['行测技巧','技巧视频']},
   L6:{stream:'简历',title:'轻松：翻看自己简历1遍找1个可优化点',min:20,light:true,purpose:'不荒废',accept:'找到1点',kw:['翻简历','看简历']},
+  L4b:{stream:'硬技能',title:'轻松：看1个 SQL/Excel 入门短视频（从0开始，不用有基础）',min:30,light:true,purpose:'零基础先起步，建立手感',accept:'看懂1个短视频',kw:['入门视频','从0','sql入门']},
   /* —— 2026-09-09 新增：补方向缺口（银行 / 结构化 / 外企英文面试）—— */
   U67:{stream:'面试',title:'结构化面试题型(自我认知/人际/应急/综合分析/组织管理)模板+开口',min:60,light:false,purpose:'央国企半结构化前的结构化底子',accept:'背熟5类题框架',kw:['结构化','五大题型','综合分析','组织管理','应急','自我认知']},
   U68:{stream:'英语',title:'外企英文面试(1分钟英文自我介绍+3个英文STAR故事+口语模拟)',min:60,light:false,purpose:'外企面试硬门槛',accept:'能脱稿讲1分钟+1个故事',kw:['英文面试','英文自我介绍','英文star','英文bq','口语模拟']},
@@ -378,11 +379,29 @@ const HOWTO={
 const STREAMS=['硬技能','简历','投递','行测','测评','面试','英语'];
 const COLOR={硬技能:'#4f6ef7',简历:'#f0883e',投递:'#16a34a',行测:'#9333ea',测评:'#e11d48',面试:'#0891b2',英语:'#ca8a04',fixed:'#94a3b8'};
 const LOW_MAP={硬技能:'L4',英语:'L3',面试:'L1',投递:'L2',行测:'L5',简历:'L6'};
+/* 她到底学没学过某条流？没学过的，轻量模式不叫"复习"，给"入门视频·从0开始" */
+function hasLearned(stream){
+  if((S.history||[]).some(x=>x.type==='done'&&x.stream===stream))return true;
+  return (S.done||[]).some(d=>{try{return getUnit(d.unitId).stream===stream;}catch(e){return false;}});
+}
+function lowUnitFor(stream){
+  if(stream==='硬技能'&&!hasLearned('硬技能'))return 'L4b';
+  return LOW_MAP[stream];
+}
 
 /* ============ 状态 ============ */
 const KEY='liuxue_coach_v2';
 let S=null;
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function cnNum(s){
+  if(/^\d+$/.test(s))return parseInt(s,10);
+  const map={'零':0,'一':1,'二':2,'两':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10};
+  if(s==='十')return 10;
+  if(s.length===1)return map[s]!==undefined?map[s]:NaN;
+  if(s[0]==='十')return 10+(map[s[1]]||0);
+  if(s[1]==='十')return (map[s[0]]||0)*10+(s[2]?(map[s[2]]||0):0);
+  return NaN;
+}
 function toMin(hm){const [h,m]=hm.split(':').map(Number);return h*60+m;}
 function toHM(m){m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
 function uid(){return Math.random().toString(36).slice(2,9);}
@@ -464,8 +483,14 @@ function buildRemaining(){
   const r=[];
   const doneIds=new Set(S.done.map(d=>d.unitId));
   const customs=(S.remaining||[]).filter(id=>id.indexOf('C')===0&&!doneIds.has(id)); // 保留你手动加的任务/测评
+  /* 原本排着的"重活"保留下来，别因为切轻量就被吞掉（排不下会自然进顺延，明天优先） */
+  const heavy=(S.remaining||[]).filter(id=>{
+    if(id.indexOf('C')===0||doneIds.has(id))return false;
+    const u=getUnit(id);return u&&!u.light;
+  });
   if(S.energy==='low'){
-    STREAMS.forEach(s=>{const id=LOW_MAP[s];if(id&&UNITS[id])r.push(id);});
+    STREAMS.forEach(s=>{const id=lowUnitFor(s);if(id&&UNITS[id]&&r.indexOf(id)<0)r.push(id);});
+    S.remaining=[...customs,...r,...heavy.filter(id=>r.indexOf(id)<0)];
   }else{
     cycleStream('硬技能',2).forEach(x=>r.push(x));
     r.push(...cycleStream('英语',1));
@@ -473,8 +498,8 @@ function buildRemaining(){
     r.push(...cycleStream('投递',1));
     r.push(...cycleStream('简历',1));
     r.push(...cycleStream('面试',1));
+    S.remaining=[...customs,...r];
   }
-  S.remaining=[...customs,...r];
 }
 function nowMin(){const d=new Date();return d.getHours()*60+d.getMinutes();}
 /* 有效排期起点：今天则"不能早于现在"，避免把任务排到已经过去的时段 */
@@ -603,20 +628,21 @@ function parseMinutes(t){
 function parseTime(t){
   let m=t.match(/(\d{1,2})\s*[:：]\s*(\d{2})/);if(m)return m[1]*1*60+m[2]*1;
   const ap=(t.match(/(上午|早上|中午|下午|晚上|傍晚)/)||[])[1]||'';
-  m=t.match(/(\d{1,2})\s*点(?:半)?/);if(!m)return null;
-  let h=m[1]*1;const half=/半/.test(t)?30:0;
+  m=t.match(/([\d一二三四五六七八九十]{1,3})\s*点(半)?/);if(!m)return null;
+  let h=cnNum(m[1]);if(isNaN(h))return null;
+  const half=(m[2]||/半/.test(t))?30:0;
   if(ap==='下午'||ap==='晚上'||ap==='傍晚'){if(h<12)h+=12;}
   if(ap==='中午'&&h===12)h=12;if((ap==='上午'||ap==='早上')&&h===12)h=0;
   return h*60+half;
 }
 function findTimes(t){
   const out=[];
-  const re=/(?:上午|早上|中午|下午|晚上|傍晚)?\s*(\d{1,2})\s*[:：]\s*(\d{2})|(上午|早上|中午|下午|晚上|傍晚)?\s*(\d{1,2})\s*点\s*(半)?/g;
+  const re=/(?:上午|早上|中午|下午|晚上|傍晚)?\s*(\d{1,2})\s*[:：]\s*(\d{2})|(上午|早上|中午|下午|晚上|傍晚)?\s*([\d一二三四五六七八九十]{1,3})\s*点\s*(半)?/g;
   let m;
   while((m=re.exec(t))){
     if(m[1]!==undefined){ out.push(m[1]*60 + (+m[2])); }
     else{
-      let h=+m[4];const ap=m[3]||'';
+      let h=cnNum(m[4]);if(isNaN(h))continue;const ap=m[3]||'';
       if((ap==='下午'||ap==='晚上'||ap==='傍晚')&&h<12)h+=12;
       if((ap==='上午'||ap==='早上')&&h===12)h=0;
       out.push(h*60 + (m[5]?30:0));
@@ -646,7 +672,7 @@ function classify(t){
      &&/(还有|又要|新增|加|多了|另外|再|要).{0,10}(测评|笔试|任务|作业|面试|模拟|测试)|(测评|笔试|任务|作业|面试).{0,8}(要做|得做|需要做|还没做|没做|没开始)/.test(t))return 'addtask';
   if(/测评|笔试|测试/.test(t)&&/(\d+\s*天|天内|截止|要交|多少天)/.test(t)&&!/完成|交了|提交了/.test(t))return 'addtask';
   if(/超市|吃饭|早餐|午餐|晚餐|夜宵|检查|医院|睡觉|休息|运动|逛|出门|约会|办事|快递|取|理发|洗澡|午休|午睡|不干活|不做了|歇会儿|歇一歇|什么都不做|接下来.*(?:小时|分钟).*(?:不|休息)|我要休息|休息.*(?:小时|分钟)|暂停|放空|摸鱼|暂时不|先不.*了|我不干|我没空/.test(t))return 'interrupt';
-  if(/状态差|累|困|不想动|没精神|效率差|疲惫|乏力/.test(t))return 'energyLow';
+  if(/状态差|没精神|效率差|疲惫|乏力|调轻|轻一点|轻松一点|减负|少排点|今天不想学|不想学了/.test(t))return 'energyLow';
   if(/精神好|状态好|效率高|精力旺|有力气/.test(t))return 'energyHigh';
   if(/复盘|总结今天|今天总结|每日复盘|今天复盘/.test(t))return 'review';
   if(/我的规律|越用越准|学习情况|记性|我学得/.test(t))return 'learnings';
@@ -656,6 +682,7 @@ function classify(t){
   if(/^岗位|看岗位|我的岗位|岗位库|列岗位|岗位清单/.test(t))return 'positionList';
   if(/作息|观察/.test(t))return 'rhythm';
   if((/睡|起床|起学|醒来/).test(t)&&findTimes(t).length)return 'rhythmLog';
+  if(/(都在|一直在|一上午|一整(?:个)?上午|一下午|一整(?:个)?下午|从.{1,4}点.{0,8}(到|一直).{1,4}点)/.test(t)&&/(投|投递|学|做|刷|写|看|练|背|干|玩|睡|忙|面试|测评)/.test(t))return 'retro';
   if(/(现在|已经|都|刚|才).{0,8}(点|小时|了)/.test(t)&&/(投|投递|投简历|学|做|刷|写|背|练|看|弄|干|起|开始)/.test(t)&&!/学习时间|改成|调整为|窗口/.test(t))return 'lognow';
   if((/学习时间|改成|调整为|开始学|从.*点|到.*点/).test(t)&&findTimes(t).length>0)return 'setwindow';
   if((/完成|做完了|学(了|完)|练(了|完)|看(了|完)|写(了|完)|投(了|完)|做了|刷了|过(了|完)|搞(了|完)|弄(了|完)|结束|搞定|ok|OK|可以了|对的|是的|搞定了/).test(t)
@@ -718,6 +745,36 @@ function handleInterrupt(t){
   let note='👌 记下了：'+toHM(start)+'–'+toHM(start+dur)+' 你去「'+label+'」。这段时间我从日程里空出来了，后面的安排自动往后顺，你不用管。';
   if(/吃饭|早餐|午餐|晚餐|夜宵/.test(label))note+='（顺手记进你的作息规律了）';
   return note;
+}
+/* 补记"过去那段时间我干了啥"——不删她的记录，只把已过去的时段如实标出来 */
+function handleRetro(t,opts){
+  opts=opts||{};
+  const ts=findTimes(t);
+  let s=(opts.start!=null&&opts.start!=='')?toMin(String(opts.start)):(ts.length?ts[0]:null);
+  let e=(opts.end!=null&&opts.end!=='')?toMin(String(opts.end)):(ts.length>=2?ts[1]:null);
+  let label=(opts.label||'').trim();
+  if(!label){
+    const kw=['投简历','投递','面试','测评','行测','英语','刷题','复习','简历','SQL','Excel','学习','上课','实习','玩','休息','睡觉','忙'];
+    const lt=t.toLowerCase();
+    label=kw.find(k=>lt.indexOf(k.toLowerCase())>=0)||'事务';
+  }
+  label=label.replace(/[，。！？、,.\s]+$/,'');
+  if(s===null){return '告诉我时间段就行，比如"我中午12点投简历投到下午5点"。';}
+  if(e===null)e=Math.max(s+60,nowMin());
+  if(e<s){const tmp=s;s=e;e=tmp;}
+  pushUndo('补记过去时段');
+  S.fixed.push({id:uid(),label,start:toHM(s),end:toHM(e),past:true});
+  const unitId=matchUnit(label);
+  let extra='';
+  if(unitId){
+    const u=getUnit(unitId);
+    S.totals[u.stream]=(S.totals[u.stream]||0)+1;
+    S.remaining=S.remaining.filter(id=>id!==unitId);
+    pushHistory({date:S.date,type:'done',unitId,stream:u.stream,planned:u.min,actual:e-s});
+    extra='，也帮你记进「'+u.stream+'」的完成里';
+  }
+  reconcile();
+  return '好，我把 '+toHM(s)+'–'+toHM(e)+' 记成「'+label+'」'+extra+'（这是已经过去的时段，不会再重复排）。接下来我从现在（'+toHM(nowMin())+'）往后给你安排。';
 }
 function setEnergy(e){
   pushUndo('切换状态');
@@ -796,12 +853,7 @@ function handleVent(t){
     default:'我听到了。今天先别逼自己，状态比计划重要。'
   };
   const msg=lines[emo]||lines.default;
-  setEnergy('low');
-  const ws=toMin(S.dayStart),we=toMin(S.dayEnd);
-  const mid=Math.round((ws+we)/2);
-  S.fixed.push({id:uid(),label:'休息·缓一缓',start:toHM(mid),end:toHM(mid+30)});
-  reconcile();
-  return msg+'<br><br>我已经把今天切成 <b>轻量模式</b>（看视频 / 泛听 / 复习 / 整理），并在中段插了一个 <b>30 分钟休息块</b>。等你缓过来，跟我说"状态好了"我就把重活排回来。想聊的话，我在这儿，不急着学。';
+  return msg+'<br><br>想多说两句就多说，我听着，不急着学。<br>要是你想让我把今天调轻一点（看视频 / 泛听 / 整理这种），回我一句「帮我调轻」，我再动手；你没说，我就不动你的安排。';
 }
 function giveAdvice(){
   const tips=[];
@@ -903,6 +955,7 @@ function process(t){
   else if(c==='advice')reply=handleAdvice(t);
   else if(c==='urgent')reply=handleUrgent(t);
   else if(c==='addtask')reply=handleAddTask(t);
+  else if(c==='retro')reply=handleRetro(t);
   else if(c==='lognow')reply=actReplanNow();
   else if(c==='interrupt')reply=handleInterrupt(t);
   else if(c==='energyLow')reply=setEnergy('low');
@@ -926,12 +979,17 @@ function process(t){
 const SYSTEM_PROMPT=`你是「小陪」，刘雪的秋招陪跑搭子，要像真人朋友一样陪她，温暖、自然、会说人话。
 【背景】刘雪：二本软件工程2027届，河北，轻技术背景，不走开发。主方向：用户/数据/策略/增长运营、数据分析、运维（非开发）；其他非开发岗（销售/行政/文员等）也不排斥。外企书面型，京津冀优先。秋招有8条流并行：硬技能(Excel/SQL/Python)、简历、投递、行测(央国企笔试)、测评、面试(含无领导小组)、英语(听力+口语+阅读)、紧急插队(公司发测评/笔试链接)。
 【她讨厌】死模板、听不懂人话的机器人。你要：①接住她的吐槽/焦虑/迷茫，像朋友一样共情回应；②准确理解她口语化的汇报，改对排期。
+【铁律·最重要，先读这条】
+· 她只是**吐槽 / 倾诉 / 闲聊 / 发泄情绪**时：**只回话陪她，一个 CMD 都不许发**。她说过"我跟他聊两句，他就给我硬塞两件事"——那是错的。**绝不能因为她说了句话就动她的日程**。
+· 只有当她的话**客观上改变了时间安排**（要去哪、做了多久、新任务、要重排）时才发 CMD；拿不准 → 先问一句，别擅自改。
+· 说话像朋友，别像系统播报；**不许用"级联/位移/重排/进队列"这类术语**，要说"后面的我往后挪了""剩下的明天弄"。
 【回话规则】
 1) 先用自然、温暖的中文回应（可口语、可共情），像活人，不要列点像机器。
 2) 若她的消息涉及以下操作，在回话【最后】用单独一行发出命令，格式严格为 CMD:{json}（可多行多条，不要在其他地方夹带 CMD）：
    · 记录完成：{"act":"log","q":"关键词(资料分析速算/英语/SQL/Excel/简历/投递/行测…)","min":实际分钟(可选)}
    · 新增任务/测评(真的排进今天)：{"act":"addtask","title":"任务名(如 测评/字节笔试)","stream":"测评|投递|面试|行测|简历|英语|硬技能","min":预计分钟(默认60),"qty":数量(默认1),"deadline":"14天/9月20日(可空)"}
    · 按她现在的时间重排今天：{"act":"replan_now"}
+   · 补记"过去那段时间干了啥"(不删记录、只如实记下)：{"act":"retro","label":"投简历/玩/休息/学X","start":"12:00","end":"17:00"}
    · 调整任务时长：{"act":"feedback","q":"关键词","min":新分钟数}
    · 撤销上一步：{"act":"undo"}
    · 插入生活/休息块：{"act":"interrupt","label":"超市/吃饭/检查/休息","start":"15:00(可选)","min":60}
@@ -945,9 +1003,14 @@ const SYSTEM_PROMPT=`你是「小陪」，刘雪的秋招陪跑搭子，要像�
 · "我没做/撤销/刚才那条删了/不是我完成的" = undo。
 · "资料分析时间太短/给我多排点" = feedback 延长。
 · "接下来一小时不干活/我先歇会儿" = interrupt 休息。
-· 她只是焦虑吐槽：先共情，可主动发 {"act":"energy","level":"low"} 帮她减负，但别硬改排期。
+· 她焦虑/难受/吐槽：**只共情、只陪聊，绝不自动切轻量、绝不改日程**。最多问一句"要不要我把今天调轻一点？"，她答应了才发 energy low。
 · "我还有两个测评/测评是14天的/加个XX任务" = 一定要发 addtask 把它排进今天，别只在嘴上答应。
-· 她说"现在都X点了/我才开始/上午荒废了" = 先接住，再发 {"act":"replan_now"} 把今天从当前时间重排。
+· 她说"现在都X点了/我才开始/上午荒废了" = 先接住，再发 {"act":"replan_now"} 把今天从当前时间重排；如果她讲的是**过去干了什么**（"我12点到5点都在投简历"），改发 retro 如实记下，别删她的话。
+【怎么帮她排才人性化（她反复强调的）】
+· 她的真实进度最重要：**没学过的绝不能写"复习"**，要说"看个入门短视频，从0开始，不用有基础"。
+· 她累了 / 已经下午了 / 刚投完很久简历 → 只排 30 分钟以内的"轻起步"（看视频、泛听、翻简历、整理记录），别塞硬课。
+· 按"现在到晚上能承受的量"排，**宁少勿多**，一次别塞一堆。
+· 她说"我12点到5点都在投简历"这种：先夸一句（投了5小时很拼），把这段记下来，再说"接下来轻松点"。
 【求职方法论（顺手用，别背术语，话说得像个懂行的朋友）】
 · 漏斗真相：简历关挂70%、笔试/测评关挂50%、群面挂80%、业务面挂70%——投递只是最前端，笔/面/复盘要同步做。
 · 投递策略：分层投——练习区最早投(拿来练手)、核心区主力投(必须拿下的基本盘)、冲刺区状态最好时再投；背景一般要投 80-100 份打底；看JD，60% 沾边就大胆投；双非一定要在 BOSS直聘 也投一份(官网量大可能机筛学历)。
@@ -980,6 +1043,7 @@ function execCmd(c){
     case 'position': r=handlePositionAdd('记岗位 '+(c.text||'')); break;
     case 'mark': r=markPosition('投了'+(c.q||''), c.status||'applied'); break;
     case 'addtask': r=handleAddTask(c.title||c.q||'',{title:c.title||c.q,stream:c.stream,min:c.min,qty:c.qty,deadline:c.deadline}); break;
+    case 'retro': r=handleRetro((c.label||'')+' '+(c.start||'')+'到'+(c.end||''),{label:c.label,start:c.start,end:c.end}); break;
     case 'replan_now': r=actReplanNow(); break;
     case 'review': r=handleReview(); break;
     case 'newplan': r=actNewplan(); break;
@@ -1019,7 +1083,6 @@ function updateLastAi(text){
 async function sendChat(){
   const i=document.getElementById('msg');const v=i.value.trim();if(!v)return;i.value='';
   if(!S.chat||!S.chat.length)renderChat();
-  refreshPlanForNow();
   pushChat('me',v);
   const st=S.settings||{};
   if(!st.apiKey){
@@ -1136,6 +1199,7 @@ function load(){
   if(!S.customUnits)S.customUnits={};
   Object.assign(UNITS,S.customUnits); // 恢复自定义任务单元
   if(S.date!==todayStr()){ actNewday(); }
+  else { reconcile(); } // 打开就按"现在"对齐一次，不再显示上午已过的时段
 }
 function exportState(){
   const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
@@ -1277,6 +1341,8 @@ if(!S.chat||!S.chat.length){
 }
 fillSettings();
 render();
+/* 长时间挂着页面时，每 10 分钟静默对齐一次"现在"（不打扰你） */
+setInterval(refreshPlanForNow,10*60*1000);
 /* 云端优先：开启同步则拉取最新覆盖本地（换设备/清缓存后恢复） */
 if(S.cloud&&S.cloud.enabled&&S.cloud.token&&S.cloud.gistId){
   pullFromCloud().then(ok=>{if(ok){save_local();render();renderChat();}});
