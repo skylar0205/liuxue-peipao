@@ -671,7 +671,14 @@ function classify(t){
   if(!/完成|做完|做了|搞定|交了|提交了|收到|链接|来了/.test(t)
      &&/(还有|又要|新增|加|多了|另外|再|要).{0,10}(测评|笔试|任务|作业|面试|模拟|测试)|(测评|笔试|任务|作业|面试).{0,8}(要做|得做|需要做|还没做|没做|没开始)/.test(t))return 'addtask';
   if(/测评|笔试|测试/.test(t)&&/(\d+\s*天|天内|截止|要交|多少天)/.test(t)&&!/完成|交了|提交了/.test(t))return 'addtask';
-  if(/超市|吃饭|早餐|午餐|晚餐|夜宵|检查|医院|睡觉|休息|运动|逛|出门|约会|办事|快递|取|理发|洗澡|午休|午睡|不干活|不做了|歇会儿|歇一歇|什么都不做|接下来.*(?:小时|分钟).*(?:不|休息)|我要休息|休息.*(?:小时|分钟)|暂停|放空|摸鱼|暂时不|先不.*了|我不干|我没空/.test(t))return 'interrupt';
+  const emoNow=/不想|难受|压抑|emo|丧|焦虑|迷茫|烦|累|崩溃|没动力|没意思|提不起/.test(t);
+  if(!emoNow&&(
+      /(超市|吃饭|吃个饭|早餐|午餐|晚餐|夜宵|医院|看病|体检|买药|理发|洗澡|取快递|拿快递|寄快递|约会|聚会|出门|办事)/.test(t)
+      ||/(睡觉|睡个觉|去睡|午休|午睡|小睡|补觉)/.test(t)
+      ||/(休息|歇).{0,4}(一|两|二|三|半|\d+)?\s*(分钟|小时|钟头)/.test(t)
+      ||/接下来.{0,8}(小时|分钟).{0,6}(不|休息|歇|睡)/.test(t)
+      ||/(不干了|不做了|先不学|暂停一下|我没空|不干活)/.test(t)
+  ))return 'interrupt';
   if(/状态差|没精神|效率差|疲惫|乏力|调轻|轻一点|轻松一点|减负|少排点|今天不想学|不想学了/.test(t))return 'energyLow';
   if(/精神好|状态好|效率高|精力旺|有力气/.test(t))return 'energyHigh';
   if(/复盘|总结今天|今天总结|每日复盘|今天复盘/.test(t))return 'review';
@@ -688,7 +695,7 @@ function classify(t){
   if((/完成|做完了|学(了|完)|练(了|完)|看(了|完)|写(了|完)|投(了|完)|做了|刷了|过(了|完)|搞(了|完)|弄(了|完)|结束|搞定|ok|OK|可以了|对的|是的|搞定了/).test(t)
      && !/没完成|没做|没学|没练|没看|没写|没投|不想|不想做|不愿意|别|不要|不是|没做完|没搞|没弄/.test(t)
      && matchUnit(t))return 'log';
-  if(/重新|规划|安排|今天干嘛|该干嘛|排一下|怎么排/.test(t))return 'newplan';
+  if(!emoNow&&/(重新规划|重排今天|重新排|帮我排|给我排一下|排一下今天|今天该干嘛|今天干什么|安排一下今天)/.test(t))return 'newplan';
   return 'unknown';
 }
 function actNewplan(){pushUndo('重新规划今天');buildRemaining();reconcile();return '已按当前状态重新规划今天 ✅<br><br>'+giveAdvice();}
@@ -730,9 +737,12 @@ function logProgress(t){
   }
 }
 function handleInterrupt(t){
-  pushUndo('插入生活块：'+t.slice(0,20));
-  const label=(t.match(/超市|吃饭|早餐|午餐|晚餐|夜宵|检查|医院|睡觉|休息|运动|逛|出门|约会|办事|快递|取|理发|洗澡|午休|午睡|不干活|不做了|歇会儿|歇一歇|什么都不做|接下来.*(?:小时|分钟).*(?:不|休息)|我要休息|休息.*(?:小时|分钟)|暂停|放空|摸鱼|暂时不|先不.*了|我不干|我没空/)||['事务'])[0];
-  let start=parseTime(t);if(start===null)start=toMin(S.dayEnd)-60;
+  const hm=t.match(/超市|吃饭|吃个饭|早餐|午餐|晚餐|夜宵|医院|看病|体检|买药|理发|洗澡|取快递|拿快递|寄快递|约会|聚会|出门|办事|睡觉|睡个觉|去睡|午休|午睡|小睡|补觉|休息|歇/);
+  if(!hm)return '你是要去干嘛、还是想歇多久？说清楚我再记（比如"下午3点去超市一小时"），我不乱给你加东西。';
+  const label=hm[0];
+  pushUndo('记一段「'+label+'」');
+  let start=parseTime(t);
+  if(start===null)start=Math.max(nowMin(),toMin(S.dayStart));
   let dur=parseMinutes(t)||60;
   if(start+dur>toMin(S.dayEnd)){dur=toMin(S.dayEnd)-start;if(dur<15)dur=15;}
   S.fixed.push({id:uid(),label,start:toHM(start),end:toHM(start+dur)});
@@ -983,6 +993,7 @@ const SYSTEM_PROMPT=`你是「小陪」，刘雪的秋招陪跑搭子，要像�
 · 她只是**吐槽 / 倾诉 / 闲聊 / 发泄情绪**时：**只回话陪她，一个 CMD 都不许发**。她说过"我跟他聊两句，他就给我硬塞两件事"——那是错的。**绝不能因为她说了句话就动她的日程**。
 · 只有当她的话**客观上改变了时间安排**（要去哪、做了多久、新任务、要重排）时才发 CMD；拿不准 → 先问一句，别擅自改。
 · 说话像朋友，别像系统播报；**不许用"级联/位移/重排/进队列"这类术语**，要说"后面的我往后挪了""剩下的明天弄"。
+· **绝不许为了"安慰她"就去插生活块/休息块**（她吐槽时被塞一个晚上 20:30 的块，她会完全看不懂）。interrupt 只在她明确说"我要去/去做某件具体的事"时才发，label 必须写清楚，**不许留空、不许写"事务"**。
 【回话规则】
 1) 先用自然、温暖的中文回应（可口语、可共情），像活人，不要列点像机器。
 2) 若她的消息涉及以下操作，在回话【最后】用单独一行发出命令，格式严格为 CMD:{json}（可多行多条，不要在其他地方夹带 CMD）：
@@ -992,7 +1003,7 @@ const SYSTEM_PROMPT=`你是「小陪」，刘雪的秋招陪跑搭子，要像�
    · 补记"过去那段时间干了啥"(不删记录、只如实记下)：{"act":"retro","label":"投简历/玩/休息/学X","start":"12:00","end":"17:00"}
    · 调整任务时长：{"act":"feedback","q":"关键词","min":新分钟数}
    · 撤销上一步：{"act":"undo"}
-   · 插入生活/休息块：{"act":"interrupt","label":"超市/吃饭/检查/休息","start":"15:00(可选)","min":60}
+   · 插入生活/休息块（**只在她明确说"要去/在做"具体的事时才用**，如"下午去超市""我想歇半小时"）：{"act":"interrupt","label":"超市/吃饭/休息","start":"15:00(可选)","min":60}
    · 改学习窗口：{"act":"window","start":"08:30","end":"21:30"} 或只改开始 {"act":"setwindow_start","start":"09:00"}
    · 切状态：{"act":"energy","level":"low"或"high"或"normal"}
    · 记岗位：{"act":"position","text":"公司 岗位 城市"}
@@ -1036,7 +1047,7 @@ function execCmd(c){
     case 'log': r=logProgress((c.q||'')+(c.min?(' 用了'+c.min+'分钟'):'')); break;
     case 'feedback': r=handleFeedback((c.q||'')+' 改到'+(c.min||'')+'分钟'); break;
     case 'undo': r=handleUndo(); break;
-    case 'interrupt': r=handleInterrupt((c.label||'事务')+(c.start?(' '+c.start):'')+(c.min?(' '+(c.min/60)+'小时'):' 1小时')); break;
+    case 'interrupt': r=handleInterrupt((c.label||'')+(c.start?(' '+c.start):'')+(c.min?(' '+(c.min/60)+'小时'):'')); break;
     case 'window': r=setWindow('学习时间'+(c.start||'')+'到'+(c.end||'')); break;
     case 'setwindow_start': r=setWindow('今天从'+(c.start||'')+'开始'); break;
     case 'energy': r=setEnergy(c.level||'normal'); break;
