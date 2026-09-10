@@ -133,11 +133,11 @@
 </head>
 <body>
 <div class="app">
-  <div class="appbar">🤝 秋招陪跑 · 小陪</div>
+  <div class="appbar" id="appbar">🤝 秋招陪跑 · 小陪</div>
   <aside class="sidebar">
     <div class="brand">
       <div class="logo">陪</div>
-      <div><div class="brand-name">秋招陪跑</div><div class="brand-sub">小陪 · 你的求职搭子</div></div>
+      <div><div class="brand-name">秋招陪跑 <span id="verSide" style="font-size:11px;opacity:.85;"></span></div><div class="brand-sub">小陪 · 你的求职搭子</div></div>
     </div>
     <nav>
       <button class="nav active" data-tab="chat" onclick="switchTab('chat')"><span class="ic">💬</span><span class="lb">陪跑</span></button>
@@ -275,6 +275,11 @@
             </div>
           </details>
         </div>
+        <div class="panel">
+          <h3>ℹ️ 版本</h3>
+          <div class="note">当前版本：<b id="verTag"></b></div>
+          <div class="note" style="margin-top:6px;">以后每改一次，这个号和顶部标题都会变。核对手机是不是最新版，看这里就行。</div>
+        </div>
         <div class="hintbox">
           <b>怎么拿 Key（免费额度都够用）：</b><br>
           · OpenRouter：openrouter.ai → Sign Up → Keys 里创建，默认送免费额度。<br>
@@ -391,6 +396,9 @@ function lowUnitFor(stream){
 
 /* ============ 状态 ============ */
 const KEY='liuxue_coach_v2';
+/* 版本号：每次改动 +1，并显示在界面顶部，方便核对手机上是哪一版 */
+const APP_VERSION='V1.0';
+const APP_BUILT='2026-09-10';
 let S=null;
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function cnNum(s){
@@ -650,6 +658,24 @@ function findTimes(t){
   }
   return out;
 }
+/* 只解析"A点到B点"这种区间，比 findTimes 准，不会把句子里别的时间也抓进来 */
+function parseRange(t){
+  let m=t.match(/(\d{1,2}|[一二三四五六七八九十]{1,3})\s*点\s*(?:到|至|~|～|—|-|一直)\s*(\d{1,2}|[一二三四五六七八九十]{1,3})\s*点/);
+  if(!m)m=t.match(/(\d{1,2}[:：]\d{2})\s*(?:到|至|~|～|—|-|一直)\s*(\d{1,2}[:：]\d{2})/);
+  if(!m)return null;
+  const ap=(t.match(/(上午|早上|中午|下午|晚上|傍晚)/)||[])[1]||'';
+  const conv=x=>{
+    if(/[:：]/.test(x))return toMin(x.replace('：',':'));
+    let v=cnNum(x);if(isNaN(v))return NaN;
+    if((ap==='下午'||ap==='晚上'||ap==='傍晚')&&v<12)v+=12;
+    if((ap==='上午'||ap==='早上')&&v===12)v=0;
+    return v*60;
+  };
+  let a=conv(m[1]),b=conv(m[2]);
+  if(isNaN(a)||isNaN(b))return null;
+  if(b<=a)b+=12*60; // "12点到5点" → 5点按下午算
+  return [a,b];
+}
 function matchUnit(t){
   const tl=(t||'').toLowerCase();
   let best=null,bestScore=0;
@@ -662,6 +688,8 @@ function matchUnit(t){
 }
 function classify(t){
   if(isVent(t))return 'vent';
+  if(/删掉|删除|移除|去掉|不要了|不算数/.test(t)&&!/刚才|上一步|上一条|上一个|最后那条/.test(t)
+     &&(matchUnit(t)||findTimes(t).length>0||/事务|生活|块|记录|条|投简历|超市|睡觉|睡懒觉|玩/.test(t)))return 'delblock';
   if(/撤销|恢复|取消|删掉|删除|弄错了|不是我|(?:我|你)(?:并)?没有(?:完成|做完|做)|我没做|我没完成|我没做完|别记录|别记|撤回|回退|刚才那(?:条|个|句)|不对|错了|去掉|重置/.test(t))return 'undo';
   if((/觉得|认为|感觉|分配|安排|时间|时长|调|改|加|减|延|缩/).test(t)
      && (/少|短|长|多|不够|一点|延|缩|调|加|减|改|扩|压/).test(t)
@@ -759,9 +787,10 @@ function handleInterrupt(t){
 /* 补记"过去那段时间我干了啥"——不删她的记录，只把已过去的时段如实标出来 */
 function handleRetro(t,opts){
   opts=opts||{};
+  const rg=parseRange(t);
   const ts=findTimes(t);
-  let s=(opts.start!=null&&opts.start!=='')?toMin(String(opts.start)):(ts.length?ts[0]:null);
-  let e=(opts.end!=null&&opts.end!=='')?toMin(String(opts.end)):(ts.length>=2?ts[1]:null);
+  let s=(opts.start!=null&&opts.start!=='')?toMin(String(opts.start)):(rg?rg[0]:(ts.length?ts[0]:null));
+  let e=(opts.end!=null&&opts.end!=='')?toMin(String(opts.end)):(rg?rg[1]:(ts.length>=2?ts[1]:null));
   let label=(opts.label||'').trim();
   if(!label){
     const kw=['投简历','投递','面试','测评','行测','英语','刷题','复习','简历','SQL','Excel','学习','上课','实习','玩','休息','睡觉','忙'];
@@ -785,6 +814,45 @@ function handleRetro(t,opts){
   }
   reconcile();
   return '好，我把 '+toHM(s)+'–'+toHM(e)+' 记成「'+label+'」'+extra+'（这是已经过去的时段，不会再重复排）。接下来我从现在（'+toHM(nowMin())+'）往后给你安排。';
+}
+/* 删除指定的日程/记录——她说"把投简历那条删掉"就真的删掉 */
+function handleDelete(t,opts){
+  opts=opts||{};
+  pushUndo('删除若干条');
+  const q=(opts.q||'').trim();
+  const unitHit=q?null:matchUnit(t);
+  const startQ=opts.start?String(opts.start):'';
+  const removed=[];
+  const hitTitle=(title,id)=>{
+    if(!title)return false;
+    if(q&&title.indexOf(q)>=0)return true;
+    if(unitHit&&id===unitHit)return true;
+    if(title.length>=2&&t.indexOf(title)>=0)return true; // 她话里点名的块，直接删
+    return false;
+  };
+  S.fixed=(S.fixed||[]).filter(f=>{
+    const hit=hitTitle(f.label,null)||(startQ&&f.start===startQ);
+    if(hit)removed.push('「'+f.label+'」'+(f.start||'')+((f.end&&f.end!=='—')?('–'+f.end):''));
+    return !hit;
+  });
+  S.done=(S.done||[]).filter(d=>{
+    const u=getUnit(d.unitId);const title=u?u.title:d.unitId;
+    const hit=hitTitle(title,d.unitId)||(startQ&&d.start===startQ);
+    if(hit)removed.push('完成记录「'+title+'」');
+    return !hit;
+  });
+  const filt=arr=>(arr||[]).filter(id=>{
+    const u=getUnit(id);const title=u?u.title:id;
+    const hit=hitTitle(title,id);
+    if(hit)removed.push('任务「'+title+'」');
+    return !hit;
+  });
+  S.remaining=filt(S.remaining);
+  S.deferred=filt(S.deferred);
+  if(!removed.length)return '我没找到你说的是哪一条 🤔 直接说名字或时间就行，比如"把投简历那条删掉""把 12:00 那条删掉"。';
+  const uniq=[...new Set(removed)];
+  reconcile();
+  return '🗑 删掉了 '+uniq.length+' 条：<br>· '+uniq.join('<br>· ')+'<br>剩下的我重新顺了一遍，你看看对不对。';
 }
 function setEnergy(e){
   pushUndo('切换状态');
@@ -960,6 +1028,7 @@ function process(t){
   if(!t)return;
   const c=classify(t);let reply;
   if(c==='vent')reply=handleVent(t);
+  else if(c==='delblock')reply=handleDelete(t);
   else if(c==='undo')reply=handleUndo();
   else if(c==='feedback')reply=handleFeedback(t);
   else if(c==='advice')reply=handleAdvice(t);
@@ -1003,6 +1072,7 @@ const SYSTEM_PROMPT=`你是「小陪」，刘雪的秋招陪跑搭子，要像�
    · 补记"过去那段时间干了啥"(不删记录、只如实记下)：{"act":"retro","label":"投简历/玩/休息/学X","start":"12:00","end":"17:00"}
    · 调整任务时长：{"act":"feedback","q":"关键词","min":新分钟数}
    · 撤销上一步：{"act":"undo"}
+   · **删除指定的某条日程/记录**（她说"把投简历那条删掉""把那个事务给我删了"）：{"act":"delblock","q":"要删的名字(如 投简历/事务/睡懒觉/超市)","start":"12:00(可选，按时间删)"}
    · 插入生活/休息块（**只在她明确说"要去/在做"具体的事时才用**，如"下午去超市""我想歇半小时"）：{"act":"interrupt","label":"超市/吃饭/休息","start":"15:00(可选)","min":60}
    · 改学习窗口：{"act":"window","start":"08:30","end":"21:30"} 或只改开始 {"act":"setwindow_start","start":"09:00"}
    · 切状态：{"act":"energy","level":"low"或"high"或"normal"}
@@ -1012,6 +1082,7 @@ const SYSTEM_PROMPT=`你是「小陪」，刘雪的秋招陪跑搭子，要像�
 3) 没有操作就不要发 CMD 行。
 【关键理解】
 · "我没做/撤销/刚才那条删了/不是我完成的" = undo。
+· 她说"把XX删掉/把这个删了/两个事务都删掉" = **发 delblock 真的删掉**；**绝不许用 undo 糊弄，更不许顺手再加一条或改时间**（她已经被"越删越乱"气到过）。
 · "资料分析时间太短/给我多排点" = feedback 延长。
 · "接下来一小时不干活/我先歇会儿" = interrupt 休息。
 · 她焦虑/难受/吐槽：**只共情、只陪聊，绝不自动切轻量、绝不改日程**。最多问一句"要不要我把今天调轻一点？"，她答应了才发 energy low。
@@ -1047,6 +1118,7 @@ function execCmd(c){
     case 'log': r=logProgress((c.q||'')+(c.min?(' 用了'+c.min+'分钟'):'')); break;
     case 'feedback': r=handleFeedback((c.q||'')+' 改到'+(c.min||'')+'分钟'); break;
     case 'undo': r=handleUndo(); break;
+    case 'delblock': r=handleDelete((c.q||'')+(c.start?(' '+c.start):''),{q:c.q,start:c.start}); break;
     case 'interrupt': r=handleInterrupt((c.label||'')+(c.start?(' '+c.start):'')+(c.min?(' '+(c.min/60)+'小时'):'')); break;
     case 'window': r=setWindow('学习时间'+(c.start||'')+'到'+(c.end||'')); break;
     case 'setwindow_start': r=setWindow('今天从'+(c.start||'')+'开始'); break;
@@ -1124,6 +1196,9 @@ function pushLog(who,text){ // 非对话型日志（按钮触发）
   pushChat(who,text);
 }
 function renderHeader(){
+  const ab=document.getElementById('appbar');if(ab)ab.textContent='🤝 秋招陪跑 · 小陪 '+APP_VERSION;
+  const vs=document.getElementById('verSide');if(vs)vs.textContent=APP_VERSION;
+  const vt=document.getElementById('verTag');if(vt)vt.textContent=APP_VERSION+'（'+APP_BUILT+' 构建）';
   document.getElementById('topMeta').textContent=S.date+' ｜ '+S.dayStart+'–'+S.dayEnd+' ｜ 完成 '+S.done.length+' 项';
   const aiOn=(S.settings&&S.settings.apiKey);
   document.getElementById('sideStatus').innerHTML='<span class="dot '+(aiOn?'on':'off')+'"></span>'+(aiOn?'AI 已接入 · 活人模式':'规则模式 · 去设置填 Key');
