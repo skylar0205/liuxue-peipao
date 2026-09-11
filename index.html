@@ -554,7 +554,7 @@ function lowUnitFor(stream){
 /* ============ 状态 ============ */
 const KEY='liuxue_coach_v2';
 /* 版本号：每次改动 +1，并显示在界面顶部，方便核对手机上是哪一版 */
-const APP_VERSION='V1.2';
+const APP_VERSION='V1.3';
 const APP_BUILT='2026-09-10';
 let S=null;
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -573,7 +573,7 @@ function uid(){return Math.random().toString(36).slice(2,9);}
 function stripTags(s){return (s||'').replace(/<[^>]*>/g,'');}
 
 function initState(){
-  S={date:todayStr(),dayStart:'08:30',dayEnd:'21:30',energy:'normal',
+  S={date:todayStr(),dayStart:'08:30',dayEnd:'22:00',energy:'normal',
      fixed:[],done:[],remaining:[],deferred:[],pointers:{},totals:{},log:[],rhythm:{meals:[]},
      history:[],learnings:{capacityFactor:1,notes:[],totalDays:0,lastReviewed:null,lastSummary:null},positions:[],
      undoStack:[],unitOverrides:{},customUnits:{},chat:[],chatDate:todayStr(),
@@ -1635,6 +1635,11 @@ function load(){
   if(!S.settings)S.settings={provider:'openrouter',apiKey:'',model:'openai/gpt-4o-mini'};
   if(!S.customUnits)S.customUnits={};
   Object.assign(UNITS,S.customUnits); // 恢复自定义任务单元
+  /* 数据迁移：清掉早期 bug 硬塞的「事务」垃圾块 / 非法块，它们会挤占当日空档让任务全变"顺延" */
+  if(Array.isArray(S.fixed)){
+    S.fixed=S.fixed.filter(f=>f&&f.label&&f.label!=='事务'&&f.start&&f.end&&f.start!=='—'&&f.end!=='—');
+  }
+  if(S.dayEnd==='21:30')S.dayEnd='22:00'; // 计划里复盘到 22:00，窗口跟上，免得最后一段总排不下
   if(!S.diary)S.diary={};
   if(!S.recurring)S.recurring=[];
   if(!S.chatArchive)S.chatArchive={};
