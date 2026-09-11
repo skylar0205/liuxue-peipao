@@ -554,8 +554,8 @@ function lowUnitFor(stream){
 /* ============ 状态 ============ */
 const KEY='liuxue_coach_v2';
 /* 版本号：每次改动 +1，并显示在界面顶部，方便核对手机上是哪一版 */
-const APP_VERSION='V1.4';
-const APP_BUILT='2026-09-10';
+const APP_VERSION='V1.5';
+const APP_BUILT='2026-09-11';
 let S=null;
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function cnNum(s){
@@ -674,10 +674,16 @@ function buildRemaining(){
   }
   S.customUnits=S.customUnits||{};
   const ids=[];
+  /* 让口语能认出计划任务：①投递 ②行测 ③学习段 ④面试表达 ⑤复盘。
+     不加这些别名，"我12点投简历"会因标题是"投递（刷岗…）"而认不出，导致勾不掉原块、重复新建 */
+  const PLAN_KW={0:['投递','投简历','投了','投出','刷岗','挑岗','网申','投哪家'],
+                 1:['行测','资料分析','速算','粉笔','笔试','限时'],
+                 3:['面试','表达','口述','录音','群面','无领导','自我介绍','面经'],
+                 4:['复盘','三行','总结今天']};
   list.forEach((o,i)=>{
     const id='P'+i;
     S.customUnits[id]={stream:o.stream,title:o.title,min:o.min,light:false,
-      purpose:o.note,accept:o.accept,note:o.note,how:o.how,kw:[],plan:true};
+      purpose:o.note,accept:o.accept,note:o.note,how:o.how,kw:PLAN_KW[i]||[],plan:true};
     UNITS[id]=S.customUnits[id];
     if(!doneIds.has(id))ids.push(id);
   });
@@ -907,7 +913,8 @@ function classify(t){
   if(/作息|观察/.test(t))return 'rhythm';
   if((/睡|起床|起学|醒来/).test(t)&&findTimes(t).length)return 'rhythmLog';
   if(/(都在|一直在|一上午|一整(?:个)?上午|一下午|一整(?:个)?下午|从.{1,4}点.{0,8}(到|一直).{1,4}点)/.test(t)&&/(投|投递|学|做|刷|写|看|练|背|干|玩|睡|忙|面试|测评)/.test(t))return 'retro';
-  if(/(现在|已经|都|刚|才).{0,8}(点|小时|了)/.test(t)&&/(投|投递|投简历|学|做|刷|写|背|练|看|弄|干|起|开始)/.test(t)&&!/学习时间|改成|调整为|窗口/.test(t))return 'lognow';
+  /* "投递完了/做完了" 这种带完成动词的 → 交给下面的 'log' 去勾掉任务（别走 lognow 只重排却不勾） */
+  if(/(现在|已经|都|刚|才).{0,8}(点|小时|了)/.test(t)&&/(投|投递|投简历|学|做|刷|写|背|练|看|弄|干|起|开始)/.test(t)&&!/学习时间|改成|调整为|窗口|完成|做完了|学完|练完|看完|写完|投了|投完|搞定了|弄完|结束|搞定|可以了/.test(t))return 'lognow';
   if((/学习时间|改成|调整为|开始学|从.*点|到.*点/).test(t)&&findTimes(t).length>0)return 'setwindow';
   if((/完成|做完了|学(了|完)|练(了|完)|看(了|完)|写(了|完)|投(了|完)|做了|刷了|过(了|完)|搞(了|完)|弄(了|完)|结束|搞定|ok|OK|可以了|对的|是的|搞定了/).test(t)
      && !/没完成|没做|没学|没练|没看|没写|没投|不想|不想做|不愿意|别|不要|不是|没做完|没搞|没弄/.test(t)
@@ -936,27 +943,37 @@ function actNewday(){
   reconcile();
   return '🌅 新的一天：聊天框已清空（昨天聊的都留在「📔 日记」和日程里，没丢），未完成的任务顺延到今天。';
 }
+/* 把某个任务"勾掉完成"——统一入口：从待办/顺延移除、进 done、刷新排期。
+   start/end 给真实时间窗（如汇报"12点到2点投的"），不给就用计划块的原时间。 */
+function markUnitDone(unitId,opt){
+  opt=opt||{};
+  const u=getUnit(unitId);if(!u)return null;
+  const already=S.done.find(d=>d.unitId===unitId&&!d.offplan);
+  pushUndo('记录完成：'+u.title.slice(0,20));
+  const blk=S.plan.find(b=>b.unitId===unitId);
+  const start=opt.start||(blk?blk.start:'—');
+  const end=opt.end||(blk?blk.end:'—');
+  const actual=(opt.actual!=null)?opt.actual:(blk?toMin(blk.end)-toMin(blk.start):u.min);
+  S.remaining=S.remaining.filter(id=>id!==unitId);
+  S.deferred=S.deferred.filter(id=>id!==unitId);
+  if(!already){
+    S.done.push({unitId,start,end,actual,offplan:!blk&&!opt.start});
+    S.totals[u.stream]=(S.totals[u.stream]||0)+1;
+    pushHistory({date:S.date,type:'done',unitId,stream:u.stream,planned:u.min,actual,offplan:!blk});
+  }
+  reconcile();
+  return u;
+}
 function logProgress(t){
-  pushUndo('记录完成：'+t.slice(0,20));
   const unitId=matchUnit(t);
   if(!unitId)return '没太懂你做了什么，能说下具体任务名吗？（如"SQL做完了""英语学了一个小时"）';
-  const u=getUnit(unitId);
-  const M=parseMinutes(t)||u.min;
-  const blk=S.plan.find(b=>b.unitId===unitId);
-  pushHistory({date:S.date,type:'done',unitId,stream:u.stream,planned:u.min,actual:M,offplan:!blk});
-  if(blk){
-    const st=toMin(blk.start);
-    S.done.push({unitId,start:blk.start,end:toHM(st+M),actual:M});
-    S.remaining=S.remaining.filter(id=>id!==unitId);
-    S.totals[u.stream]=(S.totals[u.stream]||0)+1;
-    reconcile();
-    return '✅ 记下了：<b>'+u.title+'</b> 实际用了 '+M+' 分钟（原计划 '+u.min+' 分钟），后面的安排我重新顺了一下。';
-  }else{
-    S.done.push({unitId,start:'—',end:'—',actual:M,offplan:true});
-    S.totals[u.stream]=(S.totals[u.stream]||0)+1;
-    reconcile();
-    return '✅ 记下了 <b>'+u.title+'</b> 完成（'+M+' 分钟）。它不在今天的计划里，我标成"计划外完成"，不动你后面的安排。';
-  }
+  const M=parseMinutes(t);
+  const u=markUnitDone(unitId,{actual:M});
+  if(!u)return '这个任务我找不到，换个说法？';
+  const done=S.done.find(d=>d.unitId===unitId);
+  const offplan=done&&done.offplan;
+  const tl=done&&(done.start!=='—'&&done.end!=='—')?('（'+done.start+'–'+done.end+'，实际 '+done.actual+' 分钟）'):(done?('（实际 '+done.actual+' 分钟）'):'');
+  return '✅ 记下了：<b>'+u.title+'</b> 完成'+tl+(offplan?'（不在今天原计划里，记成计划外完成）':'')+'。已经从待办里勾掉了，后面的安排我重新顺了一下，接下来从 '+toHM(nowMin())+' 往后排。';
 }
 function handleInterrupt(t){
   const hm=t.match(/超市|吃饭|吃个饭|早餐|午餐|晚餐|夜宵|医院|看病|体检|买药|理发|洗澡|取快递|拿快递|寄快递|约会|聚会|出门|办事|睡觉|睡个觉|去睡|午休|午睡|小睡|补觉|休息|歇/);
@@ -979,7 +996,10 @@ function handleInterrupt(t){
   if(/吃饭|早餐|午餐|晚餐|夜宵/.test(label))note+='（顺手记进你的作息规律了）';
   return note;
 }
-/* 补记"过去那段时间我干了啥"——不删她的记录，只把已过去的时段如实标出来 */
+/* 补记"过去那段时间我干了啥"。
+   关键修复：如果她说的是今天计划里本来就有的任务（如"12点到2点投简历"，而计划排的是2-4:28投简历），
+   就直接把那个任务勾掉完成（用她说的真实时间窗），而不是新建一条导致重复；
+   只有当她说的是计划外的事（玩/刷手机/休息）才加一块"已过去"的固定块。 */
 function handleRetro(t,opts){
   opts=opts||{};
   const rg=parseRange(t);
@@ -996,20 +1016,20 @@ function handleRetro(t,opts){
   if(s===null){return '告诉我时间段就行，比如"我中午12点投简历投到下午5点"。';}
   if(e===null)e=Math.max(s+60,nowMin());
   if(e<s){const tmp=s;s=e;e=tmp;}
+  const unitId=matchUnit(t)||matchUnit(label);
+  /* 命中了"今天计划里的某个任务"→ 直接勾掉它（这才是她要的，不再留重复块） */
+  if(unitId){
+    const inPlan=S.plan.some(b=>b.unitId===unitId)||S.remaining.includes(unitId)||S.deferred.includes(unitId);
+    const u=markUnitDone(unitId,{start:toHM(s),end:toHM(e),actual:e-s,offplan:!inPlan});
+    diaryAdd(u.title+'（'+toHM(s)+'–'+toHM(e)+' 已完成）');
+    return '✅ 记下了：<b>'+u.title+'</b> 你已经在 '+toHM(s)+'–'+toHM(e)+' 做完了（实际 '+(e-s)+' 分钟），我把它从今天的待办里勾掉了'+(inPlan?'':'（你这会儿做的不在今天原计划里，记成计划外完成）')+'，后面的安排顺好了。接下来从 '+toHM(nowMin())+' 往后排。';
+  }
+  /* 计划外的事（玩/刷手机/休息等）→ 加一块"已过去"的固定块，占住时间、避免重排时撞上 */
   pushUndo('补记过去时段');
   S.fixed.push({id:uid(),label,start:toHM(s),end:toHM(e),past:true});
-  const unitId=matchUnit(label);
-  let extra='';
-  if(unitId){
-    const u=getUnit(unitId);
-    S.totals[u.stream]=(S.totals[u.stream]||0)+1;
-    S.remaining=S.remaining.filter(id=>id!==unitId);
-    pushHistory({date:S.date,type:'done',unitId,stream:u.stream,planned:u.min,actual:e-s});
-    extra='，也帮你记进「'+u.stream+'」的完成里';
-  }
   reconcile();
   diaryAdd(label+'（'+toHM(s)+'–'+toHM(e)+'）');
-  return '好，我把 '+toHM(s)+'–'+toHM(e)+' 记成「'+label+'」'+extra+'，也记进📔日记了（这是已经过去的时段，不会再重复排）。接下来我从现在（'+toHM(nowMin())+'）往后给你安排。';
+  return '好，我把 '+toHM(s)+'–'+toHM(e)+' 记成「'+label+'」（这是已经过去的时段，占用了一块时间，后面的安排自动往后顺）。接下来从 '+toHM(nowMin())+' 往后排。';
 }
 /* 删除指定的日程/记录——她说"把投简历那条删掉"就真的删掉 */
 function handleDelete(t,opts){
@@ -1268,7 +1288,7 @@ const SYSTEM_PROMPT=`你是「小陪」，刘雪的秋招陪跑搭子，要像�
    · 记录完成：{"act":"log","q":"关键词(资料分析速算/英语/SQL/Excel/简历/投递/行测…)","min":实际分钟(可选)}
    · 新增任务/测评(真的排进今天)：{"act":"addtask","title":"任务名(如 测评/字节笔试)","stream":"测评|投递|面试|行测|简历|英语|硬技能","min":预计分钟(默认60),"qty":数量(默认1),"deadline":"14天/9月20日(可空)"}
    · 按她现在的时间重排今天：{"act":"replan_now"}
-   · 补记"过去那段时间干了啥"(不删记录、只如实记下)：{"act":"retro","label":"投简历/玩/休息/学X","start":"12:00","end":"17:00"}
+   · 补记"过去那段时间干了啥"：{"act":"retro","label":"投简历/玩/休息/学X","start":"12:00","end":"17:00"}。⚠️ 如果她说的恰好是**今天计划里本来有的任务**（比如计划排了 2-4:28 投简历，她说"我12点到2点一直在投简历"），retro 会自动把那个计划任务**勾掉完成**（按她说的真实时间窗），而不是又新建一条导致重复——这正是她反复吐槽的 bug，必须这么处理；只有"玩/刷手机/休息"这种计划外的事才加一块"已过去"的占位块。
    · 记日记（她说"我去了X""我做了X"这类生活事件）：{"act":"diary","text":"去了图书馆/做了力量训练"}
    · 设周期事件（她说"我力量训练隔天做一次""一周练3次"）：{"act":"recurring","label":"力量训练","every":2}
    · 调整任务时长：{"act":"feedback","q":"关键词","min":新分钟数}
@@ -1288,7 +1308,8 @@ const SYSTEM_PROMPT=`你是「小陪」，刘雪的秋招陪跑搭子，要像�
 · "接下来一小时不干活/我先歇会儿" = interrupt 休息。
 · 她焦虑/难受/吐槽：**只共情、只陪聊，绝不自动切轻量、绝不改日程**。最多问一句"要不要我把今天调轻一点？"，她答应了才发 energy low。
 · "我还有两个测评/测评是14天的/加个XX任务" = 一定要发 addtask 把它排进今天，别只在嘴上答应。
-· 她说"现在都X点了/我才开始/上午荒废了" = 先接住，再发 {"act":"replan_now"} 把今天从当前时间重排；如果她讲的是**过去干了什么**（"我12点到5点都在投简历"），改发 retro 如实记下，别删她的话。
+· 她说"现在都X点了/我才开始/上午荒废了" = 先接住，再发 {"act":"replan_now"} 把今天从当前时间重排；如果她讲的是**过去干了什么**（"我12点到5点都在投简历"），发 retro——但 retro 会把对应的计划任务直接勾掉完成（不会留重复块），只有计划外的事才占位。
+· 她说"X做完了/投完了/我搞定了"且能认出是哪个任务（投简历/行测/面试/复盘/SQL/Excel…）= 发 {"act":"log","q":"投简历"} 把它勾掉；别只说"好的"不动她的日程。勾掉后后面的安排会自己顺好，就是她要的"重排下一项"。
 【怎么帮她排才人性化（她反复强调的）】
 · 她的真实进度最重要：**没学过的绝不能写"复习"**，要说"看个入门短视频，从0开始，不用有基础"。
 · 她累了 / 已经下午了 / 刚投完很久简历 → 只排 30 分钟以内的"轻起步"（看视频、泛听、翻简历、整理记录），别塞硬课。
