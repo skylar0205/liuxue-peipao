@@ -410,7 +410,7 @@ const STREAMS=['硬技能','简历','投递','行测','测评','面试','英语'
 
 /* ============ 一个月学习计划（2026-09-12 ~ 10-12）============ */
 const PLAN_START='2026-09-11'; // 提前一天开始（9/11 照计划第 1 天走，做完不顺延，没做完 9/12 接着来）
-/* 每天五段固定动作（顺序不变）——每段都带"学什么/用什么/怎么练/验收" */
+/* 每天六段固定动作（顺序不变）——每段都带"学什么/用什么/怎么练/验收" */
 const DAY_TEMPLATE=[
   {start:'08:30',end:'10:00',stream:'投递',title:'① 投递：刷岗 → 挑岗 → 投 3-4 家',
    note:'用「JD 解码」过一遍值不值得投；投完记进投递追踪表。',
@@ -428,7 +428,11 @@ const DAY_TEMPLATE=[
    note:'录音 → 回听，每次只改 3 处。轮着来：自我介绍 → STAR 故事 → 场景分析题 → 群面框架。',
    how:'bq-skill 存 STAR 故事；project-story-coach 把作品讲成故事；高顿「模拟面试报告」抽题打分',
    accept:'录音并改 3 处'},
-  {start:'21:20',end:'22:00',stream:'投递',title:'⑤ 复盘：只写三行',
+  {start:'20:20',end:'21:20',stream:'英语',title:'⑤ 英语：每天 1 小时',fid:'PE',
+   note:'背单词 + 1 篇听力/阅读，或练口语。四六级、外企岗都看英语，别断。',
+   how:'墨墨/不背单词刷词；听力用 BBC 6 Minute English 或 TPO；每天新词+复习共 1 小时，碎片时间也能背',
+   accept:'学满 1 小时'},
+  {start:'21:20',end:'22:00',stream:'投递',title:'⑥ 复盘：只写三行',fid:'PR',
    note:'投了几家 / 有没有回音 / 今天最大的卡点。',
    how:'三行就行，别写长',
    accept:'三行写完'}
@@ -554,7 +558,7 @@ function lowUnitFor(stream){
 /* ============ 状态 ============ */
 const KEY='liuxue_coach_v2';
 /* 版本号：每次改动 +1，并显示在界面顶部，方便核对手机上是哪一版 */
-const APP_VERSION='V1.5';
+const APP_VERSION='V1.6';
 const APP_BUILT='2026-09-11';
 let S=null;
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -646,8 +650,8 @@ function cycleStream(stream,n){
   }
   S.pointers[stream]=p;return res;
 }
-/* 今日日程 = 她的《一个月计划》：五段固定动作 + 当天学习项（不再随机抽课） */
-const TEMPLATE_MIN=[90,120,0,90,40]; // 投递 / 行测 / 学习段(按项均分) / 面试表达 / 复盘
+/* 今日日程 = 她的《一个月计划》：六段固定动作 + 当天学习项（不再随机抽课） */
+const TEMPLATE_MIN=[90,120,0,90,60,40]; // 投递 / 行测 / 学习段(按项均分) / 面试表达 / 英语 / 复盘
 function planUnitsForToday(){
   const p=getDayPlan(S.date);
   const list=[];
@@ -657,7 +661,7 @@ function planUnitsForToday(){
       const per=items.length>1?Math.round(140/items.length):120;
       items.forEach(o=>list.push({stream:o.stream||'硬技能',title:o.title,min:o.min||per,note:o.note||'',how:o.how||'',accept:o.accept||''}));
     }else{
-      list.push({stream:t.stream,title:t.title,min:TEMPLATE_MIN[i]||60,note:t.note||'',how:t.how||'',accept:t.accept||''});
+      list.push({stream:t.stream,title:t.title,min:TEMPLATE_MIN[i]||60,note:t.note||'',how:t.how||'',accept:t.accept||'',fid:t.fid});
     }
   });
   return list;
@@ -674,14 +678,15 @@ function buildRemaining(){
   }
   S.customUnits=S.customUnits||{};
   const ids=[];
-  /* 让口语能认出计划任务：①投递 ②行测 ③学习段 ④面试表达 ⑤复盘。
+  /* 让口语能认出计划任务：①投递 ②行测 ③学习段 ④面试表达 ⑤英语 ⑥复盘。
      不加这些别名，"我12点投简历"会因标题是"投递（刷岗…）"而认不出，导致勾不掉原块、重复新建 */
   const PLAN_KW={0:['投递','投简历','投了','投出','刷岗','挑岗','网申','投哪家'],
                  1:['行测','资料分析','速算','粉笔','笔试','限时'],
                  3:['面试','表达','口述','录音','群面','无领导','自我介绍','面经'],
-                 4:['复盘','三行','总结今天']};
+                 4:['英语','背单词','学英语','练听力','口语','单词','四六级'],
+                 5:['复盘','三行','总结今天']};
   list.forEach((o,i)=>{
-    const id='P'+i;
+    const id=o.fid||('P'+i);
     S.customUnits[id]={stream:o.stream,title:o.title,min:o.min,light:false,
       purpose:o.note,accept:o.accept,note:o.note,how:o.how,kw:PLAN_KW[i]||[],plan:true};
     UNITS[id]=S.customUnits[id];
@@ -1275,7 +1280,7 @@ function process(t){
 /* ============ AI 接入（BYOK） ============ */
 const SYSTEM_PROMPT=`你是「小陪」，刘雪的秋招陪跑搭子，要像真人朋友一样陪她，温暖、自然、会说人话。
 【背景】刘雪：二本软件工程2027届，河北，轻技术背景，不走开发。主方向：用户/数据/策略/增长运营、数据分析、运维（非开发）；其他非开发岗（销售/行政/文员等）也不排斥。外企书面型，京津冀优先。秋招有8条流并行：硬技能(Excel/SQL/Python)、简历、投递、行测(央国企笔试)、测评、面试(含无领导小组)、英语(听力+口语+阅读)、紧急插队(公司发测评/笔试链接)。
-【她手上有一份《一个月学习计划 9/12–10/12》，App 已内置】：每天五段固定动作——①08:30 投递(刷岗→挑岗→投3-4家) ②10:00 行测(粉笔限时+复盘) ③13:00 学习段 ④16:10 面试表达(写稿→口述→录音改3处) ⑤21:20 复盘三行。学习段按当周清单走：第1周 Excel基础+自我介绍；第2周 Excel小报告+SQL入门+方法论；第3周 SQL刷题+A/B+群面+STAR；第4周 作品集+模拟面试+冲量；最后收尾复盘。**这一个月只学四样：Excel、SQL、数据分析方法论、面试表达**——明确不学 Python/统计系统课/Tableau深入/计算机二级/申论。她问"今天学什么"时，直接照「今日学习清单」（stateSummary 里有）回答，并说清用谁的课（戴师兄/王佩丰/Mosh/牛客）、学到哪停。
+【她手上有一份《一个月学习计划 9/12–10/12》，App 已内置】：每天六段固定动作——①08:30 投递(刷岗→挑岗→投3-4家) ②10:00 行测(粉笔限时+复盘) ③13:00 学习段 ④16:10 面试表达(写稿→口述→录音改3处) ⑤20:20 英语(每天1小时：背单词+听力/口语，四六级/外企都要) ⑥21:20 复盘三行。学习段按当周清单走：第1周 Excel基础+自我介绍；第2周 Excel小报告+SQL入门+方法论；第3周 SQL刷题+A/B+群面+STAR；第4周 作品集+模拟面试+冲量；最后收尾复盘。**这一个月只学四样：Excel、SQL、数据分析方法论、面试表达**——明确不学 Python/统计系统课/Tableau深入/计算机二级/申论。她问"今天学什么"时，直接照「今日学习清单」（stateSummary 里有）回答，并说清用谁的课（戴师兄/王佩丰/Mosh/牛客）、学到哪停。
 【她讨厌】死模板、听不懂人话的机器人。你要：①接住她的吐槽/焦虑/迷茫，像朋友一样共情回应；②准确理解她口语化的汇报，改对排期。
 【铁律·最重要，先读这条】
 · 她只是**吐槽 / 倾诉 / 闲聊 / 发泄情绪**时：**只回话陪她，一个 CMD 都不许发**。她说过"我跟他聊两句，他就给我硬塞两件事"——那是错的。**绝不能因为她说了句话就动她的日程**。
@@ -1333,7 +1338,7 @@ function stateSummary(){
   L.push('岗位库：'+ (S.positions.length? S.positions.length+'个':'空'));
   L.push('时间系数：'+ Math.round((S.learnings.capacityFactor||1)*100)+'%');
   const p=getDayPlan(S.date);
-  if(p)L.push('今日计划学习（第'+p.weekNo+'周 · '+p.theme+'）：'+(p.items&&p.items.length?p.items.map(x=>x.title).join('、'):'固定五段'));
+  if(p)L.push('今日计划学习（第'+p.weekNo+'周 · '+p.theme+'）：'+(p.items&&p.items.length?p.items.map(x=>x.title).join('、'):'固定六段'));
   const due=dueRecurring();
   if(due.length)L.push('今天该做的周期事件：'+due.map(r=>r.label).join('、'));
   if(S.recurring&&S.recurring.length)L.push('已设周期：'+S.recurring.map(r=>r.label+' 每 '+r.every+' 天（下次 '+r.next+'）').join('、'));
@@ -1505,7 +1510,7 @@ function renderTodayLearn(){
   if(due.length)h+='<div class="hintbox" style="margin:0 0 8px;">🔁 今天该做：<b>'+due.map(r=>r.label).join('、')+'</b>（周期事件，做完跟我说一声）</div>';
   if(!p){
     h+='<div class="note">今天不在「9/12–10/12 一个月计划」范围内，照下面的日程走就行，不用硬套计划。</div>';
-    h+='<details style="margin-top:8px;"><summary style="cursor:pointer;font-size:12.5px;color:#48557a;">+ 每天固定五段（点开看）</summary>';
+    h+='<details style="margin-top:8px;"><summary style="cursor:pointer;font-size:12.5px;color:#48557a;">+ 每天固定六段（点开看）</summary>';
     DAY_TEMPLATE.forEach(t=>{h+=card(t.title,{note:t.note,how:t.how,accept:t.accept});});
     h+='</details></div>';
     el.innerHTML=h;return;
@@ -1515,9 +1520,9 @@ function renderTodayLearn(){
     h+='<div style="font-size:12.5px;font-weight:600;color:#0f766e;margin:4px 0;">今天要学的（③学习段）：</div>';
     p.items.forEach(o=>{h+=card('· '+o.title,o);});
   }else{
-    h+='<div class="note">今天没有额外学习内容，按固定五段走。</div>';
+    h+='<div class="note">今天没有额外学习内容，按固定六段走（含每天 1 小时英语）。</div>';
   }
-  h+='<details style="margin-top:8px;"><summary style="cursor:pointer;font-size:12.5px;color:#48557a;">+ 每天固定五段（点开看）</summary>';
+  h+='<details style="margin-top:8px;"><summary style="cursor:pointer;font-size:12.5px;color:#48557a;">+ 每天固定六段（点开看）</summary>';
   DAY_TEMPLATE.forEach(t=>{h+=card(t.title,{note:t.note,how:t.how,accept:t.accept});});
   h+='</details></div>';
   el.innerHTML=h;
@@ -1668,6 +1673,12 @@ function load(){
   if(!S.chatArchive)S.chatArchive={};
   if(!S.chatDate)S.chatDate=S.date;
   buildRemaining(); // 每次打开都按最新计划重建今日日程（她手动加的任务 C* 会保留）
+  /* 迁移：插入"英语"段后，旧浮动的 P4/P5 等编号已不对应新模板，清掉失效的 P 类完成记录，
+     否则 renderSchedule 取 getUnit('P4') 会 undefined 导致行程渲染崩。PE/PR 是英语/复盘的稳定 id，保留。 */
+  S.done=(S.done||[]).filter(d=>{
+    if(d&&typeof d.unitId==='string'&&d.unitId.indexOf('P')===0&&d.unitId!=='PE'&&d.unitId!=='PR'&&!S.customUnits[d.unitId])return false;
+    return true;
+  });
   if(S.date!==todayStr()){ actNewday(); }                 // 换天：归档聊天+清空聊天框
   else if(S.chatDate!==todayStr()){                        // 同一天但聊天是昨天的
     archiveChat(); S.chat=[]; S.chatDate=todayStr(); reconcile();
