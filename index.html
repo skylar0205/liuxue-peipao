@@ -558,7 +558,7 @@ function lowUnitFor(stream){
 /* ============ 状态 ============ */
 const KEY='liuxue_coach_v2';
 /* 版本号：每次改动 +1，并显示在界面顶部，方便核对手机上是哪一版 */
-const APP_VERSION='V1.7';
+const APP_VERSION='V1.8';
 const APP_BUILT='2026-09-11';
 let S=null;
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -1418,6 +1418,14 @@ async function sendChat(){
     const cmds=[...reply.matchAll(/CMD:(\{[\s\S]*?\})/g)].map(m=>{try{return JSON.parse(m[1]);}catch(e){return null;}}).filter(Boolean);
     let notes=[];
     cmds.forEach(c=>{const r=execCmd(c);if(r)notes.push('· '+stripTags(r));});
+    /* —— 兜底（解决"AI 嘴上改了、行程却没动"）：
+       LLM 经常"用漂亮话总结行动却忘了发 CMD"，导致 S 没变、行程页不刷新。
+       若她的话是"做完X / 补记过去时段"(classify=log|retro) 且 LLM 没发 log/retro 指令，
+       就用规则引擎把这次汇报真正落到 S+reconcile（markUnitDone/handleRetro 幂等，不重复）。
+       吐槽/提问不会命中 log|retro，所以不会误改日程。 —— */
+    const cv=classify(v);
+    const llHandledLogRetro=cmds.some(c=>c.act==='log'||c.act==='retro');
+    if(!llHandledLogRetro&&(cv==='log'||cv==='retro')){ process(v); }
     let finalText=display || '好嘞，我记下了。';
     if(notes.length)finalText+='\n\n📌 已帮你：\n'+notes.join('\n');
     updateLastAi(finalText);
@@ -1681,6 +1689,13 @@ function load(){
     if(d&&typeof d.unitId==='string'&&d.unitId.indexOf('P')===0&&d.unitId!=='PE'&&d.unitId!=='PR'&&!S.customUnits[d.unitId])return false;
     return true;
   });
+  /* 迁移：V1.7 前 matchUnit 串台，可能把"投递完简历"误记成 U20「简历一百问」的"计划外完成"脏数据。
+     U20 从不是今日固定计划任务，清掉它在 done/plan/remaining/deferred 里的残留，
+     免得行程里凭空多出一条"简历一百问"。 */
+  S.done=(S.done||[]).filter(d=>!(d&&d.unitId==='U20'));
+  S.plan=(S.plan||[]).filter(b=>!(b&&b.unitId==='U20'));
+  S.remaining=(S.remaining||[]).filter(id=>id!=='U20');
+  S.deferred=(S.deferred||[]).filter(id=>id!=='U20');
   if(S.date!==todayStr()){ actNewday(); }                 // 换天：归档聊天+清空聊天框
   else if(S.chatDate!==todayStr()){                        // 同一天但聊天是昨天的
     archiveChat(); S.chat=[]; S.chatDate=todayStr(); reconcile();
