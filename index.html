@@ -330,7 +330,7 @@ const UNITS = {
   U09:{stream:'硬技能',title:'项目：增长/留存分析报告',min:120,light:false,purpose:'简历项目/面试谈资',accept:'一份分析报告',kw:['项目','分析报告','eda']},
   U10:{stream:'硬技能',title:'行业研究：拆解1个产品的增长路径',min:60,light:false,purpose:'高段位运营业务sense',accept:'画增长路径图',kw:['行业','拆解','增长路径','产品','商业']},
   U11:{stream:'硬技能',title:'BI工具(Tableau/帆软)入门',min:90,light:false,purpose:'数据运营加分项',accept:'连表出图',kw:['bi','tableau','帆软','powerbi','可视化']},
-  U20:{stream:'简历',title:'看"简历一百问"自评，列3个待改点',min:60,light:false,purpose:'避坑',accept:'改点清单',kw:['简历一百问','简历自评','简历','一百问']},
+  U20:{stream:'简历',title:'看"简历一百问"自评，列3个待改点',min:60,light:false,purpose:'避坑',accept:'改点清单',kw:['简历一百问','简历自评','简历自查','简历改','对照简历','查简历']},
   U21:{stream:'简历',title:'产出数据/增长运营简历初稿',min:120,light:false,purpose:'投递门槛',accept:'完整版',kw:['简历初稿','写简历','resume','初稿']},
   U22:{stream:'简历',title:'按投递岗位微调简历',min:60,light:false,purpose:'匹配度',accept:'JD关键词对齐',kw:['微调','改简历','对齐']},
   U24:{stream:'简历',title:'产出1份运营方案/活动策划作品',min:120,light:false,purpose:'作品集/面试谈资',accept:'一份方案',kw:['运营方案','活动策划','作品','方案']},
@@ -558,7 +558,7 @@ function lowUnitFor(stream){
 /* ============ 状态 ============ */
 const KEY='liuxue_coach_v2';
 /* 版本号：每次改动 +1，并显示在界面顶部，方便核对手机上是哪一版 */
-const APP_VERSION='V1.6';
+const APP_VERSION='V1.7';
 const APP_BUILT='2026-09-11';
 let S=null;
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -863,24 +863,26 @@ function parseRange(t){
 }
 function matchUnit(t){
   const tl=(t||'').toLowerCase();
+  /* 今天的计划任务（P*，且仍在 plan/remaining/deferred）享有绝对优先权重：
+     用户说"投递完简历"必须命中"投递"计划块，绝不能串到 U20「简历一百问」(它关键词含裸词"简历")。
+     仅当该单元本身已被关键词/标题命中(sc>0)时才加权重，避免"做完了"这类空话乱选计划任务。 */
+  const inPlan=id=>(S.plan&&S.plan.some(b=>b.unitId===id))||(S.remaining&&S.remaining.includes(id))||(S.deferred&&S.deferred.includes(id));
   let best=null,bestScore=0;
   for(const id in UNITS){
-    const u=UNITS[id];let sc=0;
-    for(const k of u.kw){if(tl.includes(k.toLowerCase()))sc+=k.length;}
-    if(sc>bestScore){bestScore=sc;best=id;}
-  }
-  /* 再按"标题"匹配计划任务 P* 和手动任务 C*：支持双向模糊，所以"材料归档做完了"能认出来 */
-  for(const id in UNITS){
-    const u=UNITS[id];
-    if(!u||!(u.plan||u.custom)||!u.title)continue;
-    const clean=u.title.toLowerCase().replace(/^[①②③④⑤·\s]+/,'').replace(/（[^）]*）/g,'').replace(/\([^)]*\)/g,'').replace(/[：:].*$/,'');
-    let hit=0;
-    clean.split(/[，,、:：/\s]+/).forEach(seg=>{if(seg.length>=2&&tl.indexOf(seg)>=0)hit=Math.max(hit,seg.length);});
-    if(!hit){
-      const core=tl.replace(/做完了|学完了|完成了|搞定了|练完了|看完了|完成|做了|搞定|学完|练完|看完|结束|了/g,'');
-      for(let i=0;i+3<=clean.length;i++){const s3=clean.slice(i,i+3);if(core.indexOf(s3)>=0){hit=3;break;}}
+    const u=UNITS[id];if(!u)continue;let sc=0;
+    for(const k of (u.kw||[])){if(tl.includes(String(k).toLowerCase()))sc+=String(k).length;}
+    if(u.title){
+      const clean=u.title.toLowerCase().replace(/^[①②③④⑤·\s]+/,'').replace(/（[^）]*）/g,'').replace(/\([^)]*\)/g,'').replace(/[：:].*$/,'');
+      let hit=0;
+      clean.split(/[，,、:：/\s]+/).forEach(seg=>{if(seg.length>=2&&tl.indexOf(seg)>=0)hit=Math.max(hit,seg.length);});
+      if(!hit){
+        const core=tl.replace(/做完了|学完了|完成了|搞定了|练完了|看完了|完成|做了|搞定|学完|练完|看完|结束|了/g,'');
+        for(let i=0;i+3<=clean.length;i++){const s3=clean.slice(i,i+3);if(core.indexOf(s3)>=0){hit=3;break;}}
+      }
+      if(hit)sc+=hit+2;
     }
-    if(hit&&(hit+2)>bestScore){bestScore=hit+2;best=id;}
+    if(sc>0&&inPlan(id))sc+=100;            // ← 计划任务压过一切参考单元(U20 等)
+    if(sc>bestScore){bestScore=sc;best=id;}
   }
   return bestScore>0?best:null;
 }
@@ -917,7 +919,7 @@ function classify(t){
   if(/^岗位|看岗位|我的岗位|岗位库|列岗位|岗位清单/.test(t))return 'positionList';
   if(/作息|观察/.test(t))return 'rhythm';
   if((/睡|起床|起学|醒来/).test(t)&&findTimes(t).length)return 'rhythmLog';
-  if(/(都在|一直在|一上午|一整(?:个)?上午|一下午|一整(?:个)?下午|从.{1,4}点.{0,8}(到|一直).{1,4}点)/.test(t)&&/(投|投递|学|做|刷|写|看|练|背|干|玩|睡|忙|面试|测评)/.test(t))return 'retro';
+  if(/(都在|一直在|一上午|一整(?:个)?上午|一下午|一整(?:个)?下午|从.{1,4}点.{0,8}(到|一直).{1,4}点|(\d+|[一二三四五六七八九十]+)\s*点\s*(?:到|至|–|-|—)\s*(\d+|[一二三四五六七八九十]+)\s*点)/.test(t)&&/(投|投递|学|做|刷|写|看|练|背|干|玩|睡|忙|面试|测评|英语|工作)/.test(t))return 'retro';
   /* "投递完了/做完了" 这种带完成动词的 → 交给下面的 'log' 去勾掉任务（别走 lognow 只重排却不勾） */
   if(/(现在|已经|都|刚|才).{0,8}(点|小时|了)/.test(t)&&/(投|投递|投简历|学|做|刷|写|背|练|看|弄|干|起|开始)/.test(t)&&!/学习时间|改成|调整为|窗口|完成|做完了|学完|练完|看完|写完|投了|投完|搞定了|弄完|结束|搞定|可以了/.test(t))return 'lognow';
   if((/学习时间|改成|调整为|开始学|从.*点|到.*点/).test(t)&&findTimes(t).length>0)return 'setwindow';
