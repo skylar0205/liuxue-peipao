@@ -144,6 +144,7 @@
       <button class="nav" data-tab="today" onclick="switchTab('today')"><span class="ic">📅</span><span class="lb">今日日程</span></button>
       <button class="nav" data-tab="learn" onclick="switchTab('learn')"><span class="ic">📊</span><span class="lb">我的规律</span></button>
       <button class="nav" data-tab="jobs" onclick="switchTab('jobs')"><span class="ic">📁</span><span class="lb">岗位库</span></button>
+      <button class="nav" data-tab="diary" onclick="switchTab('diary')"><span class="ic">📔</span><span class="lb">日记</span></button>
       <button class="nav" data-tab="set" onclick="switchTab('set')"><span class="ic">⚙️</span><span class="lb">设置</span></button>
     </nav>
     <div class="side-foot" id="sideStatus"></div>
@@ -158,12 +159,12 @@
     <section class="tab" id="tab-chat">
       <div class="chat" id="chatlog"></div>
       <div class="quick" id="quick">
-        <button class="chip" onclick="quick('今天该干嘛')">今天该干嘛</button>
+        <button class="chip" onclick="quick('今天该干嘛')">今天学什么</button>
+        <button class="chip" onclick="quick('我去图书馆了')">记日记</button>
+        <button class="chip" onclick="quick('我力量训练隔天做一次')">设周期提醒</button>
         <button class="chip" onclick="quick('我英语学了一个小时')">英语学1小时</button>
         <button class="chip" onclick="quick('下午3点去超市，一小时')">下午去超市</button>
         <button class="chip" onclick="quick('今天好压抑')">今天好压抑</button>
-        <button class="chip" onclick="quick('资料分析速算时间太短了')">资料分析太短</button>
-        <button class="chip" onclick="quick('刚才那条撤销')">撤销</button>
       </div>
       <div class="inputbar">
         <input id="msg" placeholder="随便说，说人话就行…" onkeydown="if(event.key==='Enter')send()">
@@ -179,6 +180,7 @@
           <button class="btn" onclick="doAct('newday')">🌅 新的一天</button>
           <button class="btn" onclick="doAct('review')">📝 复盘</button>
         </div>
+        <div id="todayLearn"></div>
         <div id="progress"></div>
         <div class="tl" id="schedule"></div>
       </div>
@@ -202,6 +204,29 @@
           <h3>📁 岗位库</h3>
           <div class="note">在「陪跑」里直接说「记岗位 字节跳动 用户运营 北京」「投了字节」就能增删，不用手填。</div>
           <div id="positions" style="margin-top:12px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 日记本 -->
+    <section class="tab hidden" id="tab-diary">
+      <div class="pad">
+        <div class="panel">
+          <h3>📔 日记本</h3>
+          <div class="note">在「陪跑」里说「我今天去图书馆了」「上午练了力量训练」，我自动记到这里；也可以手写。</div>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <input id="diaryInput" placeholder="今天发生了什么…" style="flex:1;padding:10px 12px;border:1px solid var(--line);border-radius:11px;font-size:14px;outline:none;background:#f7f9fc;">
+            <button class="btn primary" onclick="diaryAddManual()">记一笔</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>🔁 周期提醒</h3>
+          <div class="note">比如「力量训练每隔一天做一次」——到日子我会自动提醒你。在「陪跑」里说「我力量训练隔天做一次」即可。</div>
+          <div id="recurringBox" style="margin-top:10px;"></div>
+        </div>
+        <div class="panel">
+          <h3>📖 我的记录</h3>
+          <div id="diaryList"></div>
         </div>
       </div>
     </section>
@@ -382,6 +407,138 @@ const HOWTO={
   U68:'🗣 背1分钟英文自我介绍 + 3个英文STAR故事(用你中文故事翻英文)；💬 用豆包/陪跑对话做英文口语模拟面试；达不到"能脱稿讲1分钟+1个故事"就不停。',
 };
 const STREAMS=['硬技能','简历','投递','行测','测评','面试','英语'];
+
+/* ============ 一个月学习计划（2026-09-12 ~ 10-12）============ */
+const PLAN_START='2026-09-12';
+/* 每天五段固定动作（顺序不变）——每段都带"学什么/用什么/怎么练/验收" */
+const DAY_TEMPLATE=[
+  {start:'08:30',end:'10:00',stream:'投递',title:'① 投递：刷岗 → 挑岗 → 投 3-4 家',
+   note:'用「JD 解码」过一遍值不值得投；投完记进投递追踪表。',
+   how:'高顿 / BOSS / 牛客 搜「国企·银行 信息化/数据/运营/综合职能」；双非一定要在 BOSS 也投一份',
+   accept:'当天投 3-4 家并记录'},
+  {start:'10:00',end:'12:00',stream:'行测',title:'② 笔试 / 行测：限时做题',
+   note:'粉笔 App 限时 → 错题用「行测复盘一体版」复盘 → 存进「朱批录」。',
+   how:'粉笔限时 1 组；重点资料分析，用花生十三速算（截位直除、415 份数法）。投银行搜关键词用 EPI',
+   accept:'1 组限时 + 错题复盘'},
+  {start:'13:00',end:'15:20',stream:'硬技能',title:'③ 学习段（按当周清单）',
+   note:'固定顺序：Excel → SQL → 方法论 → BI（选学）。每天 1-2 项。',
+   how:'看下面「今日学习清单」里当天那几项',
+   accept:'按清单完成'},
+  {start:'16:10',end:'17:40',stream:'面试',title:'④ 面试表达：写稿 → 口述 → 录音回听',
+   note:'录音 → 回听，每次只改 3 处。轮着来：自我介绍 → STAR 故事 → 场景分析题 → 群面框架。',
+   how:'bq-skill 存 STAR 故事；project-story-coach 把作品讲成故事；高顿「模拟面试报告」抽题打分',
+   accept:'录音并改 3 处'},
+  {start:'21:20',end:'22:00',stream:'投递',title:'⑤ 复盘：只写三行',
+   note:'投了几家 / 有没有回音 / 今天最大的卡点。',
+   how:'三行就行，别写长',
+   accept:'三行写完'}
+];
+/* 休息（不要压掉休息去换时长） */
+const REST_BLOCKS=[
+  {label:'午饭',start:'12:00',end:'13:00'},
+  {label:'午休',start:'15:20',end:'15:40'},
+  {label:'晚饭',start:'17:40',end:'18:30'},
+  {label:'休息',start:'20:00',end:'20:20'}
+];
+/* 逐周 × 逐日：当天学习段要学什么（含老师/课程/章节/练法/验收） */
+const WEEK_PLAN=[
+ {theme:'打地基 + 铺量（Excel 基础 · 自我介绍 · 行测找回手感）', days:[
+  {items:[
+   {stream:'投递',title:'求职材料归档',note:'成绩单、四六级、学生干部证明、志愿服务证明、获奖证书、证件照（白底+蓝底）',how:'全部拍照，存进手机一个叫「求职材料」的文件夹',accept:'材料归档完成'},
+   {stream:'硬技能',title:'戴师兄 Excel（前 1/3）',note:'戴师兄《课程2.0｜Excel 基础操作｜大厂周报制作｜常用函数》约 200 分钟 · 看前 1/3',how:'B站搜「戴师兄 Excel」；开着电脑边看边跟做',accept:'看完前 1/3 并跟做'}]},
+  {items:[
+   {stream:'硬技能',title:'戴师兄 Excel（中 1/3）',note:'同上课程 · 中 1/3',how:'边看边在电脑上敲一遍',accept:'跟做完中 1/3'},
+   {stream:'面试',title:'写自我介绍「1 分钟版」',note:'PREP 结构：观点-理由-例子-结论；突出「数据/增长」相关经历',how:'写完对着镜子念一遍',accept:'1 分钟版成稿'}]},
+  {items:[
+   {stream:'硬技能',title:'戴师兄 Excel（后 1/3）',note:'重点：数据透视表、VLOOKUP、SUMIFS',how:'每学一个函数，立刻拿一份自己的表练 3 遍',accept:'能独立做出透视表和 VLOOKUP'}]},
+  {items:[
+   {stream:'硬技能',title:'王佩丰 24 讲 · 挑讲补漏',note:'王佩丰《Excel 基础教程 24 讲》——只挑「数据透视表 + 图表」几讲看（当字典用）',how:'B站搜「王佩丰 Excel 24 讲」；哪块虚就补哪块',accept:'透视表和图表不卡壳'},
+   {stream:'面试',title:'自我介绍念三遍 + 录音',note:'1 分钟版 · 念 3 遍，录音回听',how:'听自己的口癖和卡壳处，记下来',accept:'录音已回听'}]},
+  {items:[
+   {stream:'硬技能',title:'真实数据练透视表',note:'拿班级/社团/公开数据集，做一张交互汇总表（行=月份，值=人数/金额）',how:'数据集可从天池或学校数据里挑一份',accept:'一张能交互的透视表'},
+   {stream:'面试',title:'开写自我介绍「3 分钟版」',note:'在 1 分钟版基础上加：一段实习细节 + 一段校园经历（都带数字）',how:'写完先不背，读顺为准',accept:'3 分钟版初稿'}]},
+  {items:[
+   {stream:'硬技能',title:'同一份数据做 2 张图',note:'柱状图 + 折线图，标题写清「谁、什么、什么时候」',how:'图的标题和结论要能自己讲出来',accept:'2 张图 + 能讲'},
+   {stream:'面试',title:'自我介绍两版定稿 + 录音',note:'1 分钟版 + 3 分钟版，都录音',how:'录音回听，只改 3 处',accept:'两版定稿'}]},
+  {items:[
+   {stream:'投递',title:'今天不投递 · 半天复盘',note:'这周投了几家 / 有没有回音 / Excel 哪块还不熟 / 录音改 3 处',how:'复盘完剩下时间休息，别加码',accept:'复盘写完、休息'}]}
+ ]},
+ {theme:'交第一件作品 + SQL 入门（Excel 收尾 · SQL 语法 · 方法论开个头）', days:[
+  {items:[
+   {stream:'硬技能',title:'Excel 小报告 · 第 1 步：定口径 + 取数',note:'用真实数据做一份 2-3 页数据分析小报告（这是简历上唯一能替代「没有实习」的东西）',how:'先说清「这份数据统计的是谁、什么时间、什么口径」，再取数',accept:'口径写清 + 数据取好'},
+   {stream:'硬技能',title:'Mosh SQL 教程（第 1 段）',note:'B站中文版 Mosh SQL，约 3 小时 · 看第 1 段（SELECT/WHERE/ORDER BY）',how:'B站搜「Mosh SQL 中文」；网页 SQLZoo 跟着敲',accept:'能写基本查询'}]},
+  {items:[
+   {stream:'硬技能',title:'Excel 小报告 · 第 2 步：出 3 张图',note:'柱状/折线/饼图各一，图要服务于结论',how:'每张图配一句话结论',accept:'3 张图 + 3 句结论'},
+   {stream:'硬技能',title:'Mosh SQL（第 2 段）',note:'看第 2 段（GROUP BY + 聚合函数）',how:'牛客/菜鸟教程找对应练习',accept:'会分组聚合'},
+   {stream:'硬技能',title:'方法论 20 分钟：趋势分析',note:'5 种分析方法之一（趋势、对比、漏斗、多维拆解、RFM）',how:'自己整理成一页笔记，别买课',accept:'能讲清趋势分析'}]},
+  {items:[
+   {stream:'硬技能',title:'Excel 小报告 · 第 3 步：写 3 条结论（收尾）',note:'结论要写成「因为…所以建议…」，不是复述数字',how:'写完存成能直接打开给面试官看的东西',accept:'★ 小报告交稿'},
+   {stream:'硬技能',title:'Mosh SQL（第 3 段）',note:'看第 3 段（JOIN 关联）',how:'重点 INNER JOIN 和 LEFT JOIN 的区别',accept:'会写关联查询'},
+   {stream:'硬技能',title:'方法论 20 分钟：对比分析',note:'同比/环比/横向对比怎么用',how:'配一个电商场景例子',accept:'能讲清对比分析'}]},
+  {items:[
+   {stream:'硬技能',title:'牛客 SQL 10 题',note:'牛客网 SQL 篇 · 每天 10 题，边写边看结果',how:'做错的题截图存相册',accept:'10 题 + 错题截图'},
+   {stream:'硬技能',title:'方法论 20 分钟：漏斗分析 ⭐',note:'5 种方法里最重要的一种——后面写作品集和答题都要用',how:'画一张「看到→点击→注册→付费」漏斗图',accept:'能画漏斗并讲转化'}]},
+  {items:[
+   {stream:'硬技能',title:'牛客 SQL 10 题',note:'重点 SELECT + GROUP BY 组合',how:'限时做，别查答案',accept:'10 题'},
+   {stream:'硬技能',title:'方法论 20 分钟：多维拆解',note:'把一个指标拆成多个维度找原因',how:'例：日活下降→拆新老/渠道/机型/地区',accept:'能拆一层'}]},
+  {items:[
+   {stream:'硬技能',title:'牛客 SQL 10 题',note:'重点 GROUP BY + HAVING',how:'错的记下来',accept:'10 题'},
+   {stream:'硬技能',title:'方法论 20 分钟：用户分层（RFM）',note:'R 最近购买、F 频次、M 金额',how:'举一个把你实习社群分层的小例子',accept:'能讲清 RFM'}]},
+  {items:[
+   {stream:'硬技能',title:'牛客 SQL 10 题',note:'本周累计到 40 题',how:'记录正确率',accept:'10 题'},
+   {stream:'硬技能',title:'方法论整理成一页',note:'5 种方法 + 各一句自己话的解释',how:'这页以后面试前直接看',accept:'★ 方法论一页纸'}]}
+ ]},
+ {theme:'刷题 + 群面 + 场景题（SQL 刷到量 · A/B · 群面框架 · STAR）', days:[
+  {items:[
+   {stream:'硬技能',title:'牛客 SQL 10 题',note:'重点 JOIN 组合',how:'限时',accept:'10 题'},
+   {stream:'硬技能',title:'A/B 测试入门',note:'搞懂：对照组/实验组、显著性、怎么判断有效',how:'B站搜「A/B测试 入门」；讲清一次 AB 实验怎么设计',accept:'能讲清 AB 实验'}]},
+  {items:[
+   {stream:'硬技能',title:'牛客 SQL 10 题',note:'重点多表关联',how:'限时',accept:'10 题'},
+   {stream:'面试',title:'场景分析题 · 四步骨架',note:'题：「某电商 App 日活下降 20% 你怎么分析？」四步=界定指标口径→拆影响因素→说需要哪些数据→给动作建议',how:'⭐ 别一上来就猜原因，这是最常见的挂法',accept:'四步骨架写出来'}]},
+  {items:[
+   {stream:'硬技能',title:'牛客 SQL 10 题',note:'注意 WHERE 与 HAVING 的区别',how:'限时',accept:'10 题'},
+   {stream:'面试',title:'群面建场感：看 3 个真实复盘',note:'B站/牛客搜「无领导 群面 复盘」，看 3 个',how:'记下「坏人」和「好角色」各是什么样',accept:'看完 3 个并记笔记'}]},
+  {items:[
+   {stream:'硬技能',title:'牛客 SQL 10 题',note:'累计到 60+ 题就收手',how:'限时',accept:'10 题'},
+   {stream:'面试',title:'群面五类题框架（先写 2 类）',note:'五类=排序、资源分配、危机处理、两难选择、方案设计；每类一个框架',how:'⭐ 你的角色选「记录者 / Reporter」，别抢 Leader',accept:'2 类框架'},
+   {stream:'面试',title:'STAR 故事 1-2 个',note:'用 bq-skill；结果一定要带数字',how:'从 FILA / 网易实习里挖',accept:'1-2 个故事入库'}]},
+  {items:[
+   {stream:'硬技能',title:'SQL 收尾（刷到 30-50 题）',note:'到了量就收，窗口函数看不看都行',how:'统计总题数和正确率',accept:'★ SQL 达标'},
+   {stream:'面试',title:'群面框架补齐 5 类',note:'开场 30 秒给框架、至少 3 次拉回主线、结尾帮 Reporter 补一条',how:'写在小卡片上',accept:'★ 5 个框架'},
+   {stream:'面试',title:'STAR 故事 3 个',note:'继续用 bq-skill 存',how:'每个故事 2 分钟能讲完',accept:'3 个故事'}]},
+  {items:[
+   {stream:'面试',title:'群面模拟 1 次',note:'找 3-5 个同学线上模拟并录下来；找不到就自言自语练一题+录音复盘',how:'录完听自己有没有抢话/跑题',accept:'模拟 1 次 + 录音'},
+   {stream:'面试',title:'STAR 故事 4 个',note:'补一个「解决问题」类故事',how:'面试题最爱问「你怎么解决困难」',accept:'4 个故事'}]},
+  {items:[
+   {stream:'面试',title:'STAR 故事 5 个 + 小复盘',note:'本周：群面 5 框架 + STAR 5 个 + 场景题骨架',how:'复盘哪块还虚，下周一并补',accept:'★ 三个交付物'}]}
+ ]},
+ {theme:'作品集 + 模拟面试 + 投递冲量（这一周主线只有一个：作品集）', days:[
+  {items:[
+   {stream:'硬技能',title:'作品集 · 第 1 步：找数据 + 定业务问题',note:'去阿里云天池找一个公开数据集（选你感兴趣的行业，别选看不懂的）',how:'自己定一个业务问题，例：「为什么这个品类复购在下降」',accept:'数据集 + 问题定好'}]},
+  {items:[
+   {stream:'硬技能',title:'作品集 · 第 2 步：SQL 取数',note:'用 SQL 把需要的字段取出来，写清筛选条件',how:'取不出来就先简化问题',accept:'数据取好'}]},
+  {items:[
+   {stream:'硬技能',title:'作品集 · 第 3 步：Excel 出图（有余力上 BI）',note:'Excel 出 3-4 张图；有余力用 Power BI/Tableau 做个看板（BI 只学连数据源、做图、搭看板）',how:'图要能直接看出结论',accept:'图 / 看板完成'},
+   {stream:'硬技能',title:'写第 1 条策略建议',note:'格式：谁去做 + 做什么 + 怎么验证（带指标）',how:'别写「提升用户体验」这种空话',accept:'第 1 条建议'}]},
+  {items:[
+   {stream:'硬技能',title:'写满 3 条策略建议',note:'每条都落到「谁去做、做什么、怎么验证」',how:'写不出来就回到数据看哪一环最弱',accept:'3 条建议'}]},
+  {items:[
+   {stream:'硬技能',title:'作品集整理成 3-5 页',note:'结构：背景/口径 → 图 → 结论 → 建议',how:'存成能直接打开给面试官看的东西（PDF 或网页）',accept:'★ 作品集交稿'}]},
+  {items:[
+   {stream:'面试',title:'模拟面试：高顿「模拟面试报告」',note:'抽题 → 你答 → 拿评分报告（有评分才有反馈）',how:'用高顿的模拟面试工具；再用 big-tech-interviews 练一次被追问',accept:'★ 评分报告 1 份'}]},
+  {items:[
+   {stream:'面试',title:'STAR 故事补到 8 个',note:'每个都带数字结果',how:'用 bq-skill 管理',accept:'★ 8 个故事'},
+   {stream:'投递',title:'投递冲量：今天多投 1-2 家',note:'冲刺区想去的公司，今天状态最好，先投它',how:'分层投递：练习区早投、核心区主力、冲刺区状态好时投',accept:'多投 1-2 家'}]}
+ ]},
+ {theme:'收尾（总复盘 + 红线检查）', days:[
+  {items:[
+   {stream:'投递',title:'总复盘',note:'投递总数、回音数、错题集中在哪个模块、面试稿改到第几版',how:'写成一张纸',accept:'★ 一个月总复盘'}]},
+  {items:[
+   {stream:'投递',title:'红线检查',note:'有没有面试？没有 → 把私企放进来。别把时间花在「再学一个技能」上',how:'技能只决定面试时你说不说得出来；投递量决定有没有面试',accept:'红线检查完'}]},
+  {items:[
+   {stream:'投递',title:'计划收尾 + 定下一阶段',note:'一个月做到 60% 就是成功；把没交出的产出物排进下个月',how:'剩下时间休息',accept:'下阶段计划'}]}
+ ]}
+];
 const COLOR={硬技能:'#4f6ef7',简历:'#f0883e',投递:'#16a34a',行测:'#9333ea',测评:'#e11d48',面试:'#0891b2',英语:'#ca8a04',fixed:'#94a3b8'};
 const LOW_MAP={硬技能:'L4',英语:'L3',面试:'L1',投递:'L2',行测:'L5',简历:'L6'};
 /* 她到底学没学过某条流？没学过的，轻量模式不叫"复习"，给"入门视频·从0开始" */
@@ -397,7 +554,7 @@ function lowUnitFor(stream){
 /* ============ 状态 ============ */
 const KEY='liuxue_coach_v2';
 /* 版本号：每次改动 +1，并显示在界面顶部，方便核对手机上是哪一版 */
-const APP_VERSION='V1.0';
+const APP_VERSION='V1.1';
 const APP_BUILT='2026-09-10';
 let S=null;
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -419,7 +576,9 @@ function initState(){
   S={date:todayStr(),dayStart:'08:30',dayEnd:'21:30',energy:'normal',
      fixed:[],done:[],remaining:[],deferred:[],pointers:{},totals:{},log:[],rhythm:{meals:[]},
      history:[],learnings:{capacityFactor:1,notes:[],totalDays:0,lastReviewed:null,lastSummary:null},positions:[],
-     undoStack:[],unitOverrides:{},customUnits:{},chat:[],settings:{provider:'openrouter',apiKey:'',model:'openai/gpt-4o-mini'},cloud:{enabled:false,token:'',gistId:'',lastSync:null}};
+     undoStack:[],unitOverrides:{},customUnits:{},chat:[],chatDate:todayStr(),
+     diary:{},recurring:[],
+     settings:{provider:'openrouter',apiKey:'',model:'openai/gpt-4o-mini'},cloud:{enabled:false,token:'',gistId:'',lastSync:null}};
   STREAMS.forEach(s=>{S.pointers[s]=0;S.totals[s]=0;});
   buildRemaining();
   reconcile();
@@ -699,6 +858,8 @@ function classify(t){
   if(!/完成|做完|做了|搞定|交了|提交了|收到|链接|来了/.test(t)
      &&/(还有|又要|新增|加|多了|另外|再|要).{0,10}(测评|笔试|任务|作业|面试|模拟|测试)|(测评|笔试|任务|作业|面试).{0,8}(要做|得做|需要做|还没做|没做|没开始)/.test(t))return 'addtask';
   if(/测评|笔试|测试/.test(t)&&/(\d+\s*天|天内|截止|要交|多少天)/.test(t)&&!/完成|交了|提交了/.test(t))return 'addtask';
+  if(/隔天|每隔?[\d一二三四五六七八九十]+天|每天|一周[\d一二三四五]次|两天一次/.test(t)
+     &&!/不想|难受|压抑|emo|丧|焦虑|烦|累|崩溃/.test(t))return 'recurring';
   const emoNow=/不想|难受|压抑|emo|丧|焦虑|迷茫|烦|累|崩溃|没动力|没意思|提不起/.test(t);
   if(!emoNow&&(
       /(超市|吃饭|吃个饭|早餐|午餐|晚餐|夜宵|医院|看病|体检|买药|理发|洗澡|取快递|拿快递|寄快递|约会|聚会|出门|办事)/.test(t)
@@ -724,23 +885,28 @@ function classify(t){
      && !/没完成|没做|没学|没练|没看|没写|没投|不想|不想做|不愿意|别|不要|不是|没做完|没搞|没弄/.test(t)
      && matchUnit(t))return 'log';
   if(!emoNow&&/(重新规划|重排今天|重新排|帮我排|给我排一下|排一下今天|今天该干嘛|今天干什么|安排一下今天)/.test(t))return 'newplan';
+  if(/(我|今天)[^，。！？]{0,8}(去|到)[^，。！？]{0,6}了|记一笔|记一下今天|今天(发生|遇到)了/.test(t))return 'diary';
   return 'unknown';
 }
 function actNewplan(){pushUndo('重新规划今天');buildRemaining();reconcile();return '已按当前状态重新规划今天 ✅<br><br>'+giveAdvice();}
 function actNewday(){
   pushUndo('新的一天');
   reviewDay();
+  archiveChat(); // 昨天聊的内容先归档进日记，再清聊天框
   const carry=[...S.deferred,...S.remaining.filter(id=>!S.done.find(d=>d.unitId===id))];
   const oldLog=S.log.slice(-20);
-  const keepHistory=S.history,keepLearn=S.learnings,keepPos=S.positions,keepChat=S.chat,keepCustom=S.customUnits||{};
+  const keepHistory=S.history,keepLearn=S.learnings,keepPos=S.positions,keepCustom=S.customUnits||{},
+        keepDiary=S.diary||{},keepRec=S.recurring||[],keepArch=S.chatArchive||{};
   initState();
-  S.history=keepHistory;S.learnings=keepLearn;S.positions=keepPos;S.chat=keepChat;
+  S.history=keepHistory;S.learnings=keepLearn;S.positions=keepPos;
   S.customUnits=keepCustom;Object.assign(UNITS,keepCustom);
+  S.diary=keepDiary;S.recurring=keepRec;S.chatArchive=keepArch;
+  S.chat=[];S.chatDate=todayStr(); // ← 聊天框清空（新的一天）
   S.date=todayStr();
   if(carry.length){S.remaining=[...carry,...S.remaining];}
   S.log=oldLog;
   reconcile();
-  return '🌅 新的一天：昨日未完成已顺延到今天，学习沉淀已保留。';
+  return '🌅 新的一天：聊天框已清空（昨天聊的都留在「📔 日记」和日程里，没丢），未完成的任务顺延到今天。';
 }
 function logProgress(t){
   pushUndo('记录完成：'+t.slice(0,20));
@@ -780,7 +946,8 @@ function handleInterrupt(t){
     if(S.rhythm.meals.length>20)S.rhythm.meals.shift();
   }
   reconcile();
-  let note='👌 记下了：'+toHM(start)+'–'+toHM(start+dur)+' 你去「'+label+'」。这段时间我从日程里空出来了，后面的安排自动往后顺，你不用管。';
+  diaryAdd('去了'+label);
+  let note='👌 记下了：'+toHM(start)+'–'+toHM(start+dur)+' 你去「'+label+'」。这段时间我从日程里空出来了，后面的安排自动往后顺，你不用管。（也记进📔日记了）';
   if(/吃饭|早餐|午餐|晚餐|夜宵/.test(label))note+='（顺手记进你的作息规律了）';
   return note;
 }
@@ -813,7 +980,8 @@ function handleRetro(t,opts){
     extra='，也帮你记进「'+u.stream+'」的完成里';
   }
   reconcile();
-  return '好，我把 '+toHM(s)+'–'+toHM(e)+' 记成「'+label+'」'+extra+'（这是已经过去的时段，不会再重复排）。接下来我从现在（'+toHM(nowMin())+'）往后给你安排。';
+  diaryAdd(label+'（'+toHM(s)+'–'+toHM(e)+'）');
+  return '好，我把 '+toHM(s)+'–'+toHM(e)+' 记成「'+label+'」'+extra+'，也记进📔日记了（这是已经过去的时段，不会再重复排）。接下来我从现在（'+toHM(nowMin())+'）往后给你安排。';
 }
 /* 删除指定的日程/记录——她说"把投简历那条删掉"就真的删掉 */
 function handleDelete(t,opts){
@@ -1036,6 +1204,7 @@ function process(t){
   else if(c==='addtask')reply=handleAddTask(t);
   else if(c==='retro')reply=handleRetro(t);
   else if(c==='lognow')reply=actReplanNow();
+  else if(c==='recurring')reply=handleRecurring(t);
   else if(c==='interrupt')reply=handleInterrupt(t);
   else if(c==='energyLow')reply=setEnergy('low');
   else if(c==='energyHigh')reply=setEnergy('high');
@@ -1050,6 +1219,7 @@ function process(t){
   else if(c==='positionList')reply=listPositions();
   else if(c==='markApplied')reply=markPosition(t,'applied');
   else if(c==='markInterview')reply=markPosition(t,'interview');
+  else if(c==='diary')reply=handleDiary(t);
   else reply=handleUnknown();
   return reply;
 }
@@ -1057,6 +1227,7 @@ function process(t){
 /* ============ AI 接入（BYOK） ============ */
 const SYSTEM_PROMPT=`你是「小陪」，刘雪的秋招陪跑搭子，要像真人朋友一样陪她，温暖、自然、会说人话。
 【背景】刘雪：二本软件工程2027届，河北，轻技术背景，不走开发。主方向：用户/数据/策略/增长运营、数据分析、运维（非开发）；其他非开发岗（销售/行政/文员等）也不排斥。外企书面型，京津冀优先。秋招有8条流并行：硬技能(Excel/SQL/Python)、简历、投递、行测(央国企笔试)、测评、面试(含无领导小组)、英语(听力+口语+阅读)、紧急插队(公司发测评/笔试链接)。
+【她手上有一份《一个月学习计划 9/12–10/12》，App 已内置】：每天五段固定动作——①08:30 投递(刷岗→挑岗→投3-4家) ②10:00 行测(粉笔限时+复盘) ③13:00 学习段 ④16:10 面试表达(写稿→口述→录音改3处) ⑤21:20 复盘三行。学习段按当周清单走：第1周 Excel基础+自我介绍；第2周 Excel小报告+SQL入门+方法论；第3周 SQL刷题+A/B+群面+STAR；第4周 作品集+模拟面试+冲量；最后收尾复盘。**这一个月只学四样：Excel、SQL、数据分析方法论、面试表达**——明确不学 Python/统计系统课/Tableau深入/计算机二级/申论。她问"今天学什么"时，直接照「今日学习清单」（stateSummary 里有）回答，并说清用谁的课（戴师兄/王佩丰/Mosh/牛客）、学到哪停。
 【她讨厌】死模板、听不懂人话的机器人。你要：①接住她的吐槽/焦虑/迷茫，像朋友一样共情回应；②准确理解她口语化的汇报，改对排期。
 【铁律·最重要，先读这条】
 · 她只是**吐槽 / 倾诉 / 闲聊 / 发泄情绪**时：**只回话陪她，一个 CMD 都不许发**。她说过"我跟他聊两句，他就给我硬塞两件事"——那是错的。**绝不能因为她说了句话就动她的日程**。
@@ -1070,6 +1241,8 @@ const SYSTEM_PROMPT=`你是「小陪」，刘雪的秋招陪跑搭子，要像�
    · 新增任务/测评(真的排进今天)：{"act":"addtask","title":"任务名(如 测评/字节笔试)","stream":"测评|投递|面试|行测|简历|英语|硬技能","min":预计分钟(默认60),"qty":数量(默认1),"deadline":"14天/9月20日(可空)"}
    · 按她现在的时间重排今天：{"act":"replan_now"}
    · 补记"过去那段时间干了啥"(不删记录、只如实记下)：{"act":"retro","label":"投简历/玩/休息/学X","start":"12:00","end":"17:00"}
+   · 记日记（她说"我去了X""我做了X"这类生活事件）：{"act":"diary","text":"去了图书馆/做了力量训练"}
+   · 设周期事件（她说"我力量训练隔天做一次""一周练3次"）：{"act":"recurring","label":"力量训练","every":2}
    · 调整任务时长：{"act":"feedback","q":"关键词","min":新分钟数}
    · 撤销上一步：{"act":"undo"}
    · **删除指定的某条日程/记录**（她说"把投简历那条删掉""把那个事务给我删了"）：{"act":"delblock","q":"要删的名字(如 投简历/事务/睡懒觉/超市)","start":"12:00(可选，按时间删)"}
@@ -1110,6 +1283,12 @@ function stateSummary(){
   L.push('顺延：'+ (S.deferred.length? S.deferred.map(id=>getUnit(id).title).join('、'):'无'));
   L.push('岗位库：'+ (S.positions.length? S.positions.length+'个':'空'));
   L.push('时间系数：'+ Math.round((S.learnings.capacityFactor||1)*100)+'%');
+  const p=getDayPlan(S.date);
+  if(p)L.push('今日计划学习（第'+p.weekNo+'周 · '+p.theme+'）：'+(p.items&&p.items.length?p.items.map(x=>x.title).join('、'):'固定五段'));
+  const due=dueRecurring();
+  if(due.length)L.push('今天该做的周期事件：'+due.map(r=>r.label).join('、'));
+  if(S.recurring&&S.recurring.length)L.push('已设周期：'+S.recurring.map(r=>r.label+' 每 '+r.every+' 天（下次 '+r.next+'）').join('、'));
+  if(S.diary&&S.diary[S.date]&&S.diary[S.date].length)L.push('今天已记日记：'+S.diary[S.date].map(x=>x.text).join('；'));
   return L.join('\n');
 }
 function execCmd(c){
@@ -1119,6 +1298,8 @@ function execCmd(c){
     case 'feedback': r=handleFeedback((c.q||'')+' 改到'+(c.min||'')+'分钟'); break;
     case 'undo': r=handleUndo(); break;
     case 'delblock': r=handleDelete((c.q||'')+(c.start?(' '+c.start):''),{q:c.q,start:c.start}); break;
+    case 'recurring': r=handleRecurring((c.label||'')+(c.every?(' 每'+c.every+'天'):' 隔天')); break;
+    case 'diary': r=handleDiary(c.text||c.q||''); break;
     case 'interrupt': r=handleInterrupt((c.label||'')+(c.start?(' '+c.start):'')+(c.min?(' '+(c.min/60)+'小时'):'')); break;
     case 'window': r=setWindow('学习时间'+(c.start||'')+'到'+(c.end||'')); break;
     case 'setwindow_start': r=setWindow('今天从'+(c.start||'')+'开始'); break;
@@ -1243,6 +1424,144 @@ function renderLearnings(){
   el.innerHTML=showLearnings();
   const rb=document.getElementById('rhythmBox');if(rb)rb.innerHTML=showRhythm();
 }
+/* ============ 一个月计划：今日学习清单 ============ */
+function planDayIndex(dstr){
+  const s=new Date(PLAN_START+'T00:00:00'),d=new Date(dstr+'T00:00:00');
+  return Math.round((d-s)/86400000);
+}
+function getDayPlan(dstr){
+  const i=planDayIndex(dstr);
+  if(i<0||i>=WEEK_PLAN.length*7)return null;
+  const w=Math.floor(i/7),di=i%7;
+  const wk=WEEK_PLAN[w];if(!wk)return null;
+  return {weekNo:w+1,theme:wk.theme,items:(wk.days&&wk.days[di]&&wk.days[di].items)||[]};
+}
+function renderTodayLearn(){
+  const el=document.getElementById('todayLearn');if(!el)return;
+  const p=getDayPlan(S.date);
+  const card=(t,o)=>'<div style="margin:7px 0;padding:9px 11px;background:#f7f9fc;border:1px solid var(--line);border-radius:10px;line-height:1.6;">'
+    +'<div style="font-weight:600;font-size:13.5px;">'+t+'</div>'
+    +(o.note?'<div style="font-size:12px;color:#5b6478;margin-top:3px;">📖 '+o.note+'</div>':'')
+    +(o.how?'<div style="font-size:12px;color:#4a5b8c;margin-top:3px;">🛠 '+o.how+'</div>':'')
+    +(o.accept?'<div style="font-size:11.5px;color:#16a34a;margin-top:3px;">✓ 验收：'+o.accept+'</div>':'')
+    +'</div>';
+  let h='<div class="panel"><h3>📌 今日学习清单'+(p?(' <span class="tag">第'+p.weekNo+'周</span>'):'')+'</h3>';
+  const due=dueRecurring();
+  if(due.length)h+='<div class="hintbox" style="margin:0 0 8px;">🔁 今天该做：<b>'+due.map(r=>r.label).join('、')+'</b>（周期事件，做完跟我说一声）</div>';
+  if(!p){
+    h+='<div class="note">今天不在「9/12–10/12 一个月计划」范围内，照下面的日程走就行，不用硬套计划。</div>';
+    h+='<details style="margin-top:8px;"><summary style="cursor:pointer;font-size:12.5px;color:#48557a;">+ 每天固定五段（点开看）</summary>';
+    DAY_TEMPLATE.forEach(t=>{h+=card(t.title,{note:t.note,how:t.how,accept:t.accept});});
+    h+='</details></div>';
+    el.innerHTML=h;return;
+  }
+  h+='<div class="note" style="margin-bottom:6px;">本周主题：'+p.theme+'</div>';
+  if(p.items.length){
+    h+='<div style="font-size:12.5px;font-weight:600;color:#0f766e;margin:4px 0;">今天要学的（③学习段）：</div>';
+    p.items.forEach(o=>{h+=card('· '+o.title,o);});
+  }else{
+    h+='<div class="note">今天没有额外学习内容，按固定五段走。</div>';
+  }
+  h+='<details style="margin-top:8px;"><summary style="cursor:pointer;font-size:12.5px;color:#48557a;">+ 每天固定五段（点开看）</summary>';
+  DAY_TEMPLATE.forEach(t=>{h+=card(t.title,{note:t.note,how:t.how,accept:t.accept});});
+  h+='</details></div>';
+  el.innerHTML=h;
+}
+/* ============ 日记本 ============ */
+function niceDate(d){if(!d)return '—';const p=String(d).split('-');return (+p[1])+'/'+(+p[2]);}
+function daysBetween(a,b){const d1=new Date(a+'T00:00:00'),d2=new Date(b+'T00:00:00');return Math.round((d2-d1)/86400000);}
+function addDays(dstr,n){const d=new Date(dstr+'T00:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function diaryAdd(text,dateStr){
+  const t=(text||'').trim();if(!t)return;
+  const d=dateStr||S.date;
+  S.diary=S.diary||{};
+  if(!S.diary[d])S.diary[d]=[];
+  if(S.diary[d].some(x=>x.text===t))return;
+  S.diary[d].push({t:Date.now(),text:t});
+}
+function diaryAddManual(){
+  const i=document.getElementById('diaryInput');if(!i)return;
+  const v=i.value.trim();if(!v)return;
+  i.value='';
+  const rc=(S.recurring||[]).find(r=>v.indexOf(r.label)>=0);
+  diaryAdd(v);
+  if(rc){rc.last=S.date;rc.next=addDays(S.date,rc.every);}
+  save();renderDiary();renderTodayLearn();renderSchedule();
+}
+function renderDiary(){
+  const el=document.getElementById('diaryList');if(!el)return;
+  const D=S.diary||{};
+  const days=Object.keys(D).sort().reverse();
+  const arch=S.chatArchive||{};
+  let h='';
+  if(!days.length){h='<div class="empty" style="padding:20px;">还没有记录。在「陪跑」里说「今天去了图书馆」，我就记下来。</div>';}
+  else{
+    h=days.map(d=>{
+      const items=D[d]||[];
+      return '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;color:#334155;margin-bottom:5px;">📅 '+niceDate(d)+'（'+items.length+' 条）</div>'
+        +items.map(x=>'<div style="font-size:13px;color:#475569;padding:5px 0 5px 10px;border-left:2px solid #e7eaf2;">'+x.text+'</div>').join('')
+        +(arch[d]?'<details style="margin-top:4px;"><summary style="cursor:pointer;font-size:11.5px;color:#8a93a6;">那天的聊天记录</summary><div style="font-size:12px;color:#8a93a6;line-height:1.7;padding-left:8px;">'+arch[d].map(m=>(m.role==='user'?'我：':'小陪：')+stripTags(m.content).slice(0,120)).join('<br>')+'</div></details>':'')
+        +'</div>';
+    }).join('');
+  }
+  el.innerHTML=h;
+}
+/* ============ 周期事件（如力量训练隔天一次） ============ */
+function dueRecurring(){return (S.recurring||[]).filter(r=>r.next&&daysBetween(S.date,r.next)<=0);}
+function renderRecurring(){
+  const el=document.getElementById('recurringBox');if(!el)return;
+  const rs=S.recurring||[];
+  if(!rs.length){el.innerHTML='<div class="note">还没有周期事件。在「陪跑」里说「我力量训练隔天做一次」，我就记住并在到日子提醒你。</div>';return;}
+  el.innerHTML=rs.map(r=>{
+    const left=daysBetween(S.date,r.next);
+    const st=left<=0?'<span class="pill interview">今天该做</span>':(left===1?'<span class="pill todo">明天</span>':'<span class="pill todo">还有 '+left+' 天</span>');
+    return '<div class="job"><div><div class="c">'+r.label+'</div><div class="m">每 '+(r.every===1?'天':r.every+' 天')+'一次 · 上次 '+niceDate(r.last)+' · 下次 '+niceDate(r.next)+'</div></div>'+st+'</div>';
+  }).join('');
+}
+function addRecurring(label,every,fromDate){
+  S.recurring=S.recurring||[];
+  const today=fromDate||S.date;
+  const ex=S.recurring.find(r=>r.label===label);
+  const next=addDays(today,every);
+  if(ex){ex.every=every;ex.last=today;ex.next=next;}
+  else S.recurring.push({label,every,last:today,next});
+}
+function handleRecurring(t){
+  const m=t.match(/每隔?([\d一二三四五六七八九十]+)天|隔天|每隔?一?天|一周([\d一二三四五])次|每天/);
+  let every=2;
+  if(m){
+    if(m[2])every=Math.max(1,Math.round(7/(cnNum(m[2])||1)));
+    else if(m[1])every=cnNum(m[1])||2;
+    else every=2;
+  }
+  const kw=['力量训练','健身','跑步','游泳','瑜伽','练肩','练背','练腿','有氧','无氧','深蹲','运动','背单词','英语'];
+  let label=kw.find(k=>t.indexOf(k)>=0);
+  if(!label){
+    const mm=t.match(/([\u4e00-\u9fa5]{2,6})(?:每隔|隔天|一周|每天)/);
+    label=mm?mm[1]:'';
+  }
+  if(!label)return '要给哪件事设周期？比如「力量训练隔天做一次」。';
+  addRecurring(label,every);
+  diaryAdd('设定周期：'+label+'（每 '+every+' 天一次）');
+  return '🔁 记下了：<b>'+label+'</b> 每 '+every+' 天一次，下次是 '+niceDate(addDays(S.date,every))+'。到日子我会在「今日日程」提醒你。';
+}
+function handleDiary(t){
+  let text=t.trim().replace(/^(我)?(今天|今天上午|今天下午|今天晚上|上午|下午|晚上)?/,'').trim();
+  if(!text)text=t.trim();
+  const rc=(S.recurring||[]).find(r=>t.indexOf(r.label)>=0);
+  diaryAdd(text);
+  if(rc){rc.last=S.date;rc.next=addDays(S.date,rc.every);return '📔 记进日记了：'+text+'<br>🔁「'+rc.label+'」下次是 '+niceDate(rc.next)+'。';}
+  return '📔 记进日记了：'+text+'（在「📔 日记」页能看到）。';
+}
+/* 换天：把昨天的聊天归档、清空聊天框（但行程和日记都留着） */
+function archiveChat(){
+  if(!S.chat||!S.chat.length)return;
+  S.chatArchive=S.chatArchive||{};
+  const d=S.chatDate||S.date;
+  S.chatArchive[d]=S.chat.slice(-40);
+  const ks=Object.keys(S.chatArchive).sort();
+  if(ks.length>30)ks.slice(0,ks.length-30).forEach(k=>delete S.chatArchive[k]);
+}
 function renderPositions(){
   const el=document.getElementById('positions');if(!el)return;
   const ps=S.positions||[];
@@ -1253,7 +1572,7 @@ function renderPositions(){
   }).join('');
 }
 function render(){
-  renderHeader();renderProgress();renderSchedule();renderLearnings();renderPositions();
+  renderHeader();renderTodayLearn();renderProgress();renderSchedule();renderLearnings();renderPositions();renderDiary();renderRecurring();
 }
 function renderChat(){
   const el=document.getElementById('chatlog');el.innerHTML='';lastAiEl=null;
@@ -1284,8 +1603,15 @@ function load(){
   if(!S.settings)S.settings={provider:'openrouter',apiKey:'',model:'openai/gpt-4o-mini'};
   if(!S.customUnits)S.customUnits={};
   Object.assign(UNITS,S.customUnits); // 恢复自定义任务单元
-  if(S.date!==todayStr()){ actNewday(); }
-  else { reconcile(); } // 打开就按"现在"对齐一次，不再显示上午已过的时段
+  if(!S.diary)S.diary={};
+  if(!S.recurring)S.recurring=[];
+  if(!S.chatArchive)S.chatArchive={};
+  if(!S.chatDate)S.chatDate=S.date;
+  if(S.date!==todayStr()){ actNewday(); }                 // 换天：归档聊天+清空聊天框
+  else if(S.chatDate!==todayStr()){                        // 同一天但聊天是昨天的
+    archiveChat(); S.chat=[]; S.chatDate=todayStr(); reconcile();
+  }
+  else { reconcile(); } // 打开就按"现在"对齐一次，不再显示已过的时段
 }
 function exportState(){
   const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
@@ -1367,7 +1693,7 @@ function disconnectCloud(){
 }
 
 /* ============ 交互 ============ */
-const TAB_TITLE={chat:'陪跑',today:'今日日程',learn:'我的规律',jobs:'岗位库',set:'设置'};
+const TAB_TITLE={chat:'陪跑',today:'今日日程',learn:'我的规律',jobs:'岗位库',diary:'日记',set:'设置'};
 function switchTab(name){
   document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.tab===name));
   document.querySelectorAll('.tab').forEach(t=>t.classList.add('hidden'));
