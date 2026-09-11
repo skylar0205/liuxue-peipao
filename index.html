@@ -554,7 +554,7 @@ function lowUnitFor(stream){
 /* ============ 状态 ============ */
 const KEY='liuxue_coach_v2';
 /* 版本号：每次改动 +1，并显示在界面顶部，方便核对手机上是哪一版 */
-const APP_VERSION='V1.3';
+const APP_VERSION='V1.4';
 const APP_BUILT='2026-09-10';
 let S=null;
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -1440,10 +1440,12 @@ function renderSchedule(){
       sc.innerHTML+='<div class="blk done"><div class="top"><span class="time">'+dt+'</span><span class="st" style="background:'+COLOR[it.stream]+'">'+it.stream+'</span></div><div class="ti">'+it.title+(it.offplan?' <span class="tag warn">计划外完成</span>':' ✓')+'</div>'+(it.actual?'<div class="pp">实际 '+it.actual+' 分钟</div>':'')+'</div>';
     }else{
       const u=getUnit(it.unitId)||{};
+      const title=u.title||it.unitId||'任务';
+      const stream=u.stream||'硬技能';
       const note=u.note?('<div class="pp">📖 '+u.note+'</div>'):(u.purpose?('<div class="pp">目的：'+u.purpose+'</div>'):'');
       const how=u.how?('<div class="ht">🛠 '+u.how+'</div>'):(HOWTO[it.unitId]?('<div class="ht">📘 怎么学：'+HOWTO[it.unitId]+'</div>'):'');
       const acc=u.accept?('<div class="ac">✓ 验收：'+u.accept+'</div>'):'';
-      sc.innerHTML+='<div class="blk"><div class="top"><span class="time">'+it.start+'–'+it.end+'</span><span class="st" style="background:'+COLOR[it.stream]+'">'+it.stream+'</span></div><div class="ti">'+it.title+'</div>'+note+how+acc+'</div>';
+      sc.innerHTML+='<div class="blk"><div class="top"><span class="time">'+it.start+'–'+it.end+'</span><span class="st" style="background:'+(COLOR[stream]||'#94a3b8')+'">'+stream+'</span></div><div class="ti">'+title+'</div>'+note+how+acc+'</div>';
     }
   });
   if(items.length===0)sc.innerHTML='<div class="empty">今天还没安排，点「重新规划今天」或去「陪跑」说点什么。</div>';
@@ -1644,6 +1646,7 @@ function load(){
   if(!S.recurring)S.recurring=[];
   if(!S.chatArchive)S.chatArchive={};
   if(!S.chatDate)S.chatDate=S.date;
+  buildRemaining(); // 每次打开都按最新计划重建今日日程（她手动加的任务 C* 会保留）
   if(S.date!==todayStr()){ actNewday(); }                 // 换天：归档聊天+清空聊天框
   else if(S.chatDate!==todayStr()){                        // 同一天但聊天是昨天的
     archiveChat(); S.chat=[]; S.chatDate=todayStr(); reconcile();
