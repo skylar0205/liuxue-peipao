@@ -409,7 +409,7 @@ const HOWTO={
 const STREAMS=['硬技能','简历','投递','行测','测评','面试','英语'];
 
 /* ============ 一个月学习计划（2026-09-12 ~ 10-12）============ */
-const PLAN_START='2026-09-12';
+const PLAN_START='2026-09-11'; // 提前一天开始（9/11 照计划第 1 天走，做完不顺延，没做完 9/12 接着来）
 /* 每天五段固定动作（顺序不变）——每段都带"学什么/用什么/怎么练/验收" */
 const DAY_TEMPLATE=[
   {start:'08:30',end:'10:00',stream:'投递',title:'① 投递：刷岗 → 挑岗 → 投 3-4 家',
@@ -554,7 +554,7 @@ function lowUnitFor(stream){
 /* ============ 状态 ============ */
 const KEY='liuxue_coach_v2';
 /* 版本号：每次改动 +1，并显示在界面顶部，方便核对手机上是哪一版 */
-const APP_VERSION='V1.1';
+const APP_VERSION='V1.2';
 const APP_BUILT='2026-09-10';
 let S=null;
 function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -646,27 +646,42 @@ function cycleStream(stream,n){
   }
   S.pointers[stream]=p;return res;
 }
-function buildRemaining(){
-  const r=[];
-  const doneIds=new Set(S.done.map(d=>d.unitId));
-  const customs=(S.remaining||[]).filter(id=>id.indexOf('C')===0&&!doneIds.has(id)); // 保留你手动加的任务/测评
-  /* 原本排着的"重活"保留下来，别因为切轻量就被吞掉（排不下会自然进顺延，明天优先） */
-  const heavy=(S.remaining||[]).filter(id=>{
-    if(id.indexOf('C')===0||doneIds.has(id))return false;
-    const u=getUnit(id);return u&&!u.light;
+/* 今日日程 = 她的《一个月计划》：五段固定动作 + 当天学习项（不再随机抽课） */
+const TEMPLATE_MIN=[90,120,0,90,40]; // 投递 / 行测 / 学习段(按项均分) / 面试表达 / 复盘
+function planUnitsForToday(){
+  const p=getDayPlan(S.date);
+  const list=[];
+  DAY_TEMPLATE.forEach((t,i)=>{
+    if(i===2){
+      const items=(p&&p.items&&p.items.length)?p.items:[{stream:'硬技能',title:t.title,note:t.note,how:t.how,accept:t.accept}];
+      const per=items.length>1?Math.round(140/items.length):120;
+      items.forEach(o=>list.push({stream:o.stream||'硬技能',title:o.title,min:o.min||per,note:o.note||'',how:o.how||'',accept:o.accept||''}));
+    }else{
+      list.push({stream:t.stream,title:t.title,min:TEMPLATE_MIN[i]||60,note:t.note||'',how:t.how||'',accept:t.accept||''});
+    }
   });
+  return list;
+}
+function buildRemaining(){
+  const doneIds=new Set(S.done.map(d=>d.unitId));
+  const customs=(S.remaining||[]).filter(id=>id.indexOf('C')===0&&!doneIds.has(id)); // 你手动加的任务/测评
+  let list=planUnitsForToday();
   if(S.energy==='low'){
-    STREAMS.forEach(s=>{const id=lowUnitFor(s);if(id&&UNITS[id]&&r.indexOf(id)<0)r.push(id);});
-    S.remaining=[...customs,...r,...heavy.filter(id=>r.indexOf(id)<0)];
-  }else{
-    cycleStream('硬技能',2).forEach(x=>r.push(x));
-    r.push(...cycleStream('英语',1));
-    r.push(...cycleStream('行测',1));
-    r.push(...cycleStream('投递',1));
-    r.push(...cycleStream('简历',1));
-    r.push(...cycleStream('面试',1));
-    S.remaining=[...customs,...r];
+    /* 轻量档（计划第七节）：只留「投递 40min + 一个最小动作 20min」，不写"复习" */
+    const dep=list[0],learn=list[2]||list[1];
+    list=[{...dep,title:'投递（轻量版）：刷岗 + 投 1-2 家',min:40}];
+    if(learn)list.push({...learn,title:'最小动作：'+learn.title,min:20});
   }
+  S.customUnits=S.customUnits||{};
+  const ids=[];
+  list.forEach((o,i)=>{
+    const id='P'+i;
+    S.customUnits[id]={stream:o.stream,title:o.title,min:o.min,light:false,
+      purpose:o.note,accept:o.accept,note:o.note,how:o.how,kw:[],plan:true};
+    UNITS[id]=S.customUnits[id];
+    if(!doneIds.has(id))ids.push(id);
+  });
+  S.remaining=[...customs,...ids];
 }
 function nowMin(){const d=new Date();return d.getHours()*60+d.getMinutes();}
 /* 有效排期起点：今天则"不能早于现在"，避免把任务排到已经过去的时段 */
@@ -765,7 +780,7 @@ function handleAddTask(t,opts){
   for(let i=0;i<qty;i++){
     const cid='C'+uid();
     const nm=qty>1?title+'（'+(i+1)+'/'+qty+'）':title;
-    const unit={stream,title:nm,min,light:false,
+    const unit={stream,title:nm,min,light:false,custom:true,
       purpose:deadline?('新加的任务 · 截止'+deadline):'你刚加进来的任务',
       accept:'完成即可',kw:[]};
     S.customUnits[cid]=unit;UNITS[cid]=unit;
@@ -843,6 +858,19 @@ function matchUnit(t){
     for(const k of u.kw){if(tl.includes(k.toLowerCase()))sc+=k.length;}
     if(sc>bestScore){bestScore=sc;best=id;}
   }
+  /* 再按"标题"匹配计划任务 P* 和手动任务 C*：支持双向模糊，所以"材料归档做完了"能认出来 */
+  for(const id in UNITS){
+    const u=UNITS[id];
+    if(!u||!(u.plan||u.custom)||!u.title)continue;
+    const clean=u.title.toLowerCase().replace(/^[①②③④⑤·\s]+/,'').replace(/（[^）]*）/g,'').replace(/\([^)]*\)/g,'').replace(/[：:].*$/,'');
+    let hit=0;
+    clean.split(/[，,、:：/\s]+/).forEach(seg=>{if(seg.length>=2&&tl.indexOf(seg)>=0)hit=Math.max(hit,seg.length);});
+    if(!hit){
+      const core=tl.replace(/做完了|学完了|完成了|搞定了|练完了|看完了|完成|做了|搞定|学完|练完|看完|结束|了/g,'');
+      for(let i=0;i+3<=clean.length;i++){const s3=clean.slice(i,i+3);if(core.indexOf(s3)>=0){hit=3;break;}}
+    }
+    if(hit&&(hit+2)>bestScore){bestScore=hit+2;best=id;}
+  }
   return bestScore>0?best:null;
 }
 function classify(t){
@@ -893,7 +921,7 @@ function actNewday(){
   pushUndo('新的一天');
   reviewDay();
   archiveChat(); // 昨天聊的内容先归档进日记，再清聊天框
-  const carry=[...S.deferred,...S.remaining.filter(id=>!S.done.find(d=>d.unitId===id))];
+  const carry=[...S.deferred,...S.remaining.filter(id=>!S.done.find(d=>d.unitId===id))].filter(id=>id.indexOf('P')!==0); // P*=今天的计划任务，明天按新一天重排
   const oldLog=S.log.slice(-20);
   const keepHistory=S.history,keepLearn=S.learnings,keepPos=S.positions,keepCustom=S.customUnits||{},
         keepDiary=S.diary||{},keepRec=S.recurring||[],keepArch=S.chatArchive||{};
@@ -1400,8 +1428,8 @@ function renderSchedule(){
   const items=[];
   S.fixed.forEach(f=>items.push({type:'fixed',...f}));
   S.done.forEach(d=>items.push({type:'done',title:getUnit(d.unitId).title,stream:getUnit(d.unitId).stream,start:d.start,end:d.end,actual:d.actual,offplan:d.offplan}));
-  S.plan.forEach(b=>items.push({type:'todo',unitId:b.unitId,title:getUnit(b.unitId).title,stream:getUnit(b.unitId).stream,purpose:getUnit(b.unitId).purpose,accept:getUnit(b.unitId).accept,start:b.start,end:b.end}));
-  S.deferred.forEach(id=>items.push({type:'deferred',title:getUnit(id).title,stream:getUnit(id).stream,start:'顺延',end:''}));
+  S.plan.forEach(b=>items.push({type:'todo',unitId:b.unitId,start:b.start,end:b.end}));
+  /* 顺延的不再逐条列出来（看着像一堆没做完的，吓人），只在最后提示一行 */
   const keyv=x=>{if(x==='顺延'||!x)return 9999;const n=toMin(x);return isNaN(n)?9998:n;};
   items.sort((a,b)=>keyv(a.start)-keyv(b.start));
   items.forEach(it=>{
@@ -1410,14 +1438,18 @@ function renderSchedule(){
     }else if(it.type==='done'){
       const dt=it.offplan?'计划外':(it.start+'–'+it.end);
       sc.innerHTML+='<div class="blk done"><div class="top"><span class="time">'+dt+'</span><span class="st" style="background:'+COLOR[it.stream]+'">'+it.stream+'</span></div><div class="ti">'+it.title+(it.offplan?' <span class="tag warn">计划外完成</span>':' ✓')+'</div>'+(it.actual?'<div class="pp">实际 '+it.actual+' 分钟</div>':'')+'</div>';
-    }else if(it.type==='todo'){
-      const ht=HOWTO[it.unitId]?'<div class="ht">📘 怎么学：'+HOWTO[it.unitId]+'</div>':'';
-      sc.innerHTML+='<div class="blk"><div class="top"><span class="time">'+it.start+'–'+it.end+'</span><span class="st" style="background:'+COLOR[it.stream]+'">'+it.stream+'</span></div><div class="ti">'+it.title+'</div><div class="pp">目的：'+it.purpose+'</div><div class="ac">验收：'+it.accept+'</div>'+ht+'</div>';
     }else{
-      sc.innerHTML+='<div class="blk deferred"><div class="top"><span class="time">顺延</span><span class="st" style="background:'+COLOR[it.stream]+'">'+it.stream+'</span></div><div class="ti">'+it.title+' <span class="tag warn">今日排不下</span></div></div>';
+      const u=getUnit(it.unitId)||{};
+      const note=u.note?('<div class="pp">📖 '+u.note+'</div>'):(u.purpose?('<div class="pp">目的：'+u.purpose+'</div>'):'');
+      const how=u.how?('<div class="ht">🛠 '+u.how+'</div>'):(HOWTO[it.unitId]?('<div class="ht">📘 怎么学：'+HOWTO[it.unitId]+'</div>'):'');
+      const acc=u.accept?('<div class="ac">✓ 验收：'+u.accept+'</div>'):'';
+      sc.innerHTML+='<div class="blk"><div class="top"><span class="time">'+it.start+'–'+it.end+'</span><span class="st" style="background:'+COLOR[it.stream]+'">'+it.stream+'</span></div><div class="ti">'+it.title+'</div>'+note+how+acc+'</div>';
     }
   });
   if(items.length===0)sc.innerHTML='<div class="empty">今天还没安排，点「重新规划今天」或去「陪跑」说点什么。</div>';
+  if(S.deferred&&S.deferred.length){
+    sc.innerHTML+='<div style="font-size:12px;color:#9aa3b0;text-align:center;padding:12px 6px 4px;">另有 '+S.deferred.length+' 项今天排不下，已经顺延到明天了，不用管它 👌</div>';
+  }
 }
 function renderLearnings(){
   const el=document.getElementById('learnings');if(!el)return;
