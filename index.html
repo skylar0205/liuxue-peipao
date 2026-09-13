@@ -2,1852 +2,368 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>刘雪·秋招陪跑</title>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="秋招陪跑">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#4f6ef7">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>刘雪·30天可勾选求职日规划（央国企+外企）</title>
 <style>
-  :root{
-    --bg:#eef1f8; --card:#ffffff; --ink:#1f2430; --sub:#8a93a6; --line:#e7eaf2;
-    --accent:#4f6ef7; --accent2:#22b8a6;
-    --硬技能:#4f6ef7; --简历:#f0883e; --投递:#16a34a; --行测:#9333ea; --测评:#e11d48;
-    --面试:#0891b2; --英语:#ca8a04; --fixed:#94a3b8; --done:#aab2c0;
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{margin:0;height:100%;overflow:hidden;}
-  body{background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.55;}
-  .app{display:flex;height:100vh;height:100dvh;max-width:1080px;margin:0 auto;background:var(--bg);overflow:hidden;}
-  /* 顶部 App 标题栏（桌面隐藏，手机端显示，占住灵动岛安全区） */
-  .appbar{display:none;}
-  /* 侧边栏 */
-  .sidebar{width:230px;flex:none;background:linear-gradient(180deg,#3a4ed8,#22b8a6);color:#fff;display:flex;flex-direction:column;padding:22px 16px;}
-  .brand{display:flex;align-items:center;gap:11px;margin-bottom:26px;}
-  .logo{width:42px;height:42px;border-radius:13px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;}
-  .brand-name{font-size:17px;font-weight:700;}
-  .brand-sub{font-size:11px;opacity:.8;}
-  nav{display:flex;flex-direction:column;gap:6px;flex:1;}
-  .nav{display:flex;align-items:center;gap:10px;padding:12px 14px;border:none;background:transparent;color:#fff;font-size:15px;text-align:left;border-radius:12px;cursor:pointer;opacity:.82;transition:.15s;}
-  .nav .ic{font-size:18px;width:22px;text-align:center;}
-  .nav:active{transform:scale(.97);}
-  .nav.active{background:rgba(255,255,255,.20);opacity:1;font-weight:600;}
-  .side-foot{font-size:11px;opacity:.8;line-height:1.6;border-top:1px solid rgba(255,255,255,.2);padding-top:12px;}
-  .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle;}
-  .dot.on{background:#7CFFB2;} .dot.off{background:#ffd479;}
-  /* 主区 */
-  .main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;background:var(--bg);}
-  .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#fff;border-bottom:1px solid var(--line);}
-  .topbar .ttl{font-size:17px;font-weight:700;}
-  .topbar .tmeta{font-size:12px;color:var(--sub);}
-  .tab{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-height:0;}
-  .tab.hidden{display:none;}
-  .pad{padding:16px 18px;flex:1;}
-  /* 今日日程 */
-  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
-  .btn{font-size:13px;padding:8px 13px;border:1px solid var(--line);background:#fff;border-radius:10px;color:#334155;cursor:pointer;}
-  .btn:active{background:#eef1f8;}
-  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
-  .pbar{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--sub);margin-bottom:7px;}
-  .pbar .nm{width:48px;flex:none;}
-  .pbar .tr{flex:1;height:7px;background:#eef1f4;border-radius:5px;overflow:hidden;}
-  .pbar .fl{height:100%;border-radius:5px;}
-  .pbar .ct{width:34px;text-align:right;flex:none;color:#475569;font-weight:600;}
-  .tl{position:relative;margin-top:8px;padding-left:18px;}
-  .tl::before{content:'';position:absolute;left:5px;top:4px;bottom:4px;width:2px;background:var(--line);}
-  .blk{position:relative;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:11px 13px;margin:10px 0;box-shadow:0 1px 3px rgba(30,40,80,.04);}
-  .blk::before{content:'';position:absolute;left:-15px;top:16px;width:11px;height:11px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:0 0 0 2px var(--line);}
-  .blk .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
-  .blk .time{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;}
-  .blk .st{font-size:11px;padding:2px 9px;border-radius:7px;color:#fff;}
-  .blk .ti{font-size:15px;font-weight:600;margin:5px 0 3px;}
-  .blk .pp{font-size:12px;color:#66707f;}
-  .blk .ac{font-size:11px;color:#9aa3b0;margin-top:2px;}
-  .blk .ht{font-size:11.5px;color:#4a5b8c;margin-top:5px;background:#f4f7ff;border:1px solid #e3eafd;border-radius:9px;padding:7px 9px;line-height:1.65;}
-  .blk.done{opacity:.6;}
-  .blk.done .ti{text-decoration:line-through;}
-  .blk.done::before{background:var(--done);}
-  .blk.fixed{border-left:3px solid var(--fixed);}
-  .blk.fixed::before{background:var(--fixed);}
-  .blk.deferred{border-style:dashed;background:#fafbfc;}
-  .blk.deferred::before{background:#cbd2dd;}
-  .tag{font-size:10px;padding:1px 7px;border-radius:6px;background:#eef1f4;color:#64748b;margin-left:6px;}
-  .tag.warn{background:#fee2e2;color:#b91c1c;}
-  /* 陪跑对话：固定高度，消息在内部滚动，输入框常驻底部 */
-  #tab-chat{overflow:hidden;}
-  .chat{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:16px 16px 6px;display:flex;flex-direction:column;}
-  .bub{margin:7px 0;padding:10px 13px;border-radius:15px;font-size:14.5px;max-width:88%;white-space:pre-wrap;word-break:break-word;line-height:1.6;}
-  .bub.me{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:5px;}
-  .bub.ai{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:5px;}
-  .bub.ai b{color:#0f766e;}
-  .inputbar{display:flex;gap:9px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--line);}
-  .inputbar input{flex:1;border:1px solid var(--line);border-radius:13px;padding:12px 14px;font-size:15px;background:#f7f9fc;outline:none;}
-  .inputbar input:focus{background:#fff;border-color:var(--accent);}
-  .inputbar button{background:var(--accent);color:#fff;border:none;border-radius:13px;padding:0 18px;font-size:15px;font-weight:600;}
-  .inputbar button:active{background:#3a57d8;}
-  .quick{display:flex;gap:7px;flex-wrap:wrap;padding:0 14px 10px;background:#fff;}
-  .chip{font-size:12px;padding:6px 11px;border-radius:999px;background:#eef1f8;color:#4a5468;border:none;cursor:pointer;}
-  .chip:active{background:#e1e6f5;}
-  .empty{color:var(--sub);text-align:center;padding:40px 20px;font-size:14px;}
-  /* 规律 / 岗位 */
-  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px;margin-bottom:13px;box-shadow:0 1px 3px rgba(30,40,80,.04);}
-  .panel h3{margin:0 0 10px;font-size:15px;}
-  .panel p{margin:6px 0;font-size:13.5px;color:#4a5468;line-height:1.7;}
-  .note{font-size:12.5px;color:#66707f;line-height:1.7;}
-  .job{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 13px;border:1px solid var(--line);border-radius:12px;margin-bottom:9px;background:#fff;}
-  .job .c{font-weight:600;font-size:14px;}
-  .job .m{font-size:11.5px;color:var(--sub);margin-top:2px;}
-  .pill{font-size:11px;padding:3px 10px;border-radius:999px;white-space:nowrap;}
-  .pill.todo{background:#eef1f4;color:#64748b;}
-  .pill.applied{background:#dcfce7;color:#15803d;}
-  .pill.interview{background:#fef3c7;color:#b45309;}
-  .field{margin-bottom:13px;}
-  .field label{display:block;font-size:13px;color:#4a5468;margin-bottom:6px;font-weight:600;}
-  .field input,.field select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:11px;font-size:14px;background:#f7f9fc;outline:none;}
-  .field input:focus{background:#fff;border-color:var(--accent);}
-  .hintbox{background:#f1f4fd;border:1px solid #dde4fb;border-radius:12px;padding:12px 14px;font-size:12.5px;color:#48557a;line-height:1.7;margin-top:10px;}
-  .warnbox{background:#fff4e5;border:1px solid #ffe0a3;border-radius:12px;padding:11px 14px;font-size:12.5px;color:#8a5a00;line-height:1.7;margin-top:10px;}
-  /* 移动端：侧边栏变底部导航 */
-  @media (max-width:720px){
-    .app{flex-direction:column;}
-    .sidebar{width:auto;flex-direction:row;padding:8px 6px;align-items:center;gap:4px;}
-    .brand{display:none;}
-    nav{flex-direction:row;flex:1;justify-content:space-around;gap:2px;}
-    .nav{flex-direction:column;gap:2px;padding:6px 4px;font-size:10px;border-radius:10px;}
-    .nav .ic{font-size:18px;}
-    .nav .lb{font-size:10px;}
-    .side-foot{display:none;}
-    /* 顶部标题栏：占住灵动岛安全区，把下面那排 tab 压到岛下方 */
-    .appbar{display:flex;align-items:center;justify-content:center;gap:8px;
-      padding:calc(8px + env(safe-area-inset-top)) 12px 9px;
-      background:linear-gradient(90deg,#3a4ed8,#22b8a6);color:#fff;
-      font-weight:700;font-size:16px;letter-spacing:.5px;position:sticky;top:0;z-index:20;}
-    .main{padding-bottom:0;}
-    .tab{padding-bottom:0;}
-    .inputbar{padding-bottom:calc(12px + env(safe-area-inset-bottom));}
-  }
+  :root{--bg:#f6f7fb;--card:#fff;--ink:#1f2330;--sub:#5b6172;--line:#e7e9ef;
+    --blue:#2f6bff;--green:#1f9d6b;--amber:#d98a00;--red:#d8453a;--purple:#7a52d6;--teal:#0fa3a3;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.6;font-size:15px;padding:12px;}
+  .wrap{max-width:820px;margin:0 auto}
+  .head{background:linear-gradient(135deg,#2f6bff,#7a52d6);color:#fff;border-radius:16px;padding:18px 16px;margin-bottom:12px}
+  .head h1{font-size:19px;font-weight:800}
+  .head p{font-size:12.5px;opacity:.92;margin-top:5px}
+  .tabs{display:flex;gap:8px;margin-bottom:12px}
+  .tab{flex:1;text-align:center;padding:10px 0;border-radius:12px;background:var(--card);border:1px solid var(--line);
+    font-weight:700;font-size:14px;color:var(--sub);cursor:pointer;user-select:none}
+  .tab.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;margin-bottom:12px;box-shadow:0 1px 3px rgba(20,30,60,.04)}
+  .card h2{font-size:16px;margin-bottom:9px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .tag{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;color:#fff}
+  .t-blue{background:var(--blue)}.t-green{background:var(--green)}.t-amber{background:var(--amber)}
+  .t-red{background:var(--red)}.t-pur{background:var(--purple)}.t-teal{background:var(--teal)}
+  .lead{background:#eef3ff;border-left:4px solid var(--blue);padding:9px 11px;border-radius:8px;font-size:13.5px;margin-bottom:10px}
+  .note{font-size:12.5px;color:var(--sub);margin-top:8px}
+  .vac{border-left:4px solid var(--red);background:#fff4f2;padding:9px 12px;border-radius:8px;margin:8px 0;font-size:13px}
+  .vac b{color:var(--red)}
+  .rule{border-left:4px solid var(--purple);padding:8px 12px;margin:8px 0;background:#faf8ff;border-radius:8px;font-size:13.5px}
+  .rule b{color:var(--purple)}
+  /* day nav */
+  .daynav{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .daynav button{background:var(--blue);color:#fff;border:none;border-radius:10px;padding:9px 14px;font-size:14px;font-weight:700;cursor:pointer}
+  .daynav button:disabled{background:#c7cdda;cursor:not-allowed}
+  .daynav .dlabel{flex:1;text-align:center;font-weight:800;font-size:16px}
+  .daynav .today{background:#eef3ff;color:var(--blue);border:1px solid #cfe0ff;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer}
+  .wkbadge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff;margin-left:6px}
+  .bar{height:10px;background:#eef0f5;border-radius:20px;overflow:hidden;margin:4px 0 12px}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--green),#4fd1a0);width:0;transition:width .25s}
+  .pcount{font-size:12.5px;color:var(--sub);font-weight:700}
+  /* items */
+  .item{display:flex;gap:11px;align-items:flex-start;padding:11px 10px;border:1px solid var(--line);border-radius:11px;margin-bottom:8px;background:#fff}
+  .item.done{background:#f3fbf7;border-color:#bfe9d4}
+  .item input{width:20px;height:20px;margin-top:2px;accent-color:var(--green);flex-shrink:0;cursor:pointer}
+  .item .body{flex:1}
+  .item .lbl{font-weight:800;font-size:14px}
+  .item .txt{font-size:13.5px;color:var(--sub);margin-top:3px}
+  .item.done .txt{color:#3a7a5c}
+  .pill{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:10px;background:#eef3ff;color:var(--blue);margin-left:6px}
+  .pill.no{background:#fff0ee;color:var(--red)}
+  /* week/month */
+  .wk{margin-bottom:14px}
+  .wk h3{font-size:15px;margin-bottom:6px}
+  .wk .m{font-size:13.5px;color:var(--ink);margin:4px 0}
+  .wk .m b{color:var(--purple)}
+  .wk .acc{font-size:13px;color:var(--green);font-weight:700;margin-top:4px}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+  th,td{border:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+  th{background:#f1f3f8;font-weight:700}
+  tr:nth-child(even) td{background:#fafbfd}
+  .src{font-size:11.5px;color:#9aa1b1;margin-top:6px}
+  .foot{text-align:center;color:var(--sub);font-size:12px;margin:16px 0 4px}
+  .hidden{display:none}
+  .reset{background:#fff;border:1px solid var(--line);color:var(--sub);border-radius:8px;padding:5px 10px;font-size:11.5px;cursor:pointer;float:right}
+  ul,ol{margin-left:18px;margin-top:6px}
+  li{margin:4px 0}
+  .chip{display:inline-block;background:#eef3ff;color:var(--blue);border:1px solid #d6e2ff;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:600;margin:3px 3px 0 0}
+  details{margin-top:8px}
+  summary{cursor:pointer;font-weight:700;color:var(--blue);font-size:13.5px}
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="appbar" id="appbar">🤝 秋招陪跑 · 小陪</div>
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="logo">陪</div>
-      <div><div class="brand-name">秋招陪跑 <span id="verSide" style="font-size:11px;opacity:.85;"></span></div><div class="brand-sub">小陪 · 你的求职搭子</div></div>
+<div class="wrap">
+
+<div class="head">
+  <h1>💡 刘雪·30天可勾选求职日规划</h1>
+  <p>央国企 + 外企 并行 ｜ 每日三练(英45-60 / 行测60 / 面试60) + 力量训练×3周 + 6共性技能 + 周验收 ｜ 2026-09-13 ~ 10-12</p>
+</div>
+
+<div class="tabs">
+  <div class="tab on" id="tab-day" onclick="showTab('day')">📅 日计划</div>
+  <div class="tab" id="tab-week" onclick="showTab('week')">🗓️ 周计划</div>
+  <div class="tab" id="tab-month" onclick="showTab('month')">📆 月计划</div>
+</div>
+
+<!-- ======= 日视图 ======= -->
+<div id="view-day">
+  <div class="card">
+    <button class="reset" onclick="resetDay()">清空本日勾选</button>
+    <h2>📅 当日任务（点 ✓ 打勾，进度自动保存）</h2>
+    <div class="daynav">
+      <button id="prev" onclick="goDay(-1)">‹ 前一天</button>
+      <div class="dlabel" id="dlabel">9/13</div>
+      <button id="next" onclick="goDay(1)">后一天 ›</button>
+      <span class="today" onclick="goToday()">回到今天</span>
     </div>
-    <nav>
-      <button class="nav active" data-tab="chat" onclick="switchTab('chat')"><span class="ic">💬</span><span class="lb">陪跑</span></button>
-      <button class="nav" data-tab="today" onclick="switchTab('today')"><span class="ic">📅</span><span class="lb">今日日程</span></button>
-      <button class="nav" data-tab="learn" onclick="switchTab('learn')"><span class="ic">📊</span><span class="lb">我的规律</span></button>
-      <button class="nav" data-tab="jobs" onclick="switchTab('jobs')"><span class="ic">📁</span><span class="lb">岗位库</span></button>
-      <button class="nav" data-tab="diary" onclick="switchTab('diary')"><span class="ic">📔</span><span class="lb">日记</span></button>
-      <button class="nav" data-tab="set" onclick="switchTab('set')"><span class="ic">⚙️</span><span class="lb">设置</span></button>
-    </nav>
-    <div class="side-foot" id="sideStatus"></div>
-  </aside>
-  <main class="main">
-    <div class="topbar">
-      <span class="ttl" id="topTitle">陪跑</span>
-      <span class="tmeta" id="topMeta"></span>
+    <div class="pcount" id="pcount">完成 0 / 0</div>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="items"></div>
+    <div class="note" id="daynote"></div>
+  </div>
+</div>
+
+<!-- ======= 周视图 ======= -->
+<div id="view-week" class="hidden">
+  <div class="card">
+    <h2>🗓️ 周计划（笼统）</h2>
+    <div class="wk">
+      <h3>🟦 W1（9/13–9/19）Excel 地基 + 渠道 + 英语启动</h3>
+      <div class="m"><b>技术：</b>Excel 透视表 / VLOOKUP / SUMIFS / 图表 / 业务看板（戴师兄搭骨架 → 王佩丰查漏）</div>
+      <div class="m"><b>面试：</b>建"四大题型"框架（站长面试B站+花生十三学结构）→ 结构化/半结构化/无领导/行为STAR轮换</div>
+      <div class="m"><b>每日：</b>英45-60 · 行测60 · 面试60 · 力量训练×3(一三五日) · 共性输入×3(二四日) · 投递(Boss仅工作日9-18)</div>
+      <div class="acc">✅ W1验收(9/19)：Excel作品集v1 + 简历A版(运营)立投/B版(数据)建框架 + 5+平台注册完</div>
     </div>
+    <div class="wk">
+      <h3>🟩 W2（9/20–9/26）SQL 取数 + 结构化面试</h3>
+      <div class="m"><b>技术：</b>SQL 查询/JOIN/GROUP BY/窗口函数 + 牛客每日10题（Mosh教程 → 牛客刷题）</div>
+      <div class="m"><b>面试：</b>结构化每日1题 + 半结构化 + 行为STAR(bq-skill) ；共性③④(业务理解/跨文化)开看</div>
+      <div class="acc">✅ W2验收(9/25-26)：SQL作品集v2 + <b>简历B版激活</b>(数据岗可投)</div>
+    </div>
+    <div class="wk">
+      <h3>🟨 W3（9/27–10/3）Power BI + RFM + 国庆作品集冲刺</h3>
+      <div class="m"><b>技术：</b>Power BI 看板 + RFM用户分层（B站孙兴华/微软路径）</div>
+      <div class="m"><b>面试：</b>无领导+半结构化+英文口语突击；共性⑤⑥(项目管理/内容增长)</div>
+      <div class="vac"><b>⚠️ 国庆10/1–10/7：</b>Boss不投、官网可投、主攻作品集+面试内功（若国务院调休补班日则按工作日算）</div>
+      <div class="acc">✅ W3验收(10/3)：BI看板+RFM报告 + 简历v3(加Power BI/RFM)</div>
+    </div>
+    <div class="wk">
+      <h3>🟪 W4（10/4–10/10）综合项目 + 全真模拟 + 行测冲刺</h3>
+      <div class="m"><b>技术：</b>天池公开数据集完整项目（业务问题→SQL→BI→策略建议）</div>
+      <div class="m"><b>面试：</b>四大件各1场全真模拟（高顿模拟面试报告打分 / big-tech-interviews被追问）</div>
+      <div class="m"><b>行测：</b>每天1套央国企真题冲刺（不碰申论、不考公）</div>
+      <div class="acc">✅ W4验收(10/10)：综合项目作品集v4 + 简历v4定稿(全技能标签) + 模拟面试评分表</div>
+    </div>
+    <div class="wk">
+      <h3>🟫 W5（10/11–10/12）收尾验收 + 集中投递</h2></h3>
+      <div class="m"><b>技术：</b>作品集终检 + 总复盘（投递/回音/错题集中模块）</div>
+      <div class="m"><b>10/12（周一）：</b>Boss集中投递日，A运营+B数据+C央国企多投</div>
+      <div class="acc">✅ 终验：三件产出物齐全（Excel报告 / 综合项目 / 面试素材包），红线检查有面试</div>
+    </div>
+  </div>
+</div>
 
-    <!-- 陪跑对话 -->
-    <section class="tab" id="tab-chat">
-      <div class="chat" id="chatlog"></div>
-      <div class="quick" id="quick">
-        <button class="chip" onclick="quick('今天该干嘛')">今天学什么</button>
-        <button class="chip" onclick="quick('我去图书馆了')">记日记</button>
-        <button class="chip" onclick="quick('我力量训练隔天做一次')">设周期提醒</button>
-        <button class="chip" onclick="quick('我英语学了一个小时')">英语学1小时</button>
-        <button class="chip" onclick="quick('下午3点去超市，一小时')">下午去超市</button>
-        <button class="chip" onclick="quick('今天好压抑')">今天好压抑</button>
-      </div>
-      <div class="inputbar">
-        <input id="msg" placeholder="随便说，说人话就行…" onkeydown="if(event.key==='Enter')send()">
-        <button onclick="send()">发送</button>
-      </div>
-    </section>
+<!-- ======= 月视图 ======= -->
+<div id="view-month" class="hidden">
+  <div class="card">
+    <h2>📆 月计划（最笼统）</h2>
+    <div class="lead">一个月只交付 <b>三件东西</b>：① Excel数据分析小报告 ② 综合项目作品集(天池) ③ 面试素材包(自我介绍2版+STAR8个+群面5框架+场景题骨架)。其余都是为它们服务。</div>
+    <div class="m" style="font-size:14px"><b>月度总目标：</b>双线并行——央国企走"行测+信息化(C版简历)"；外企走"Excel/SQL/BI+英语+作品集"。方向锚点不变：数据运营/分析/用户增长·外企；央国企信息化/数字化管理。</div>
+    <h3 style="margin-top:12px;font-size:15px">四大阶段</h3>
+    <table>
+      <tr><th>阶段</th><th>时间</th><th>核心</th></tr>
+      <tr><td>打地基</td><td>W1 (9/13–19)</td><td>Excel + 渠道搭建 + 面试框架 + 英语摸底</td></tr>
+      <tr><td>补缺技能</td><td>W2 (9/20–26)</td><td>SQL独立取数 + 结构化面试 + B版简历激活</td></tr>
+      <tr><td>作品集</td><td>W3 (9/27–10/3)</td><td>Power BI + RFM + 国庆冲刺（不投Boss）</td></tr>
+      <tr><td>综合+冲刺</td><td>W4–W5 (10/4–12)</td><td>综合项目 + 全真模拟 + 行测冲刺 + 集中投递</td></tr>
+    </table>
+    <h3 style="margin-top:12px;font-size:15px">关键节点（红色验收日）</h3>
+    <ul>
+      <li><b style="color:var(--red)">9/19</b> W1验收：Excel作品集v1</li>
+      <li><b style="color:var(--red)">9/26</b> W2验收：SQL作品集v2 + B版简历激活</li>
+      <li><b style="color:var(--red)">10/3</b> W3验收：BI+RFM作品集v3（国庆）</li>
+      <li><b style="color:var(--red)">10/10</b> W4验收：综合项目v4 + 简历v4定稿</li>
+      <li><b style="color:var(--red)">10/12</b> 集中投递日 + 终验</li>
+    </ul>
+    <div class="rule"><b>铁律：</b>① 投递——Boss/猎聘<b>仅工作日9-18</b>，官网/央国企网<b>随时</b>；② 行测只刷不考公、不碰申论；③ 每周3次力量训练、3次共性技能输入；④ 每次作品集提交必回头改一次简历（只换技能标签/优势首句/自我评价三处）。</div>
+    <div class="vac"><b>红线：</b>投递量决定有没有面试，技能只决定面试时说不说得出来——顺序别搞反。10月上旬0面试→把私企也放进来。</div>
+  </div>
+</div>
 
-    <!-- 今日日程 -->
-    <section class="tab hidden" id="tab-today">
-      <div class="pad">
-        <div class="actions">
-          <button class="btn primary" onclick="doAct('newplan')">↻ 重新规划今天</button>
-          <button class="btn" onclick="doAct('newday')">🌅 新的一天</button>
-          <button class="btn" onclick="doAct('review')">📝 复盘</button>
-        </div>
-        <div id="todayLearn"></div>
-        <div id="progress"></div>
-        <div class="tl" id="schedule"></div>
-      </div>
-    </section>
+<!-- ======= 资源速查（固定） ======= -->
+<div class="card">
+  <h2>📚 具体"跟谁学"资源速查（点开看）</h2>
+  <details>
+    <summary>① 技术硬技能 · 课程清单</summary>
+    <div style="margin-top:8px">
+      <span class="chip">Excel</span> <b>王佩丰《Excel基础教程24讲》(主，系统学)</b> + 戴师兄《Excel基础操作》(当速查/补大厂案例)；只学到透视表/VLOOKUP/图表，<b>不学VBA/宏</b>。<br>
+      <span class="chip">SQL</span> <b>戴师兄《SQL数据分析》课程(B站，中文，跟你Excel同一老师、体系连贯，打基础)</b> → 牛客网SQL篇每日10题(边写边看结果) → 想进阶再补 Mosh 英文版(系统)；<b>刷到50题收手</b>，窗口函数看懂即可。<br>
+      <span class="chip">Power BI</span> B站孙兴华Power BI / 微软官方学习路径；只学连数据源、做图、搭看板。<br>
+      <span class="chip">RFM/AIPL</span> 自己整理一页笔记（趋势/对比/漏斗/多维拆解/用户分层+场景题四步骨架）。
+    </div>
+  </details>
+  <details>
+    <summary>② 行测 · 只刷不考公</summary>
+    <div style="margin-top:8px">
+      <span class="chip">工具</span> 粉笔App(限时做题) + 花生十三速算(截位直除/415份数法，主攻资料分析) + 错题本「朱批录」。<br>
+      每天60min，重点模块练到正确率稳；<b>不碰申论、不考公</b>。投银行线搜 EPI。
+    </div>
+  </details>
+  <details>
+    <summary>③ 面试 · 具体学习方案（每日60min怎么用）</summary>
+    <div style="margin-top:8px">
+      <b>🎯 跟谁学（框架）：</b>以<b>面试四大题型</b>为主轴（①结构化 ②半结构化 ③无领导 ④行为STAR——这是题型<b>分类</b>，没有"熊威"这个人，是语音转文字误识别）。具体跟：<br>
+      · <b>结构化/半结构化</b>：B站搜「站长面试」或「面试学长」的结构化专项课（答题框架=审题→分层→关键词破题）；粉笔/中公免费结构化课也行；<br>
+      · <b>无领导</b>：B站搜「无领导小组讨论复盘」看3个 + 牛客面经，学群面角色（记录者/Reporter）；<br>
+      · <b>行为STAR</b>：用 <code>bq-skill</code> 把真实经历挖成中英双语故事库；<br>
+      · <b>底层表达</b>：书《金字塔原理》练"结论先行/MECE"。<br>
+      <span class="note">先按这些资源学，我帮你把每日任务对应上；你手头若另有更顺眼的面试课，告诉我替换即可。</span><br>
+      <b>⏱ 每日60min切分：</b>前20min 学/复习1个法则或1道题型框架 → 中25min 自己开口答(录音) → 后15min 复盘(对照要点改话术)。<br>
+      <b>🗓 周轮换（和日计划一致）：</b>周一/三/五=结构化+半结构化(央国企)；周二/四=行为STAR(外企，用bq-skill建英文故事)；周六=全真模拟；周日=本周复盘+改自我介绍。<br>
+      <span class="chip">技能辅助</span>
+      · <code>bq-skill</code>：把你的真实经历挖成<b>中英双语STAR故事库</b>(目标8个)——外企行为面试弹药；<br>
+      · <code>big-tech-interviews</code>：做<b>真实模拟面试、被追问</b>练临场；<br>
+      · <code>interview-brush</code> / 高顿「模拟面试报告」：结构化/半结构化<b>抽题+评分</b>拿反馈；<br>
+      · 牛客/B站搜"无领导复盘"看3个学群面节奏。<br>
+      <span class="chip">群面角色</span> 选记录者/Reporter，五类题(排序/资源分配/危机/两难/方案)各备1框架。<br>
+      <span class="note">怎么最好辅助你：① 你练完发录音/文字给我 → 我用 bq-skill 帮你把经历标准化成STAR；② 卡壳的题直接让我开 big-tech-interviews 模拟；③ 每周六我按高顿报告模板给你打分。</span>
+    </div>
+  </details>
+  <details>
+    <summary>④ 英语 · 45-60min/天（你自主跟博主）</summary>
+    <div style="margin-top:8px">
+      <span class="chip">你自主</span> 英语你已有自己的博主跟着学，<b>我不替你定听力/阅读资源</b>，按你博主节奏走即可。<br>
+      <span class="chip">两条硬指标</span> ①<b>英文自我介绍40秒必须硬背</b>（覆盖半个面试题库，优缺点/经历/动机都能从它拆）；② 需要<b>口语陪练随时找我(AI)</b>，我陪你练外企面试问答、不嫌烦。<br>
+      <span class="chip">底线</span> 四六级够用，外企要的是"敢开口+工作语言读写"，不是雅思；若你博主没覆盖自我介绍模板，我直接给你。
+    </div>
+  </details>
+  <details>
+    <summary>⑤ 6共性技能 · 看什么+为什么看（每周3次）</summary>
+    <div style="margin-top:8px;font-size:13px">
+      <b>总目的：</b>这6项是"市场最愿意付钱的隐藏共性能力"，不是让你学操作，而是<b>建立思维框架 + 面试能讲出来</b>。每次看带一个问题："这体现了哪个底层能力？我怎么用到数据运营岗？"看完写1句感悟进打卡。<br><br>
+      <b>① AI应用能力</b>（理解AI已是工作基础设施，学会把AI融进流程而非学算法）<br>
+      看：TED Nick Bostrom《电脑比人聪明后》+ B站纪录片《Code: Debugging the Gender Gap》。<br>
+      目的：放下"AI威胁/算法焦虑"，建立"用AI提效"的应用视角——这正是你简历要写的 AI Fluency。<br><br>
+      <b>② 数据素养</b>（用数据看世界、靠数据决策的能力）<br>
+      看：BBC《The Joy of Stats》汉斯·罗斯林 + TED Hans Rosling《用新媒体数据看世界》。<br>
+      目的：培养"数据直觉"——看到任何业务问题先想"用什么指标衡量"，面试能举数据驱动例子。<br><br>
+      <b>③ 业务理解/商业化</b>（懂企业靠什么赚钱，不做只会执行的人）<br>
+      看：TED Simon Sinek《Start With Why》+ 纪录片《制高点：世界经济之战》。<br>
+      目的：练 business sense——面试反问"这个岗位怎么帮公司赚钱"时言之有物。<br><br>
+      <b>④ 跨文化/英语</b>（理解文化差异下的沟通，外企刚需）<br>
+      看：TED官网每日1演讲(顺带练听力表达) + Netflix《抽象：设计的艺术》英文原声。<br>
+      目的：积累跨文化沟通素材+练耳朵，为外企面试英文问答和邮件表达打底。<br><br>
+      <b>⑤ 项目管理/推动落地</b>（跨职能推动、在约束下交付的能力）<br>
+      看：TED搜 project management 优质演讲 + 电影《阿波罗13号》(危机中的项目管理)。<br>
+      目的：学"把事从0推到1"的闭环思维，面试讲项目经历时体现推动力和风险意识。<br><br>
+      <b>⑥ 内容/增长/数字营销</b>（理解用户心理与增长逻辑）<br>
+      看：纪录片《社交困境 The Social Dilemma》+ TED Simon Sinek《Why good leaders make you feel safe》。<br>
+      目的：理解用户行为与增长机制，为运营/增长岗面试积累 insight（如"为什么用户会沉迷/转化"）。<br>
+      <span class="note">每周3次，按日计划里 g 列编号循环(二/四/日)；赶不上就周末补，不强求当天。</span>
+    </div>
+  </details>
+  <div class="src">课程来源：你9/12版《一个月学习计划》原文（戴师兄/王佩丰/Mosh/牛客/花生十三/ESLPod/bq-skill/高顿模拟面试）+ 面试资源（站长面试·B站 / 面试学长 / 无领导复盘 /《金字塔原理》）。“熊威”为语音误识别，已剔除。</div>
+</div>
 
-    <!-- 我的规律 -->
-    <section class="tab hidden" id="tab-learn">
-      <div class="pad">
-        <div class="panel" id="learnings"></div>
-        <div class="panel">
-          <h3>🕐 作息观察</h3>
-          <div class="note" id="rhythmBox"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 岗位库 -->
-    <section class="tab hidden" id="tab-jobs">
-      <div class="pad">
-        <div class="panel">
-          <h3>📁 岗位库</h3>
-          <div class="note">在「陪跑」里直接说「记岗位 字节跳动 用户运营 北京」「投了字节」就能增删，不用手填。</div>
-          <div id="positions" style="margin-top:12px;"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 日记本 -->
-    <section class="tab hidden" id="tab-diary">
-      <div class="pad">
-        <div class="panel">
-          <h3>📔 日记本</h3>
-          <div class="note">在「陪跑」里说「我今天去图书馆了」「上午练了力量训练」，我自动记到这里；也可以手写。</div>
-          <div style="display:flex;gap:8px;margin-top:10px;">
-            <input id="diaryInput" placeholder="今天发生了什么…" style="flex:1;padding:10px 12px;border:1px solid var(--line);border-radius:11px;font-size:14px;outline:none;background:#f7f9fc;">
-            <button class="btn primary" onclick="diaryAddManual()">记一笔</button>
-          </div>
-        </div>
-        <div class="panel">
-          <h3>🔁 周期提醒</h3>
-          <div class="note">比如「力量训练每隔一天做一次」——到日子我会自动提醒你。在「陪跑」里说「我力量训练隔天做一次」即可。</div>
-          <div id="recurringBox" style="margin-top:10px;"></div>
-        </div>
-        <div class="panel">
-          <h3>📖 我的记录</h3>
-          <div id="diaryList"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 设置 -->
-    <section class="tab hidden" id="tab-set">
-      <div class="pad">
-        <div class="panel">
-          <h3>🤖 AI 接入（关键）</h3>
-          <div class="field">
-            <label>服务商</label>
-            <select id="setProvider" onchange="onProviderChange()">
-              <option value="openrouter">OpenRouter（推荐，Claude/Gemini/GPT 都能用）</option>
-              <option value="siliconflow">硅基流动（DeepSeek/Qwen/GLM 等国产便宜模型）</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>API Key（存在你手机本地，不会上传）</label>
-            <input id="setKey" type="password" placeholder="sk-or-... / sk-...">
-          </div>
-          <div class="field">
-            <label>模型名</label>
-            <input id="setModel" placeholder="openai/gpt-4o-mini">
-            <div class="note" id="modelHint"></div>
-          </div>
-          <button class="btn primary" onclick="saveSettings()">💾 保存设置</button>
-          <div class="hintbox" id="aiState"></div>
-        </div>
-
-        <div class="panel">
-          <h3>⏰ 学习窗口（实验）</h3>
-          <div style="display:flex;gap:10px;">
-            <div class="field" style="flex:1;margin:0;"><label>开始</label><input id="setStart" placeholder="08:30"></div>
-            <div class="field" style="flex:1;margin:0;"><label>结束</label><input id="setEnd" placeholder="21:30"></div>
-          </div>
-          <button class="btn" onclick="saveWindow()">保存窗口</button>
-        </div>
-
-        <div class="panel">
-          <h3>📦 数据</h3>
-          <div class="actions" style="margin:0;">
-            <button class="btn" onclick="exportState()">⬇ 导出进度</button>
-            <button class="btn" onclick="document.getElementById('imp').click()">⬆ 导入进度</button>
-            <button class="btn" onclick="resetAll()">🗑 重置全部</button>
-            <input id="imp" type="file" accept="application/json" style="display:none" onchange="importState(event)">
-          </div>
-          <div class="warnbox">没填 Key 也能用，但只是「规则版」——能听懂固定句式，听不懂口语吐槽。填了 Key 才是真·活人 AI，随便说都接得住。</div>
-        </div>
-
-        <div class="panel">
-          <h3>☁️ 云端同步（防丢 · 跨设备）</h3>
-          <div class="note" style="margin-bottom:10px;">把进度自动存到你的 <b>GitHub 私有 Gist</b>（免费、只有你能看）。开启后<b>换手机 / 清缓存都不丢</b>，换设备填同一个 Token 即恢复全部进度。</div>
-          <div class="field">
-            <label>GitHub Token（只需填一次，存在你手机本地）</label>
-            <input id="setCloudToken" type="password" placeholder="ghp_... 或 github_pat_...">
-          </div>
-          <div class="actions" style="margin:0 0 8px;">
-            <button class="btn primary" onclick="connectCloud()">☁ 开启云端同步</button>
-            <button class="btn" onclick="disconnectCloud()">断开</button>
-          </div>
-          <div class="note" id="cloudStatus">⚪ 未开启云端同步</div>
-          <details style="margin-top:10px;">
-            <summary style="cursor:pointer;font-size:12.5px;color:#48557a;">怎么拿 Token？（30秒，免费）</summary>
-            <div class="note" style="margin-top:8px;line-height:1.9;">
-              1. 打开 <b>github.com</b> → 登录或注册（邮箱即可）<br>
-              2. 右上角头像 → <b>Settings</b> → 最下方 <b>Developer settings</b><br>
-              3. <b>Personal access tokens</b> → <b>Tokens (classic)</b> → <b>Generate new token</b><br>
-              4. Note 随便写；<b>Expiration 选 No expiration</b><br>
-              5. 权限只勾 <b>gist</b> 一项 → <b>Generate token</b><br>
-              6. 复制 <b>ghp_...</b> 那串 → 粘到上面框 → 点「开启云端同步」
-            </div>
-          </details>
-        </div>
-        <div class="panel">
-          <h3>ℹ️ 版本</h3>
-          <div class="note">当前版本：<b id="verTag"></b></div>
-          <div class="note" style="margin-top:6px;">以后每改一次，这个号和顶部标题都会变。核对手机是不是最新版，看这里就行。</div>
-        </div>
-        <div class="hintbox">
-          <b>怎么拿 Key（免费额度都够用）：</b><br>
-          · OpenRouter：openrouter.ai → Sign Up → Keys 里创建，默认送免费额度。<br>
-          · 硅基流动：siliconflow.cn → 控制台 → API 密钥，注册送额度。<br>
-          拿到后粘进上面「API Key」即可。
-        </div>
-      </div>
-    </section>
-  </main>
+<div class="foot">刘雪专属 · 小灯制作 · 进度存本地(localStorage)不丢 · 数据截至 2026-09-13</div>
 </div>
 
 <script>
-/* ============ 课程数据（高段位运营向） ============ */
-const UNITS = {
-  U01:{stream:'硬技能',title:'Excel 函数 VLOOKUP/XLOOKUP/SUMIFS',min:60,light:false,purpose:'数据运营取数硬门槛',accept:'多条件汇总一张表',kw:['excel','函数','vlookup','xlookup','sumifs']},
-  U02:{stream:'硬技能',title:'Excel 透视表+图表',min:60,light:false,purpose:'数据呈现硬门槛',accept:'交互汇总图',kw:['透视','图表','pivot']},
-  U03:{stream:'硬技能',title:'SQL 查询 SELECT/JOIN/GROUP BY',min:90,light:false,purpose:'取数入门',accept:'关联聚合查询',kw:['sql','查询','join','select','group']},
-  U04:{stream:'硬技能',title:'SQL 窗口函数+子查询',min:90,light:false,purpose:'笔试高频难点',accept:'窗口函数算排名',kw:['窗口','子查询','window']},
-  U05:{stream:'硬技能',title:'SQL 刷题 (SQLZoo/牛客)',min:90,light:false,purpose:'数据分析笔试硬门槛',accept:'10+题',kw:['刷题','sqlzoo','牛客']},
-  U06:{stream:'硬技能',title:'增长漏斗/留存/北极星指标',min:60,light:false,purpose:'增长运营方法论',accept:'能画用户漏斗',kw:['漏斗','留存','北极星','增长']},
-  U07:{stream:'硬技能',title:'A/B 测试基础',min:60,light:false,purpose:'策略/增长运营核心',accept:'讲清一次AB实验设计',kw:['ab','ab测试','显著性','分流']},
-  U08:{stream:'硬技能',title:'Python pandas 数据清洗',min:90,light:false,purpose:'自动化取数加分',accept:'脏表→规范表',kw:['pandas','python','清洗']},
-  U09:{stream:'硬技能',title:'项目：增长/留存分析报告',min:120,light:false,purpose:'简历项目/面试谈资',accept:'一份分析报告',kw:['项目','分析报告','eda']},
-  U10:{stream:'硬技能',title:'行业研究：拆解1个产品的增长路径',min:60,light:false,purpose:'高段位运营业务sense',accept:'画增长路径图',kw:['行业','拆解','增长路径','产品','商业']},
-  U11:{stream:'硬技能',title:'BI工具(Tableau/帆软)入门',min:90,light:false,purpose:'数据运营加分项',accept:'连表出图',kw:['bi','tableau','帆软','powerbi','可视化']},
-  U20:{stream:'简历',title:'看"简历一百问"自评，列3个待改点',min:60,light:false,purpose:'避坑',accept:'改点清单',kw:['简历一百问','简历自评','简历自查','简历改','对照简历','查简历']},
-  U21:{stream:'简历',title:'产出数据/增长运营简历初稿',min:120,light:false,purpose:'投递门槛',accept:'完整版',kw:['简历初稿','写简历','resume','初稿']},
-  U22:{stream:'简历',title:'按投递岗位微调简历',min:60,light:false,purpose:'匹配度',accept:'JD关键词对齐',kw:['微调','改简历','对齐']},
-  U24:{stream:'简历',title:'产出1份运营方案/活动策划作品',min:120,light:false,purpose:'作品集/面试谈资',accept:'一份方案',kw:['运营方案','活动策划','作品','方案']},
-  U30:{stream:'投递',title:'挑岗+投递（外企运营+央国企×5）',min:45,light:false,purpose:'拿面试',accept:'当日投递记录',kw:['挑岗','投递','投简历','投出','岗位']},
-  U31:{stream:'投递',title:'研究1家公司（业务/笔面流程）',min:30,light:false,purpose:'面试谈资',accept:'公司速记卡',kw:['研究公司','公司速记','公司']},
-  U32:{stream:'投递',title:'更新投递追踪表(公司-岗位-进度)',min:15,light:false,purpose:'不漏笔面',accept:'表已更新',kw:['追踪表','投递表','进度表']},
-  U33:{stream:'投递',title:'搭建网申素材库(自我介绍/开放题)',min:60,light:false,purpose:'网申提速',accept:'素材就绪',kw:['网申','素材库','开放题','自我介绍']},
-  U40:{stream:'行测',title:'资料分析速算',min:45,light:false,purpose:'央国企笔试提速',accept:'限时5道',kw:['资料分析','速算','资料']},
-  U41:{stream:'行测',title:'言语理解',min:45,light:false,purpose:'笔试通过',accept:'小节练习',kw:['言语']},
-  U42:{stream:'行测',title:'判断推理/数量关系',min:45,light:false,purpose:'笔试通过',accept:'小节练习',kw:['判断','推理','数量']},
-  U43:{stream:'行测',title:'套卷模考',min:90,light:false,purpose:'适应节奏',accept:'一套卷',kw:['套卷','模考','行测卷']},
-  U50:{stream:'测评',title:'行测类测评模拟',min:60,light:false,purpose:'测评通过',accept:'一套模拟',kw:['测评模拟','测评']},
-  U51:{stream:'测评',title:'性格/职业测评策略',min:60,light:false,purpose:'不踩雷',accept:'答题策略总结',kw:['性格','职业测评']},
-  U52:{stream:'测评',title:'【紧急】收到公司测评链接→48-72h完成',min:60,light:false,purpose:'进下一轮',accept:'提交截图',kw:['测评','链接','截止','紧急'],urgent:true},
-  U60:{stream:'面试',title:'行为面 BQ：1个STAR故事',min:60,light:false,purpose:'行为面',accept:'2分钟可讲',kw:['行为面','star','bq','故事']},
-  U61:{stream:'面试',title:'技术面 SQL/Excel 现场题模拟',min:60,light:false,purpose:'技术面通过',accept:'限时3题',kw:['技术面','现场题','模拟面']},
-  U62:{stream:'面试',title:'无领导小组讨论角色(破冰/总结/时间官)',min:60,light:false,purpose:'群面不懵',accept:'说清3种角色',kw:['无领导','群面','讨论','角色']},
-  U63:{stream:'面试',title:'无领导模拟(自言自语1题+复盘)',min:45,light:false,purpose:'表达流畅',accept:'2分钟陈述',kw:['无领导模拟','群面模拟','复盘']},
-  U64:{stream:'面试',title:'表达训练：PREP讲清一件事',min:60,light:false,purpose:'面试表达',accept:'PREP讲1件事',kw:['表达','prep','讲清楚']},
-  U65:{stream:'面试',title:'商业案例拆解练习(1题+复盘)',min:60,light:false,purpose:'高段位运营面',accept:'拆解1案例',kw:['商业案例','案例','拆解练习']},
-  U66:{stream:'投递',title:'岗位广度：看1个非主方向岗JD(销售/行政/文员等)',min:20,light:true,purpose:'不排斥其他机会',accept:'速记1岗职责',kw:['销售','行政','文员','其他岗','广度','非主方向']},
-  U_ENG:{stream:'英语',title:'英语练习（听力30+口语20+阅读10）',min:60,light:false,purpose:'外企沟通基础+面试英语',accept:'听懂1段+说1分钟+概括1段',kw:['英语','english','听力','口语','阅读','技术文档']},
-  L1:{stream:'面试',title:'轻松：看1个运营面经视频',min:30,light:true,purpose:'保持手感',accept:'看完1个',kw:['面经','视频']},
-  L2:{stream:'投递',title:'轻松：整理今日投递记录',min:15,light:true,purpose:'不漏投',accept:'记录更新',kw:['整理','记录']},
-  L3:{stream:'英语',title:'轻松：英语听力泛听',min:30,light:true,purpose:'语感',accept:'泛听1段',kw:['泛听']},
-  L4:{stream:'硬技能',title:'轻松：复习SQL/Excel笔记',min:30,light:true,purpose:'巩固',accept:'过一遍笔记',kw:['复习','笔记']},
-  L5:{stream:'行测',title:'轻松：看1个行测技巧短视频/读1篇方法论',min:30,light:true,purpose:'保持手感',accept:'看完1个',kw:['行测技巧','技巧视频']},
-  L6:{stream:'简历',title:'轻松：翻看自己简历1遍找1个可优化点',min:20,light:true,purpose:'不荒废',accept:'找到1点',kw:['翻简历','看简历']},
-  L4b:{stream:'硬技能',title:'轻松：看1个 SQL/Excel 入门短视频（从0开始，不用有基础）',min:30,light:true,purpose:'零基础先起步，建立手感',accept:'看懂1个短视频',kw:['入门视频','从0','sql入门']},
-  /* —— 2026-09-09 新增：补方向缺口（银行 / 结构化 / 外企英文面试）—— */
-  U67:{stream:'面试',title:'结构化面试题型(自我认知/人际/应急/综合分析/组织管理)模板+开口',min:60,light:false,purpose:'央国企半结构化前的结构化底子',accept:'背熟5类题框架',kw:['结构化','五大题型','综合分析','组织管理','应急','自我认知']},
-  U68:{stream:'英语',title:'外企英文面试(1分钟英文自我介绍+3个英文STAR故事+口语模拟)',min:60,light:false,purpose:'外企面试硬门槛',accept:'能脱稿讲1分钟+1个故事',kw:['英文面试','英文自我介绍','英文star','英文bq','口语模拟']},
-  U70:{stream:'行测',title:'银行综合知识(经济/金融/会计/法律基础)速记',min:60,light:false,purpose:'银行笔试硬门槛',accept:'过一遍基础选择题',kw:['银行综合','经济金融','会计','综合知识','银行笔试']},
-  U71:{stream:'测评',title:'银行专业笔试真题刷题(行测+综合)',min:60,light:false,purpose:'六大行笔试通过',accept:'一套真题',kw:['银行真题','六大行','银行刷题','专业笔试']},
+// ===== 30天数据 =====
+const WEEK_THEME = {1:'Excel地基',2:'SQL取数',3:'Power BI+RFM',4:'综合项目',5:'收尾验收'};
+const GONG = {
+ 1:'①AI应用能力：TED Nick Bostrom《电脑比人聪明后》/ B站《Code: Debugging the Gender Gap》',
+ 2:'②数据素养：BBC《The Joy of Stats》汉斯·罗斯林 / TED Hans Rosling《最好的统计》',
+ 3:'③业务理解/商业化：TED Simon Sinek《Start With Why》/ 纪录片《制高点：世界经济之战》',
+ 4:'④跨文化/英语：TED官网每日1演讲(练听力+表达) / Netflix《抽象：设计的艺术》英文原声',
+ 5:'⑤项目管理：TED搜project management / 纪录片《阿波罗13号》',
+ 6:'⑥内容/增长：纪录片《社交困境》/ TED Sinek《Why good leaders make you feel safe》',
+ 0:'自由补弱：挑本周最缺的1个共性技能回看对应资源'
 };
-/* ============ 怎么学（每个单元的学习路径：去哪看 / 用什么 / 怎么练） ============ */
-const HOWTO={
-  U01:'📺 B站搜「Excel函数 实战」跟练（VLOOKUP/XLOOKUP/SUMIFS）。💻 用电脑装 WPS 或 Excel。✍️ 练法：拿自己的成绩表/课程表做"按班级汇总平均分"之类的多条件求和。',
-  U02:'📺 B站「Excel透视表 入门」；💻 同上的表，拖字段做一张交互汇总图（行=月份，值=销售额）。',
-  U03:'🌐 网站 SQLZoo 或 牛客SQL题库 的「基础查询」章节跟做；💻 不用装软件，网页直接跑。✍️ 练：写10条 SELECT+JOIN+GROUP BY。',
-  U04:'📺 B站「SQL窗口函数」；🌐 牛客SQL刷题（窗口函数/子查询专题）。',
-  U05:'🌐 SQLZoo + 牛客，每天10题，错题截图存相册。',
-  U06:'📺 B站「增长方法论 漏斗模型/留存/北极星指标」；✍️ 画一张"用户从看到→注册→付费"的漏斗图。',
-  U07:'📺 B站「A/B测试 入门」；重点懂：对照组/实验组、显著性、怎么判断有效。',
-  U08:'📺 B站「pandas 入门」；💻 装 Anaconda（自带 Jupyter），把一份乱表清洗成规范表。',
-  U09:'✍️ 用前面学的 SQL 取数 + Excel 出图，写一份「某APP用户留存分析」报告当简历项目。',
-  U10:'✍️ 选一个你常用的APP（如小红书），拆解它"怎么拉新/怎么留人"的增长路径，画成图。',
-  U11:'📺 B站「Tableau 入门」；💻 用免费的 Tableau Public 连一份样例数据，拖拽出3张图。BI=把数据做成可视化看板，会拖拽出图就行，不用深学。',
-  U20:'🌐 搜「简历自查清单 / 简历一百问」对着改；重点查：有没有量化、有没有水话。',
-  U21:'✍️ 用现有简历改，硬技能突出"数据/SQL/Excel"，经历用"做了X→带来Y结果"写。',
-  U22:'✍️ 拿到JD后，把JD里的关键词(如"数据分析""用户增长")塞进简历对应经历。',
-  U24:'✍️ 写一份活动策划：目标→动作→指标(如拉新500人)，当作作品集。',
-  U30:'🌐 高顿/牛客/Boss 按"数据分析/用户运营"搜京津冀；每天投3-5个，投了才有后续。',
-  U31:'🌐 看目标公司官网/公众号/知乎"xx公司 笔试面试流程"，记一张速记卡。',
-  U32:'🌐 用腾讯文档建「投递追踪表」：公司-岗位-投递日-进度-笔面时间，防漏。',
-  U33:'✍️ 备好中英文自我介绍 + 3个开放题（为什么选我们/你的优势）模板，网申直接复制。',
-  U40:'📱 粉笔App 刷「资料分析」专项，练速算（截位直除/分数化）；每天限时5道。',
-  U41:'📱 粉笔App「言语理解」专项。',
-  U42:'📱 粉笔App「判断推理 / 数量关系」专项。',
-  U43:'📱 粉笔App 行测套卷模考，全真计时做一套。',
-  U70:'📺 B站「银行校园招聘 经济金融基础」免费课；📚 翻《银行招聘考试一本通》的经济/金融/会计/法律章节，刷选择题。你非金融专业，这块是硬补。',
-  U71:'📱 粉笔/中公「银行笔试真题」，刷六大行历年卷（行测+综合知识）。',
-  U50:'📱 北森题库 / 粉笔测评模拟，按你买的北森题库刷行测类题。',
-  U51:'🌐 搜「性格测评答题技巧」：核心是①前后答案一致(有测谎题)②贴合岗位特质(银行稳重/外企开放)③别选极端选项。不是随便打，有套路。',
-  U52:'⏰ 收到公司测评链接，48-72小时内做完提交截图，逾期=放弃。',
-  U60:'🌐 搜「宝洁八大问」，用 STAR(情境-任务-行动-结果) 写2-3个自己的真实故事；💬 直接在这个对话里让我当面试官问你，你答我点评。',
-  U61:'💬 在陪跑对话里说"考我SQL"，我出3道现场题你限时答。',
-  U62:'📺 B站「无领导小组讨论 角色定位」；记3种角色：破冰者/时间官/总结者，看自己适合哪个。',
-  U63:'🗣 自言自语练一题(如"城市该不该限行")+录音复盘；或小红书找"无领导搭子"连麦模拟。',
-  U64:'🗣 用 PREP(观点-理由-例子-总结) 就一件小事练2分钟脱稿讲，录视频看表情。',
-  U65:'📺 B站「商业案例分析 面试」；✍️ 拿"怎么提升某产品销量"这类题，套框架拆解。',
-  U67:'📺 B站「结构化面试 五大题型 模板」跟背；💬 在陪跑对话里说"考我结构化"，我出题你开口答+录视频。五大类：自我认知/人际关系/应急应变/综合分析/组织管理。',
-  U_ENG:'👂 听力：BBC/VOA慢速+影子跟读；🗣 口语：英语流利说App 或 在陪跑里跟我用英文对话；📖 阅读：读一篇英文JD/产品文档并概括。',
-  U68:'🗣 背1分钟英文自我介绍 + 3个英文STAR故事(用你中文故事翻英文)；💬 用豆包/陪跑对话做英文口语模拟面试；达不到"能脱稿讲1分钟+1个故事"就不停。',
-};
-const STREAMS=['硬技能','简历','投递','行测','测评','面试','英语'];
-
-/* ============ 一个月学习计划（2026-09-12 ~ 10-12）============ */
-const PLAN_START='2026-09-11'; // 提前一天开始（9/11 照计划第 1 天走，做完不顺延，没做完 9/12 接着来）
-/* 每天六段固定动作（顺序不变）——每段都带"学什么/用什么/怎么练/验收" */
-const DAY_TEMPLATE=[
-  {start:'08:30',end:'10:00',stream:'投递',title:'① 投递：刷岗 → 挑岗 → 投 3-4 家',
-   note:'用「JD 解码」过一遍值不值得投；投完记进投递追踪表。',
-   how:'高顿 / BOSS / 牛客 搜「国企·银行 信息化/数据/运营/综合职能」；双非一定要在 BOSS 也投一份',
-   accept:'当天投 3-4 家并记录'},
-  {start:'10:00',end:'12:00',stream:'行测',title:'② 笔试 / 行测：限时做题',
-   note:'粉笔 App 限时 → 错题用「行测复盘一体版」复盘 → 存进「朱批录」。',
-   how:'粉笔限时 1 组；重点资料分析，用花生十三速算（截位直除、415 份数法）。投银行搜关键词用 EPI',
-   accept:'1 组限时 + 错题复盘'},
-  {start:'13:00',end:'15:20',stream:'硬技能',title:'③ 学习段（按当周清单）',
-   note:'固定顺序：Excel → SQL → 方法论 → BI（选学）。每天 1-2 项。',
-   how:'看下面「今日学习清单」里当天那几项',
-   accept:'按清单完成'},
-  {start:'16:10',end:'17:40',stream:'面试',title:'④ 面试表达：写稿 → 口述 → 录音回听',
-   note:'录音 → 回听，每次只改 3 处。轮着来：自我介绍 → STAR 故事 → 场景分析题 → 群面框架。',
-   how:'bq-skill 存 STAR 故事；project-story-coach 把作品讲成故事；高顿「模拟面试报告」抽题打分',
-   accept:'录音并改 3 处'},
-  {start:'20:20',end:'21:20',stream:'英语',title:'⑤ 英语：每天 1 小时',fid:'PE',
-   note:'背单词 + 1 篇听力/阅读，或练口语。四六级、外企岗都看英语，别断。',
-   how:'墨墨/不背单词刷词；听力用 BBC 6 Minute English 或 TPO；每天新词+复习共 1 小时，碎片时间也能背',
-   accept:'学满 1 小时'},
-  {start:'21:20',end:'22:00',stream:'投递',title:'⑥ 复盘：只写三行',fid:'PR',
-   note:'投了几家 / 有没有回音 / 今天最大的卡点。',
-   how:'三行就行，别写长',
-   accept:'三行写完'}
+const DAYS = [
+ {d:'9/13',wd:'日',w:1,boss:false,str:false,g:1,tech:'渠道搭建：Boss切学生身份 / 猎聘填意向 / 注册国家平台ncss.cn + 前程无忧 + 央国企网(国聘/中智)；确认A版(运营)简历',inter:'建「面试四大题型」笔记框架（站长面试B站+花生十三学结构；题型：结构化/半结构化/无领导/行为STAR）',en:'英语摸底(测四六级/读写) + 自主(跟自己博主) 45-60min',xc:'行测认知：粉笔App摸1套，锁定「资料分析」为主模块 60min',dl:'官网捡漏 + 央国企网注册（⚠️今日周日不投Boss）'},
+ {d:'9/14',wd:'一',w:1,boss:true,str:true,g:null,tech:'Excel：数据透视表基础（戴师兄《Excel基础操作》前段 / 王佩丰24讲查漏）',inter:'结构化1题·自我认知（框架：审题→分层→关键词破题，跟站长面试B站）',en:'自主(跟自己博主) 45-60min',xc:'粉笔限时1组+资料分析 60min（花生十三速算：截位直除）',dl:'Boss 3-5家(运营A版, 上班时间9-18) + 官网/央国企 2-3家'},
+ {d:'9/15',wd:'二',w:1,boss:true,str:false,g:2,tech:'Excel：VLOOKUP/XLOOKUP + 多条件查找',inter:'半结构化：简历经历追问（宝洁八大问变体预备）',en:'跟读+背英文自我介绍40秒 45-60min',xc:'行测60min（言语模块）',dl:'Boss运营A + 央国企网2'},
+ {d:'9/16',wd:'三',w:1,boss:true,str:true,g:null,tech:'Excel：SUMIFS/COUNTIFS + 数据清洗',inter:'行为STAR 1段（社团85人台账，用bq-skill存故事）',en:'跟读 45-60min',xc:'行测60min（数量模块）',dl:'Boss运营A + 官网'},
+ {d:'9/17',wd:'四',w:1,boss:true,str:false,g:3,tech:'Excel：图表 + 业务看板雏形',inter:'结构化：综合分析1题',en:'跟读 45-60min',xc:'行测60min（判断推理）',dl:'Boss运营A + 央国企2'},
+ {d:'9/18',wd:'五',w:1,boss:true,str:true,g:null,tech:'Excel：综合练习（做1份样例数据分析报告）',inter:'半结构化：宝洁八大问变体1',en:'跟读 45-60min',xc:'行测60min（资料分析套题）',dl:'Boss本周最后窗口 + 官网'},
+ {d:'9/19',wd:'六',w:1,boss:false,str:false,g:null,tech:'整理Excel练习 → 作品集v1（透视表+2×VLOOKUP+1图表+1句结论）',inter:'无领导自练(录音复盘) + 英文自我介绍背诵',en:'跟读 45-60min',xc:'行测60min（周复盘/错题）',dl:'官网/央国企 only（周末不投Boss）',note:'🔴 W1验收日：交Excel作品集v1 + 简历A版立投/B版建框架'},
+ {d:'9/20',wd:'日',w:2,boss:false,str:false,g:1,tech:'SQL：基础查询/过滤（Mosh SQL教程 B站中文版 前段）',inter:'结构化：组织协调1题',en:'跟读 45-60min',xc:'行测60min',dl:'官网/央国企 only（周日不投Boss）'},
+ {d:'9/21',wd:'一',w:2,boss:true,str:true,g:null,tech:'SQL：多表关联 JOIN',inter:'半结构化：经历深挖',en:'跟读 45-60min',xc:'行测60min（资料分析）',dl:'Boss运营A + 央国企2'},
+ {d:'9/22',wd:'二',w:2,boss:true,str:false,g:2,tech:'SQL：GROUP BY 分组聚合',inter:'行为STAR 1段（门店异常闭环，bq-skill）',en:'跟读 45-60min',xc:'行测60min',dl:'Boss运营A + 官网'},
+ {d:'9/23',wd:'三',w:2,boss:true,str:true,g:null,tech:'SQL：窗口函数',inter:'结构化：应急应变1题',en:'跟读 45-60min',xc:'行测60min',dl:'Boss运营A + 央国企2'},
+ {d:'9/24',wd:'四',w:2,boss:true,str:false,g:3,tech:'SQL：独立取数练习（给业务问题自己写SQL）',inter:'半结构化：宝洁变体2',en:'跟读 45-60min',xc:'行测60min',dl:'Boss运营A + 官网'},
+ {d:'9/25',wd:'五',w:2,boss:true,str:true,g:null,tech:'整理取数 → SQL作品集v2（取数SQL+结果表+解答1业务问题）',inter:'无领导自练 + 英文行为题1',en:'跟读 45-60min',xc:'行测60min（套题）',dl:'Boss运营A + 央国企2',note:'🔴 W2验收：交SQL作品集v2 + 简历B版激活(数据岗可投)'},
+ {d:'9/26',wd:'六',w:2,boss:false,str:false,g:null,tech:'SQL错题回顾 + 牛客补弱',inter:'英文自我介绍熟背（对镜子练）',en:'跟读 45-60min',xc:'行测60min（错题本过）',dl:'官网/央国企 only'},
+ {d:'9/27',wd:'日',w:3,boss:false,str:false,g:4,tech:'Power BI：安装+界面+导入数据（B站孙兴华/微软路径）',inter:'半结构化准备 + 英文口语突击启动',en:'跟读+口语 45-60min',xc:'行测60min',dl:'官网/央国企（若调休补班则Boss也可）'},
+ {d:'9/28',wd:'一',w:3,boss:true,str:true,g:null,tech:'Power BI：建第一个看板',inter:'结构化1题',en:'跟读 45-60min',xc:'行测60min',dl:'Boss(运营A+数据B+央国企C, 上班时间) + 官网'},
+ {d:'9/29',wd:'二',w:3,boss:true,str:false,g:5,tech:'Power BI：图表美化+交互',inter:'无领导框架梳理（五类题各1框架）',en:'跟读 45-60min',xc:'行测60min',dl:'Boss + 官网'},
+ {d:'9/30',wd:'三',w:3,boss:true,str:true,g:null,tech:'RFM用户分层（用真实/公开数据）',inter:'行为STAR 1段（内容曝光6万，bq-skill）',en:'跟读 45-60min',xc:'行测60min',dl:'Boss + 央国企2'},
+ {d:'10/1',wd:'四',w:3,boss:false,str:false,g:6,tech:'BI看板精修（假期主攻）',inter:'英文自我介绍 + 1行为题',en:'跟读+口语 45-60min',xc:'行测60min（套题）',dl:'官网/央国企 only（国庆不投Boss）',note:'🔴 国庆：Boss不投/官网可投/主攻作品集'},
+ {d:'10/2',wd:'五',w:3,boss:false,str:true,g:null,tech:'RFM报告撰写（3条业务建议）',inter:'无领导自练(录音)',en:'跟读 45-60min',xc:'行测60min',dl:'官网/央国企 only',note:'🔴 国庆'},
+ {d:'10/3',wd:'六',w:3,boss:false,str:false,g:null,tech:'整合 → BI+RFM作品集v3',inter:'半结构化模拟',en:'跟读 45-60min',xc:'行测60min（周复盘）',dl:'官网/央国企 only',note:'🔴 W3验收·国庆：交BI+RFM作品集v3 + 简历v3'},
+ {d:'10/4',wd:'日',w:4,boss:false,str:false,g:4,tech:'作品集自查（等国庆后综合项目用）',inter:'行为STAR复盘',en:'跟读 45-60min',xc:'行测60min',dl:'官网/央国企 only',note:'🔴 国庆'},
+ {d:'10/5',wd:'一',w:4,boss:false,str:true,g:null,tech:'补BI细节',inter:'结构化1题',en:'跟读 45-60min',xc:'行测60min',dl:'官网/央国企 only',note:'🔴 国庆'},
+ {d:'10/6',wd:'二',w:4,boss:false,str:false,g:5,tech:'用户模型复盘',inter:'无领导自练',en:'跟读 45-60min',xc:'行测60min',dl:'官网/央国企 only',note:'🔴 国庆'},
+ {d:'10/7',wd:'三',w:4,boss:false,str:true,g:null,tech:'综合评价（BI+RFM整体）',inter:'英文口语',en:'跟读+口语 45-60min',xc:'行测60min',dl:'官网/央国企 only',note:'🔴 国庆·最后一天'},
+ {d:'10/8',wd:'四',w:4,boss:true,str:false,g:6,tech:'综合项目：定业务问题 + SQL取数（天池公开数据集）',inter:'结构化全真模拟(录音) — 高顿模拟面试报告打分',en:'跟读 45-60min',xc:'行测60min（冲刺套题）',dl:'Boss恢复(全方向A/B/C) + 官网'},
+ {d:'10/9',wd:'五',w:4,boss:true,str:true,g:null,tech:'综合项目：BI看板 + 策略建议',inter:'半结构化全真模拟',en:'跟读 45-60min',xc:'行测60min',dl:'Boss + 央国企'},
+ {d:'10/10',wd:'六',w:4,boss:false,str:false,g:null,tech:'综合项目收尾 → 作品集v4',inter:'无领导+行为全真模拟',en:'跟读 45-60min',xc:'行测60min（周复盘）',dl:'官网/央国企 only',note:'🔴 W4验收：交综合项目v4 + 简历v4定稿'},
+ {d:'10/11',wd:'日',w:5,boss:false,str:false,g:0,tech:'作品集终检 + 总复盘（投递/回音/错题集中模块）',inter:'英文面试模拟',en:'跟读 45-60min',xc:'行测60min',dl:'官网/央国企 only'},
+ {d:'10/12',wd:'一',w:5,boss:true,str:true,g:null,tech:'复盘调整（薄弱项补漏）',inter:'薄弱项补漏（按模拟面试报告）',en:'跟读 45-60min',xc:'行测60min（最后冲刺）',dl:'Boss集中投递日（A运营+B数据+C央国企 多投）',note:'🔴 收口：集中投递 + 终验'}
 ];
-/* 休息（不要压掉休息去换时长） */
-const REST_BLOCKS=[
-  {label:'午饭',start:'12:00',end:'13:00'},
-  {label:'午休',start:'15:20',end:'15:40'},
-  {label:'晚饭',start:'17:40',end:'18:30'},
-  {label:'休息',start:'20:00',end:'20:20'}
-];
-/* 逐周 × 逐日：当天学习段要学什么（含老师/课程/章节/练法/验收） */
-const WEEK_PLAN=[
- {theme:'打地基 + 铺量（Excel 基础 · 自我介绍 · 行测找回手感）', days:[
-  {items:[
-   {stream:'投递',title:'求职材料归档',note:'成绩单、四六级、学生干部证明、志愿服务证明、获奖证书、证件照（白底+蓝底）',how:'全部拍照，存进手机一个叫「求职材料」的文件夹',accept:'材料归档完成'},
-   {stream:'硬技能',title:'戴师兄 Excel（前 1/3）',note:'戴师兄《课程2.0｜Excel 基础操作｜大厂周报制作｜常用函数》约 200 分钟 · 看前 1/3',how:'B站搜「戴师兄 Excel」；开着电脑边看边跟做',accept:'看完前 1/3 并跟做'}]},
-  {items:[
-   {stream:'硬技能',title:'戴师兄 Excel（中 1/3）',note:'同上课程 · 中 1/3',how:'边看边在电脑上敲一遍',accept:'跟做完中 1/3'},
-   {stream:'面试',title:'写自我介绍「1 分钟版」',note:'PREP 结构：观点-理由-例子-结论；突出「数据/增长」相关经历',how:'写完对着镜子念一遍',accept:'1 分钟版成稿'}]},
-  {items:[
-   {stream:'硬技能',title:'戴师兄 Excel（后 1/3）',note:'重点：数据透视表、VLOOKUP、SUMIFS',how:'每学一个函数，立刻拿一份自己的表练 3 遍',accept:'能独立做出透视表和 VLOOKUP'}]},
-  {items:[
-   {stream:'硬技能',title:'王佩丰 24 讲 · 挑讲补漏',note:'王佩丰《Excel 基础教程 24 讲》——只挑「数据透视表 + 图表」几讲看（当字典用）',how:'B站搜「王佩丰 Excel 24 讲」；哪块虚就补哪块',accept:'透视表和图表不卡壳'},
-   {stream:'面试',title:'自我介绍念三遍 + 录音',note:'1 分钟版 · 念 3 遍，录音回听',how:'听自己的口癖和卡壳处，记下来',accept:'录音已回听'}]},
-  {items:[
-   {stream:'硬技能',title:'真实数据练透视表',note:'拿班级/社团/公开数据集，做一张交互汇总表（行=月份，值=人数/金额）',how:'数据集可从天池或学校数据里挑一份',accept:'一张能交互的透视表'},
-   {stream:'面试',title:'开写自我介绍「3 分钟版」',note:'在 1 分钟版基础上加：一段实习细节 + 一段校园经历（都带数字）',how:'写完先不背，读顺为准',accept:'3 分钟版初稿'}]},
-  {items:[
-   {stream:'硬技能',title:'同一份数据做 2 张图',note:'柱状图 + 折线图，标题写清「谁、什么、什么时候」',how:'图的标题和结论要能自己讲出来',accept:'2 张图 + 能讲'},
-   {stream:'面试',title:'自我介绍两版定稿 + 录音',note:'1 分钟版 + 3 分钟版，都录音',how:'录音回听，只改 3 处',accept:'两版定稿'}]},
-  {items:[
-   {stream:'投递',title:'今天不投递 · 半天复盘',note:'这周投了几家 / 有没有回音 / Excel 哪块还不熟 / 录音改 3 处',how:'复盘完剩下时间休息，别加码',accept:'复盘写完、休息'}]}
- ]},
- {theme:'交第一件作品 + SQL 入门（Excel 收尾 · SQL 语法 · 方法论开个头）', days:[
-  {items:[
-   {stream:'硬技能',title:'Excel 小报告 · 第 1 步：定口径 + 取数',note:'用真实数据做一份 2-3 页数据分析小报告（这是简历上唯一能替代「没有实习」的东西）',how:'先说清「这份数据统计的是谁、什么时间、什么口径」，再取数',accept:'口径写清 + 数据取好'},
-   {stream:'硬技能',title:'Mosh SQL 教程（第 1 段）',note:'B站中文版 Mosh SQL，约 3 小时 · 看第 1 段（SELECT/WHERE/ORDER BY）',how:'B站搜「Mosh SQL 中文」；网页 SQLZoo 跟着敲',accept:'能写基本查询'}]},
-  {items:[
-   {stream:'硬技能',title:'Excel 小报告 · 第 2 步：出 3 张图',note:'柱状/折线/饼图各一，图要服务于结论',how:'每张图配一句话结论',accept:'3 张图 + 3 句结论'},
-   {stream:'硬技能',title:'Mosh SQL（第 2 段）',note:'看第 2 段（GROUP BY + 聚合函数）',how:'牛客/菜鸟教程找对应练习',accept:'会分组聚合'},
-   {stream:'硬技能',title:'方法论 20 分钟：趋势分析',note:'5 种分析方法之一（趋势、对比、漏斗、多维拆解、RFM）',how:'自己整理成一页笔记，别买课',accept:'能讲清趋势分析'}]},
-  {items:[
-   {stream:'硬技能',title:'Excel 小报告 · 第 3 步：写 3 条结论（收尾）',note:'结论要写成「因为…所以建议…」，不是复述数字',how:'写完存成能直接打开给面试官看的东西',accept:'★ 小报告交稿'},
-   {stream:'硬技能',title:'Mosh SQL（第 3 段）',note:'看第 3 段（JOIN 关联）',how:'重点 INNER JOIN 和 LEFT JOIN 的区别',accept:'会写关联查询'},
-   {stream:'硬技能',title:'方法论 20 分钟：对比分析',note:'同比/环比/横向对比怎么用',how:'配一个电商场景例子',accept:'能讲清对比分析'}]},
-  {items:[
-   {stream:'硬技能',title:'牛客 SQL 10 题',note:'牛客网 SQL 篇 · 每天 10 题，边写边看结果',how:'做错的题截图存相册',accept:'10 题 + 错题截图'},
-   {stream:'硬技能',title:'方法论 20 分钟：漏斗分析 ⭐',note:'5 种方法里最重要的一种——后面写作品集和答题都要用',how:'画一张「看到→点击→注册→付费」漏斗图',accept:'能画漏斗并讲转化'}]},
-  {items:[
-   {stream:'硬技能',title:'牛客 SQL 10 题',note:'重点 SELECT + GROUP BY 组合',how:'限时做，别查答案',accept:'10 题'},
-   {stream:'硬技能',title:'方法论 20 分钟：多维拆解',note:'把一个指标拆成多个维度找原因',how:'例：日活下降→拆新老/渠道/机型/地区',accept:'能拆一层'}]},
-  {items:[
-   {stream:'硬技能',title:'牛客 SQL 10 题',note:'重点 GROUP BY + HAVING',how:'错的记下来',accept:'10 题'},
-   {stream:'硬技能',title:'方法论 20 分钟：用户分层（RFM）',note:'R 最近购买、F 频次、M 金额',how:'举一个把你实习社群分层的小例子',accept:'能讲清 RFM'}]},
-  {items:[
-   {stream:'硬技能',title:'牛客 SQL 10 题',note:'本周累计到 40 题',how:'记录正确率',accept:'10 题'},
-   {stream:'硬技能',title:'方法论整理成一页',note:'5 种方法 + 各一句自己话的解释',how:'这页以后面试前直接看',accept:'★ 方法论一页纸'}]}
- ]},
- {theme:'刷题 + 群面 + 场景题（SQL 刷到量 · A/B · 群面框架 · STAR）', days:[
-  {items:[
-   {stream:'硬技能',title:'牛客 SQL 10 题',note:'重点 JOIN 组合',how:'限时',accept:'10 题'},
-   {stream:'硬技能',title:'A/B 测试入门',note:'搞懂：对照组/实验组、显著性、怎么判断有效',how:'B站搜「A/B测试 入门」；讲清一次 AB 实验怎么设计',accept:'能讲清 AB 实验'}]},
-  {items:[
-   {stream:'硬技能',title:'牛客 SQL 10 题',note:'重点多表关联',how:'限时',accept:'10 题'},
-   {stream:'面试',title:'场景分析题 · 四步骨架',note:'题：「某电商 App 日活下降 20% 你怎么分析？」四步=界定指标口径→拆影响因素→说需要哪些数据→给动作建议',how:'⭐ 别一上来就猜原因，这是最常见的挂法',accept:'四步骨架写出来'}]},
-  {items:[
-   {stream:'硬技能',title:'牛客 SQL 10 题',note:'注意 WHERE 与 HAVING 的区别',how:'限时',accept:'10 题'},
-   {stream:'面试',title:'群面建场感：看 3 个真实复盘',note:'B站/牛客搜「无领导 群面 复盘」，看 3 个',how:'记下「坏人」和「好角色」各是什么样',accept:'看完 3 个并记笔记'}]},
-  {items:[
-   {stream:'硬技能',title:'牛客 SQL 10 题',note:'累计到 60+ 题就收手',how:'限时',accept:'10 题'},
-   {stream:'面试',title:'群面五类题框架（先写 2 类）',note:'五类=排序、资源分配、危机处理、两难选择、方案设计；每类一个框架',how:'⭐ 你的角色选「记录者 / Reporter」，别抢 Leader',accept:'2 类框架'},
-   {stream:'面试',title:'STAR 故事 1-2 个',note:'用 bq-skill；结果一定要带数字',how:'从 FILA / 网易实习里挖',accept:'1-2 个故事入库'}]},
-  {items:[
-   {stream:'硬技能',title:'SQL 收尾（刷到 30-50 题）',note:'到了量就收，窗口函数看不看都行',how:'统计总题数和正确率',accept:'★ SQL 达标'},
-   {stream:'面试',title:'群面框架补齐 5 类',note:'开场 30 秒给框架、至少 3 次拉回主线、结尾帮 Reporter 补一条',how:'写在小卡片上',accept:'★ 5 个框架'},
-   {stream:'面试',title:'STAR 故事 3 个',note:'继续用 bq-skill 存',how:'每个故事 2 分钟能讲完',accept:'3 个故事'}]},
-  {items:[
-   {stream:'面试',title:'群面模拟 1 次',note:'找 3-5 个同学线上模拟并录下来；找不到就自言自语练一题+录音复盘',how:'录完听自己有没有抢话/跑题',accept:'模拟 1 次 + 录音'},
-   {stream:'面试',title:'STAR 故事 4 个',note:'补一个「解决问题」类故事',how:'面试题最爱问「你怎么解决困难」',accept:'4 个故事'}]},
-  {items:[
-   {stream:'面试',title:'STAR 故事 5 个 + 小复盘',note:'本周：群面 5 框架 + STAR 5 个 + 场景题骨架',how:'复盘哪块还虚，下周一并补',accept:'★ 三个交付物'}]}
- ]},
- {theme:'作品集 + 模拟面试 + 投递冲量（这一周主线只有一个：作品集）', days:[
-  {items:[
-   {stream:'硬技能',title:'作品集 · 第 1 步：找数据 + 定业务问题',note:'去阿里云天池找一个公开数据集（选你感兴趣的行业，别选看不懂的）',how:'自己定一个业务问题，例：「为什么这个品类复购在下降」',accept:'数据集 + 问题定好'}]},
-  {items:[
-   {stream:'硬技能',title:'作品集 · 第 2 步：SQL 取数',note:'用 SQL 把需要的字段取出来，写清筛选条件',how:'取不出来就先简化问题',accept:'数据取好'}]},
-  {items:[
-   {stream:'硬技能',title:'作品集 · 第 3 步：Excel 出图（有余力上 BI）',note:'Excel 出 3-4 张图；有余力用 Power BI/Tableau 做个看板（BI 只学连数据源、做图、搭看板）',how:'图要能直接看出结论',accept:'图 / 看板完成'},
-   {stream:'硬技能',title:'写第 1 条策略建议',note:'格式：谁去做 + 做什么 + 怎么验证（带指标）',how:'别写「提升用户体验」这种空话',accept:'第 1 条建议'}]},
-  {items:[
-   {stream:'硬技能',title:'写满 3 条策略建议',note:'每条都落到「谁去做、做什么、怎么验证」',how:'写不出来就回到数据看哪一环最弱',accept:'3 条建议'}]},
-  {items:[
-   {stream:'硬技能',title:'作品集整理成 3-5 页',note:'结构：背景/口径 → 图 → 结论 → 建议',how:'存成能直接打开给面试官看的东西（PDF 或网页）',accept:'★ 作品集交稿'}]},
-  {items:[
-   {stream:'面试',title:'模拟面试：高顿「模拟面试报告」',note:'抽题 → 你答 → 拿评分报告（有评分才有反馈）',how:'用高顿的模拟面试工具；再用 big-tech-interviews 练一次被追问',accept:'★ 评分报告 1 份'}]},
-  {items:[
-   {stream:'面试',title:'STAR 故事补到 8 个',note:'每个都带数字结果',how:'用 bq-skill 管理',accept:'★ 8 个故事'},
-   {stream:'投递',title:'投递冲量：今天多投 1-2 家',note:'冲刺区想去的公司，今天状态最好，先投它',how:'分层投递：练习区早投、核心区主力、冲刺区状态好时投',accept:'多投 1-2 家'}]}
- ]},
- {theme:'收尾（总复盘 + 红线检查）', days:[
-  {items:[
-   {stream:'投递',title:'总复盘',note:'投递总数、回音数、错题集中在哪个模块、面试稿改到第几版',how:'写成一张纸',accept:'★ 一个月总复盘'}]},
-  {items:[
-   {stream:'投递',title:'红线检查',note:'有没有面试？没有 → 把私企放进来。别把时间花在「再学一个技能」上',how:'技能只决定面试时你说不说得出来；投递量决定有没有面试',accept:'红线检查完'}]},
-  {items:[
-   {stream:'投递',title:'计划收尾 + 定下一阶段',note:'一个月做到 60% 就是成功；把没交出的产出物排进下个月',how:'剩下时间休息',accept:'下阶段计划'}]}
- ]}
-];
-const COLOR={硬技能:'#4f6ef7',简历:'#f0883e',投递:'#16a34a',行测:'#9333ea',测评:'#e11d48',面试:'#0891b2',英语:'#ca8a04',fixed:'#94a3b8'};
-const LOW_MAP={硬技能:'L4',英语:'L3',面试:'L1',投递:'L2',行测:'L5',简历:'L6'};
-/* 她到底学没学过某条流？没学过的，轻量模式不叫"复习"，给"入门视频·从0开始" */
-function hasLearned(stream){
-  if((S.history||[]).some(x=>x.type==='done'&&x.stream===stream))return true;
-  return (S.done||[]).some(d=>{try{return getUnit(d.unitId).stream===stream;}catch(e){return false;}});
+
+// ===== 状态 =====
+const START = new Date(2026,8,13); // 9/13
+function todayOffset(){
+  const now = new Date(); const off = Math.floor((now - START)/86400000);
+  return (off>=0 && off<=29) ? off : 0;
 }
-function lowUnitFor(stream){
-  if(stream==='硬技能'&&!hasLearned('硬技能'))return 'L4b';
-  return LOW_MAP[stream];
+let cur = todayOffset();
+
+const WKCOLOR = {1:'t-blue',2:'t-green',3:'t-amber',4:'t-pur',5:'t-teal'};
+
+function showTab(t){
+  document.getElementById('tab-day').className='tab'+(t==='day'?' on':'');
+  document.getElementById('tab-week').className='tab'+(t==='week'?' on':'');
+  document.getElementById('tab-month').className='tab'+(t==='month'?' on':'');
+  document.getElementById('view-day').className = t==='day'?'':'hidden';
+  document.getElementById('view-week').className = t==='week'?'':'hidden';
+  document.getElementById('view-month').className = t==='month'?'':'hidden';
 }
 
-/* ============ 状态 ============ */
-const KEY='liuxue_coach_v2';
-/* 版本号：每次改动 +1，并显示在界面顶部，方便核对手机上是哪一版 */
-const APP_VERSION='V1.8';
-const APP_BUILT='2026-09-11';
-let S=null;
-function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function cnNum(s){
-  if(/^\d+$/.test(s))return parseInt(s,10);
-  const map={'零':0,'一':1,'二':2,'两':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10};
-  if(s==='十')return 10;
-  if(s.length===1)return map[s]!==undefined?map[s]:NaN;
-  if(s[0]==='十')return 10+(map[s[1]]||0);
-  if(s[1]==='十')return (map[s[0]]||0)*10+(s[2]?(map[s[2]]||0):0);
-  return NaN;
-}
-function toMin(hm){const [h,m]=hm.split(':').map(Number);return h*60+m;}
-function toHM(m){m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');}
-function uid(){return Math.random().toString(36).slice(2,9);}
-function stripTags(s){return (s||'').replace(/<[^>]*>/g,'');}
+function key(d){ return 'lxx30_'+d.d; }
+function load(d){ try{return JSON.parse(localStorage.getItem(key(d)))||{};}catch(e){return {};} }
+function save(d,obj){ localStorage.setItem(key(d), JSON.stringify(obj)); }
 
-function initState(){
-  S={date:todayStr(),dayStart:'08:30',dayEnd:'22:00',energy:'normal',
-     fixed:[],done:[],remaining:[],deferred:[],pointers:{},totals:{},log:[],rhythm:{meals:[]},
-     history:[],learnings:{capacityFactor:1,notes:[],totalDays:0,lastReviewed:null,lastSummary:null},positions:[],
-     undoStack:[],unitOverrides:{},customUnits:{},chat:[],chatDate:todayStr(),
-     diary:{},recurring:[],
-     settings:{provider:'openrouter',apiKey:'',model:'openai/gpt-4o-mini'},cloud:{enabled:false,token:'',gistId:'',lastSync:null}};
-  STREAMS.forEach(s=>{S.pointers[s]=0;S.totals[s]=0;});
-  buildRemaining();
-  reconcile();
-}
-function getUnit(id){
-  const u=UNITS[id];
-  if(!u)return u;
-  const ov=(S&&S.unitOverrides)?S.unitOverrides[id]:null;
-  if(!ov)return u;
-  return {...u,...ov};
-}
-function pushUndo(label){
-  if(!S.undoStack)S.undoStack=[];
-  S.undoStack.push({label:label.slice(0,30),snap:JSON.parse(JSON.stringify({
-    remaining:S.remaining,done:S.done,plan:S.plan,fixed:S.fixed,
-    totals:S.totals,energy:S.energy,deferred:S.deferred,history:S.history||[],unitOverrides:S.unitOverrides||{}
-  }))});
-  if(S.undoStack.length>10)S.undoStack.shift();
-}
-function handleUndo(){
-  if(!S.undoStack||!S.undoStack.length)return '没有可以撤销的操作。';
-  const last=S.undoStack.pop();
-  const k=last.snap;
-  S.remaining=k.remaining;S.done=k.done;S.plan=k.plan;S.fixed=k.fixed;
-  S.totals=k.totals;S.energy=k.energy;S.deferred=k.deferred;S.history=k.history;S.unitOverrides=k.unitOverrides;
-  reconcile();
-  return '好的，我撤回了上一步（'+last.label+'）。刚才识别错了对不起 🙏 时间表已经恢复。';
-}
-function handleFeedback(t){
-  pushUndo('调整任务时长');
-  const unitId=matchUnit(t);
-  if(!unitId){
-    if(/少|短|不够|多一点|延长|加|增加/.test(t))return '你想给哪个任务多排点时间？直接说"资料分析速算多一点"就行。';
-    if(/多|长|少一点|缩短|减|减少/.test(t))return '你想给哪个任务少排点时间？直接说"英语少一点"就行。';
-    return '你想调整什么？说具体任务+多/少/长/短，比如"资料分析速算延长到60分钟"。';
-  }
-  const u=getUnit(unitId);
-  let newMin=u.min;
-  const explicit=t.match(/(\d+)\s*(?:分钟|min)/i);
-  if(explicit){newMin=parseInt(explicit[1]);}
-  else if(/延|长|多|加|增加|多一点|放大|扩/.test(t)){newMin=u.min+15;}
-  else if(/缩|短|少|减|减少|小一点|少一点|压/.test(t)){newMin=u.min-15;}
-  else return '你想让"'+u.title+'"时间长一点还是短一点？';
-  newMin=Math.max(15,newMin);
-  if(!S.unitOverrides)S.unitOverrides={};
-  S.unitOverrides[unitId]={...(S.unitOverrides[unitId]||{}),min:newMin};
-  pushHistory({date:S.date,type:'feedback',unitId,stream:u.stream,planned:u.min,actual:newMin,note:t.slice(0,80)});
-  reconcile();
-  return '收到 🫡 我把 <b>'+u.title+'</b> 从 '+u.min+' 分钟调成 '+newMin+' 分钟，后面已经重新顺延。以后默认也按 '+newMin+' 分钟排，你可以随时说"恢复默认"或"撤销"改回来。';
-}
-function pushHistory(h){
-  S.history=S.history||[];
-  const dup=S.history.find(x=>x.date===h.date&&x.type===h.type&&x.unitId===h.unitId&&x.stream===h.stream);
-  if(dup)return;
-  S.history.push(h);
-}
-function cycleStream(stream,n){
-  const pool=Object.keys(UNITS).filter(id=>{const u=getUnit(id);return u.stream===stream&&!u.light;});
-  const doneIds=new Set(S.done.map(d=>d.unitId));
-  const res=[];let p=S.pointers[stream]||0;let guard=0;
-  while(res.length<n&&guard<pool.length+8){
-    const u=pool[p%pool.length];p++;
-    if(!doneIds.has(u))res.push(u);
-    guard++;
-  }
-  S.pointers[stream]=p;return res;
-}
-/* 今日日程 = 她的《一个月计划》：六段固定动作 + 当天学习项（不再随机抽课） */
-const TEMPLATE_MIN=[90,120,0,90,60,40]; // 投递 / 行测 / 学习段(按项均分) / 面试表达 / 英语 / 复盘
-function planUnitsForToday(){
-  const p=getDayPlan(S.date);
-  const list=[];
-  DAY_TEMPLATE.forEach((t,i)=>{
-    if(i===2){
-      const items=(p&&p.items&&p.items.length)?p.items:[{stream:'硬技能',title:t.title,note:t.note,how:t.how,accept:t.accept}];
-      const per=items.length>1?Math.round(140/items.length):120;
-      items.forEach(o=>list.push({stream:o.stream||'硬技能',title:o.title,min:o.min||per,note:o.note||'',how:o.how||'',accept:o.accept||''}));
-    }else{
-      list.push({stream:t.stream,title:t.title,min:TEMPLATE_MIN[i]||60,note:t.note||'',how:t.how||'',accept:t.accept||'',fid:t.fid});
-    }
-  });
-  return list;
-}
-function buildRemaining(){
-  const doneIds=new Set(S.done.map(d=>d.unitId));
-  const customs=(S.remaining||[]).filter(id=>id.indexOf('C')===0&&!doneIds.has(id)); // 你手动加的任务/测评
-  let list=planUnitsForToday();
-  if(S.energy==='low'){
-    /* 轻量档（计划第七节）：只留「投递 40min + 一个最小动作 20min」，不写"复习" */
-    const dep=list[0],learn=list[2]||list[1];
-    list=[{...dep,title:'投递（轻量版）：刷岗 + 投 1-2 家',min:40}];
-    if(learn)list.push({...learn,title:'最小动作：'+learn.title,min:20});
-  }
-  S.customUnits=S.customUnits||{};
-  const ids=[];
-  /* 让口语能认出计划任务：①投递 ②行测 ③学习段 ④面试表达 ⑤英语 ⑥复盘。
-     不加这些别名，"我12点投简历"会因标题是"投递（刷岗…）"而认不出，导致勾不掉原块、重复新建 */
-  const PLAN_KW={0:['投递','投简历','投了','投出','刷岗','挑岗','网申','投哪家'],
-                 1:['行测','资料分析','速算','粉笔','笔试','限时'],
-                 3:['面试','表达','口述','录音','群面','无领导','自我介绍','面经'],
-                 4:['英语','背单词','学英语','练听力','口语','单词','四六级'],
-                 5:['复盘','三行','总结今天']};
-  list.forEach((o,i)=>{
-    const id=o.fid||('P'+i);
-    S.customUnits[id]={stream:o.stream,title:o.title,min:o.min,light:false,
-      purpose:o.note,accept:o.accept,note:o.note,how:o.how,kw:PLAN_KW[i]||[],plan:true};
-    UNITS[id]=S.customUnits[id];
-    if(!doneIds.has(id))ids.push(id);
-  });
-  S.remaining=[...customs,...ids];
-}
-function nowMin(){const d=new Date();return d.getHours()*60+d.getMinutes();}
-/* 有效排期起点：今天则"不能早于现在"，避免把任务排到已经过去的时段 */
-function effStart(){
-  const ds=toMin(S.dayStart),de=toMin(S.dayEnd);
-  if(S.date!==todayStr())return ds;
-  const n=nowMin();
-  return n<=ds?ds:Math.min(n,de);
-}
-function freeWindows(){
-  const s0=effStart(),e0=toMin(S.dayEnd);
-  if(e0<=s0)return [];
-  let wins=[{start:s0,end:e0}];
-  const anchors=[...S.fixed,...S.done].map(a=>({start:toMin(a.start),end:toMin(a.end)}))
-                  .filter(a=>!isNaN(a.start)&&!isNaN(a.end)&&a.end>a.start)
-                  .sort((a,b)=>a.start-b.start);
-  for(const a of anchors){
-    const nw=[];
-    for(const w of wins){
-      if(a.end<=w.start||a.start>=w.end){nw.push(w);continue;}
-      if(a.start>w.start)nw.push({start:w.start,end:a.start});
-      if(a.end<w.end)nw.push({start:a.end,end:w.end});
-    }
-    wins=nw;
-  }
-  return wins;
-}
-function reconcile(){
-  let wins=freeWindows();
-  const plan=[];const deferred=[];
-  const cf=S.learnings.capacityFactor||1;
-  for(const id of S.remaining){
-    const u=getUnit(id);let placed=false;
-    const eff=Math.round(u.min*cf);
-    for(let i=0;i<wins.length;i++){
-      if(wins[i].end-wins[i].start>=eff){
-        const st=wins[i].start;plan.push({unitId:id,start:toHM(st),end:toHM(st+eff)});
-        wins[i]={start:st+eff,end:wins[i].end};placed=true;break;
-      }
-    }
-    if(!placed)deferred.push(id);
-  }
-  S.plan=plan;S.deferred=deferred;
-  S.deferred.forEach(id=>pushHistory({date:S.date,type:'deferred',unitId:id,stream:UNITS[id].stream}));
-  save();render();
-}
-/* 若计划起点已经过去（比如她下午才打开），自动按"现在"往后重排 */
-function refreshPlanForNow(){
-  if(!S||!S.plan||!S.plan.length)return;
-  const first=toMin(S.plan[0].start);
-  if(isNaN(first))return;
-  if(first<nowMin()-1)reconcile();
-}
-/* 明确要求：从现在起重排today */
-function actReplanNow(){
-  pushUndo('按当前时间重排');
-  reconcile();
-  const t=toHM(nowMin());
-  if(!S.plan.length)return '现在（'+t+'）已经到收尾时间了，今天不再往后排新任务；剩下的已放"顺延"，明天优先办。';
-  const head=S.plan.map(b=>'· '+b.start+'–'+b.end+' '+getUnit(b.unitId).title).join('<br>');
-  let r='好，我按你现在的时间（'+t+'）把今天重排了 👇<br>'+head;
-  if(S.deferred.length)r+='<br>（还有 '+S.deferred.length+' 项今天塞不下，顺延到明天）';
-  return r;
-}
-/* 对话新增任务 / 测评（真正排进今天，而不是口头答应） */
-function handleAddTask(t,opts){
-  opts=opts||{};
-  const raw=((opts.title||opts.q||t)||'').trim();
-  if(!raw)return '要加什么任务？直接说，比如"我还有两个测评""加个面试模拟 1 小时"。';
-  pushUndo('新增任务');
-  let title=raw.replace(/^(我)?(还|又)?有?/,'').replace(/^[一二两三四五\d]+\s*(?:个|项|条)?\s*/,'').trim();
-  if(!title)title=raw;
-  let qty=opts.qty||0;
-  if(!qty){
-    const cn={'一':1,'两':2,'二':2,'三':3,'四':4,'五':5};
-    const m=raw.match(/([一二两三四五\d]+)\s*(?:个|项|条)?\s*(?:测评|笔试|任务|作业|面试|模拟|测试)/);
-    if(m)qty=cn[m[1]]||parseInt(m[1])||1;
-  }
-  qty=Math.max(1,Math.min(6,qty||1));
-  let stream=opts.stream;
-  const pool=title+' '+raw;
-  if(!stream||STREAMS.indexOf(stream)<0){
-    const pl=pool.toLowerCase();
-    if(/测评|笔试|测试/.test(pool))stream='测评';
-    else if(/面试|群面|无领导|模拟面/.test(pool))stream='面试';
-    else if(/行测|资料分析|言语|判断|数量|申论/.test(pool))stream='行测';
-    else if(/简历/.test(pool))stream='简历';
-    else if(/英语|口语|听力|阅读|四六级/.test(pool))stream='英语';
-    else if(/sql|excel|python|pandas|\bbi\b|数据|报表/.test(pl))stream='硬技能';
-    else stream='投递';
-  }
-  const min=opts.min||60;
-  const deadline=(opts.deadline||'').trim();
-  const made=[];
-  S.customUnits=S.customUnits||{};
-  for(let i=0;i<qty;i++){
-    const cid='C'+uid();
-    const nm=qty>1?title+'（'+(i+1)+'/'+qty+'）':title;
-    const unit={stream,title:nm,min,light:false,custom:true,
-      purpose:deadline?('新加的任务 · 截止'+deadline):'你刚加进来的任务',
-      accept:'完成即可',kw:[]};
-    S.customUnits[cid]=unit;UNITS[cid]=unit;
-    made.push(cid);
-  }
-  S.remaining=[...made,...S.remaining];
-  reconcile();
-  const rows=S.plan.filter(b=>made.indexOf(b.unitId)>=0);
-  let r='📌 已把 <b>'+title+'</b>'+(qty>1?('（'+qty+' 项）'):'')+' 加进今天';
-  if(rows.length)r+='，排在 '+rows.map(b=>b.start+'–'+b.end).join('、');
-  const miss=made.length-rows.length;
-  if(miss>0)r+=(rows.length?'；其中 ':'但 ')+miss+' 项今天时间不够，已放"顺延"（明天优先办）';
-  r+='。';
-  if(deadline)r+='你提到截止 '+deadline+'，我按不误期来排。';
-  return r;
-}
-function parseMinutes(t){
-  let m=t.match(/(\d+(?:\.\d+)?)\s*(?:个)?\s*(小时|钟头|h\b|hr)/i);
-  if(m)return Math.round(parseFloat(m[1])*60);
-  const cn={'一':1,'二':2,'两':2,'三':3,'四':4,'五':5,'半':0.5};
-  m=t.match(/([一二两三四五半])\s*个?\s*小时/);
-  if(m)return Math.round((cn[m[1]]||1)*60);
-  m=t.match(/(\d+)\s*(?:分钟|min)/i);if(m)return parseInt(m[1]);
-  if(/半小时/.test(t))return 30;
-  return null;
-}
-function parseTime(t){
-  let m=t.match(/(\d{1,2})\s*[:：]\s*(\d{2})/);if(m)return m[1]*1*60+m[2]*1;
-  const ap=(t.match(/(上午|早上|中午|下午|晚上|傍晚)/)||[])[1]||'';
-  m=t.match(/([\d一二三四五六七八九十]{1,3})\s*点(半)?/);if(!m)return null;
-  let h=cnNum(m[1]);if(isNaN(h))return null;
-  const half=(m[2]||/半/.test(t))?30:0;
-  if(ap==='下午'||ap==='晚上'||ap==='傍晚'){if(h<12)h+=12;}
-  if(ap==='中午'&&h===12)h=12;if((ap==='上午'||ap==='早上')&&h===12)h=0;
-  return h*60+half;
-}
-function findTimes(t){
-  const out=[];
-  const re=/(?:上午|早上|中午|下午|晚上|傍晚)?\s*(\d{1,2})\s*[:：]\s*(\d{2})|(上午|早上|中午|下午|晚上|傍晚)?\s*([\d一二三四五六七八九十]{1,3})\s*点\s*(半)?/g;
-  let m;
-  while((m=re.exec(t))){
-    if(m[1]!==undefined){ out.push(m[1]*60 + (+m[2])); }
-    else{
-      let h=cnNum(m[4]);if(isNaN(h))continue;const ap=m[3]||'';
-      if((ap==='下午'||ap==='晚上'||ap==='傍晚')&&h<12)h+=12;
-      if((ap==='上午'||ap==='早上')&&h===12)h=0;
-      out.push(h*60 + (m[5]?30:0));
-    }
-  }
-  return out;
-}
-/* 只解析"A点到B点"这种区间，比 findTimes 准，不会把句子里别的时间也抓进来 */
-function parseRange(t){
-  let m=t.match(/(\d{1,2}|[一二三四五六七八九十]{1,3})\s*点\s*(?:到|至|~|～|—|-|一直)\s*(\d{1,2}|[一二三四五六七八九十]{1,3})\s*点/);
-  if(!m)m=t.match(/(\d{1,2}[:：]\d{2})\s*(?:到|至|~|～|—|-|一直)\s*(\d{1,2}[:：]\d{2})/);
-  if(!m)return null;
-  const ap=(t.match(/(上午|早上|中午|下午|晚上|傍晚)/)||[])[1]||'';
-  const conv=x=>{
-    if(/[:：]/.test(x))return toMin(x.replace('：',':'));
-    let v=cnNum(x);if(isNaN(v))return NaN;
-    if((ap==='下午'||ap==='晚上'||ap==='傍晚')&&v<12)v+=12;
-    if((ap==='上午'||ap==='早上')&&v===12)v=0;
-    return v*60;
-  };
-  let a=conv(m[1]),b=conv(m[2]);
-  if(isNaN(a)||isNaN(b))return null;
-  if(b<=a)b+=12*60; // "12点到5点" → 5点按下午算
-  return [a,b];
-}
-function matchUnit(t){
-  const tl=(t||'').toLowerCase();
-  /* 今天的计划任务（P*，且仍在 plan/remaining/deferred）享有绝对优先权重：
-     用户说"投递完简历"必须命中"投递"计划块，绝不能串到 U20「简历一百问」(它关键词含裸词"简历")。
-     仅当该单元本身已被关键词/标题命中(sc>0)时才加权重，避免"做完了"这类空话乱选计划任务。 */
-  const inPlan=id=>(S.plan&&S.plan.some(b=>b.unitId===id))||(S.remaining&&S.remaining.includes(id))||(S.deferred&&S.deferred.includes(id));
-  let best=null,bestScore=0;
-  for(const id in UNITS){
-    const u=UNITS[id];if(!u)continue;let sc=0;
-    for(const k of (u.kw||[])){if(tl.includes(String(k).toLowerCase()))sc+=String(k).length;}
-    if(u.title){
-      const clean=u.title.toLowerCase().replace(/^[①②③④⑤·\s]+/,'').replace(/（[^）]*）/g,'').replace(/\([^)]*\)/g,'').replace(/[：:].*$/,'');
-      let hit=0;
-      clean.split(/[，,、:：/\s]+/).forEach(seg=>{if(seg.length>=2&&tl.indexOf(seg)>=0)hit=Math.max(hit,seg.length);});
-      if(!hit){
-        const core=tl.replace(/做完了|学完了|完成了|搞定了|练完了|看完了|完成|做了|搞定|学完|练完|看完|结束|了/g,'');
-        for(let i=0;i+3<=clean.length;i++){const s3=clean.slice(i,i+3);if(core.indexOf(s3)>=0){hit=3;break;}}
-      }
-      if(hit)sc+=hit+2;
-    }
-    if(sc>0&&inPlan(id))sc+=100;            // ← 计划任务压过一切参考单元(U20 等)
-    if(sc>bestScore){bestScore=sc;best=id;}
-  }
-  return bestScore>0?best:null;
-}
-function classify(t){
-  if(isVent(t))return 'vent';
-  if(/删掉|删除|移除|去掉|不要了|不算数/.test(t)&&!/刚才|上一步|上一条|上一个|最后那条/.test(t)
-     &&(matchUnit(t)||findTimes(t).length>0||/事务|生活|块|记录|条|投简历|超市|睡觉|睡懒觉|玩/.test(t)))return 'delblock';
-  if(/撤销|恢复|取消|删掉|删除|弄错了|不是我|(?:我|你)(?:并)?没有(?:完成|做完|做)|我没做|我没完成|我没做完|别记录|别记|撤回|回退|刚才那(?:条|个|句)|不对|错了|去掉|重置/.test(t))return 'undo';
-  if((/觉得|认为|感觉|分配|安排|时间|时长|调|改|加|减|延|缩/).test(t)
-     && (/少|短|长|多|不够|一点|延|缩|调|加|减|改|扩|压/).test(t)
-     && (matchUnit(t)||/时间|时长|计划/.test(t)))return 'feedback';
-  if((/建议|该怎么办|帮我分析|给我点建议|该怎么走|我该怎么办|分析一下|给我出个/).test(t)&&!/测评|笔试/.test(t))return 'advice';
-  if(/测评|笔试|测试/.test(t)&&/来了|收到|链接|通知/.test(t))return 'urgent';
-  if(!/完成|做完|做了|搞定|交了|提交了|收到|链接|来了/.test(t)
-     &&/(还有|又要|新增|加|多了|另外|再|要).{0,10}(测评|笔试|任务|作业|面试|模拟|测试)|(测评|笔试|任务|作业|面试).{0,8}(要做|得做|需要做|还没做|没做|没开始)/.test(t))return 'addtask';
-  if(/测评|笔试|测试/.test(t)&&/(\d+\s*天|天内|截止|要交|多少天)/.test(t)&&!/完成|交了|提交了/.test(t))return 'addtask';
-  if(/隔天|每隔?[\d一二三四五六七八九十]+天|每天|一周[\d一二三四五]次|两天一次/.test(t)
-     &&!/不想|难受|压抑|emo|丧|焦虑|烦|累|崩溃/.test(t))return 'recurring';
-  const emoNow=/不想|难受|压抑|emo|丧|焦虑|迷茫|烦|累|崩溃|没动力|没意思|提不起/.test(t);
-  if(!emoNow&&(
-      /(超市|吃饭|吃个饭|早餐|午餐|晚餐|夜宵|医院|看病|体检|买药|理发|洗澡|取快递|拿快递|寄快递|约会|聚会|出门|办事)/.test(t)
-      ||/(睡觉|睡个觉|去睡|午休|午睡|小睡|补觉)/.test(t)
-      ||/(休息|歇).{0,4}(一|两|二|三|半|\d+)?\s*(分钟|小时|钟头)/.test(t)
-      ||/接下来.{0,8}(小时|分钟).{0,6}(不|休息|歇|睡)/.test(t)
-      ||/(不干了|不做了|先不学|暂停一下|我没空|不干活)/.test(t)
-  ))return 'interrupt';
-  if(/状态差|没精神|效率差|疲惫|乏力|调轻|轻一点|轻松一点|减负|少排点|今天不想学|不想学了/.test(t))return 'energyLow';
-  if(/精神好|状态好|效率高|精力旺|有力气/.test(t))return 'energyHigh';
-  if(/复盘|总结今天|今天总结|每日复盘|今天复盘/.test(t))return 'review';
-  if(/我的规律|越用越准|学习情况|记性|我学得/.test(t))return 'learnings';
-  if(/记岗位|加岗位|添加岗位/.test(t))return 'positionAdd';
-  if(/投了(.+)/.test(t))return 'markApplied';
-  if(/(进面|拿到.{0,6}面试|面试通过|约面|面邀|面了.{1,6})/.test(t))return 'markInterview';
-  if(/^岗位|看岗位|我的岗位|岗位库|列岗位|岗位清单/.test(t))return 'positionList';
-  if(/作息|观察/.test(t))return 'rhythm';
-  if((/睡|起床|起学|醒来/).test(t)&&findTimes(t).length)return 'rhythmLog';
-  if(/(都在|一直在|一上午|一整(?:个)?上午|一下午|一整(?:个)?下午|从.{1,4}点.{0,8}(到|一直).{1,4}点|(\d+|[一二三四五六七八九十]+)\s*点\s*(?:到|至|–|-|—)\s*(\d+|[一二三四五六七八九十]+)\s*点)/.test(t)&&/(投|投递|学|做|刷|写|看|练|背|干|玩|睡|忙|面试|测评|英语|工作)/.test(t))return 'retro';
-  /* "投递完了/做完了" 这种带完成动词的 → 交给下面的 'log' 去勾掉任务（别走 lognow 只重排却不勾） */
-  if(/(现在|已经|都|刚|才).{0,8}(点|小时|了)/.test(t)&&/(投|投递|投简历|学|做|刷|写|背|练|看|弄|干|起|开始)/.test(t)&&!/学习时间|改成|调整为|窗口|完成|做完了|学完|练完|看完|写完|投了|投完|搞定了|弄完|结束|搞定|可以了/.test(t))return 'lognow';
-  if((/学习时间|改成|调整为|开始学|从.*点|到.*点/).test(t)&&findTimes(t).length>0)return 'setwindow';
-  if((/完成|做完了|学(了|完)|练(了|完)|看(了|完)|写(了|完)|投(了|完)|做了|刷了|过(了|完)|搞(了|完)|弄(了|完)|结束|搞定|ok|OK|可以了|对的|是的|搞定了/).test(t)
-     && !/没完成|没做|没学|没练|没看|没写|没投|不想|不想做|不愿意|别|不要|不是|没做完|没搞|没弄/.test(t)
-     && matchUnit(t))return 'log';
-  if(!emoNow&&/(重新规划|重排今天|重新排|帮我排|给我排一下|排一下今天|今天该干嘛|今天干什么|安排一下今天)/.test(t))return 'newplan';
-  if(/(我|今天)[^，。！？]{0,8}(去|到)[^，。！？]{0,6}了|记一笔|记一下今天|今天(发生|遇到)了/.test(t))return 'diary';
-  return 'unknown';
-}
-function actNewplan(){pushUndo('重新规划今天');buildRemaining();reconcile();return '已按当前状态重新规划今天 ✅<br><br>'+giveAdvice();}
-function actNewday(){
-  pushUndo('新的一天');
-  reviewDay();
-  archiveChat(); // 昨天聊的内容先归档进日记，再清聊天框
-  const carry=[...S.deferred,...S.remaining.filter(id=>!S.done.find(d=>d.unitId===id))].filter(id=>id.indexOf('P')!==0); // P*=今天的计划任务，明天按新一天重排
-  const oldLog=S.log.slice(-20);
-  const keepHistory=S.history,keepLearn=S.learnings,keepPos=S.positions,keepCustom=S.customUnits||{},
-        keepDiary=S.diary||{},keepRec=S.recurring||[],keepArch=S.chatArchive||{};
-  initState();
-  S.history=keepHistory;S.learnings=keepLearn;S.positions=keepPos;
-  S.customUnits=keepCustom;Object.assign(UNITS,keepCustom);
-  S.diary=keepDiary;S.recurring=keepRec;S.chatArchive=keepArch;
-  S.chat=[];S.chatDate=todayStr(); // ← 聊天框清空（新的一天）
-  S.date=todayStr();
-  if(carry.length){S.remaining=[...carry,...S.remaining];}
-  S.log=oldLog;
-  reconcile();
-  return '🌅 新的一天：聊天框已清空（昨天聊的都留在「📔 日记」和日程里，没丢），未完成的任务顺延到今天。';
-}
-/* 把某个任务"勾掉完成"——统一入口：从待办/顺延移除、进 done、刷新排期。
-   start/end 给真实时间窗（如汇报"12点到2点投的"），不给就用计划块的原时间。 */
-function markUnitDone(unitId,opt){
-  opt=opt||{};
-  const u=getUnit(unitId);if(!u)return null;
-  const already=S.done.find(d=>d.unitId===unitId&&!d.offplan);
-  pushUndo('记录完成：'+u.title.slice(0,20));
-  const blk=S.plan.find(b=>b.unitId===unitId);
-  const start=opt.start||(blk?blk.start:'—');
-  const end=opt.end||(blk?blk.end:'—');
-  const actual=(opt.actual!=null)?opt.actual:(blk?toMin(blk.end)-toMin(blk.start):u.min);
-  S.remaining=S.remaining.filter(id=>id!==unitId);
-  S.deferred=S.deferred.filter(id=>id!==unitId);
-  if(!already){
-    S.done.push({unitId,start,end,actual,offplan:!blk&&!opt.start});
-    S.totals[u.stream]=(S.totals[u.stream]||0)+1;
-    pushHistory({date:S.date,type:'done',unitId,stream:u.stream,planned:u.min,actual,offplan:!blk});
-  }
-  reconcile();
-  return u;
-}
-function logProgress(t){
-  const unitId=matchUnit(t);
-  if(!unitId)return '没太懂你做了什么，能说下具体任务名吗？（如"SQL做完了""英语学了一个小时"）';
-  const M=parseMinutes(t);
-  const u=markUnitDone(unitId,{actual:M});
-  if(!u)return '这个任务我找不到，换个说法？';
-  const done=S.done.find(d=>d.unitId===unitId);
-  const offplan=done&&done.offplan;
-  const tl=done&&(done.start!=='—'&&done.end!=='—')?('（'+done.start+'–'+done.end+'，实际 '+done.actual+' 分钟）'):(done?('（实际 '+done.actual+' 分钟）'):'');
-  return '✅ 记下了：<b>'+u.title+'</b> 完成'+tl+(offplan?'（不在今天原计划里，记成计划外完成）':'')+'。已经从待办里勾掉了，后面的安排我重新顺了一下，接下来从 '+toHM(nowMin())+' 往后排。';
-}
-function handleInterrupt(t){
-  const hm=t.match(/超市|吃饭|吃个饭|早餐|午餐|晚餐|夜宵|医院|看病|体检|买药|理发|洗澡|取快递|拿快递|寄快递|约会|聚会|出门|办事|睡觉|睡个觉|去睡|午休|午睡|小睡|补觉|休息|歇/);
-  if(!hm)return '你是要去干嘛、还是想歇多久？说清楚我再记（比如"下午3点去超市一小时"），我不乱给你加东西。';
-  const label=hm[0];
-  pushUndo('记一段「'+label+'」');
-  let start=parseTime(t);
-  if(start===null)start=Math.max(nowMin(),toMin(S.dayStart));
-  let dur=parseMinutes(t)||60;
-  if(start+dur>toMin(S.dayEnd)){dur=toMin(S.dayEnd)-start;if(dur<15)dur=15;}
-  S.fixed.push({id:uid(),label,start:toHM(start),end:toHM(start+dur)});
-  if(/吃饭|早餐|午餐|晚餐|夜宵|午休|午睡/.test(label)){
-    if(!S.rhythm)S.rhythm={meals:[]};
-    S.rhythm.meals.push(start);
-    if(S.rhythm.meals.length>20)S.rhythm.meals.shift();
-  }
-  reconcile();
-  diaryAdd('去了'+label);
-  let note='👌 记下了：'+toHM(start)+'–'+toHM(start+dur)+' 你去「'+label+'」。这段时间我从日程里空出来了，后面的安排自动往后顺，你不用管。（也记进📔日记了）';
-  if(/吃饭|早餐|午餐|晚餐|夜宵/.test(label))note+='（顺手记进你的作息规律了）';
-  return note;
-}
-/* 补记"过去那段时间我干了啥"。
-   关键修复：如果她说的是今天计划里本来就有的任务（如"12点到2点投简历"，而计划排的是2-4:28投简历），
-   就直接把那个任务勾掉完成（用她说的真实时间窗），而不是新建一条导致重复；
-   只有当她说的是计划外的事（玩/刷手机/休息）才加一块"已过去"的固定块。 */
-function handleRetro(t,opts){
-  opts=opts||{};
-  const rg=parseRange(t);
-  const ts=findTimes(t);
-  let s=(opts.start!=null&&opts.start!=='')?toMin(String(opts.start)):(rg?rg[0]:(ts.length?ts[0]:null));
-  let e=(opts.end!=null&&opts.end!=='')?toMin(String(opts.end)):(rg?rg[1]:(ts.length>=2?ts[1]:null));
-  let label=(opts.label||'').trim();
-  if(!label){
-    const kw=['投简历','投递','面试','测评','行测','英语','刷题','复习','简历','SQL','Excel','学习','上课','实习','玩','休息','睡觉','忙'];
-    const lt=t.toLowerCase();
-    label=kw.find(k=>lt.indexOf(k.toLowerCase())>=0)||'事务';
-  }
-  label=label.replace(/[，。！？、,.\s]+$/,'');
-  if(s===null){return '告诉我时间段就行，比如"我中午12点投简历投到下午5点"。';}
-  if(e===null)e=Math.max(s+60,nowMin());
-  if(e<s){const tmp=s;s=e;e=tmp;}
-  const unitId=matchUnit(t)||matchUnit(label);
-  /* 命中了"今天计划里的某个任务"→ 直接勾掉它（这才是她要的，不再留重复块） */
-  if(unitId){
-    const inPlan=S.plan.some(b=>b.unitId===unitId)||S.remaining.includes(unitId)||S.deferred.includes(unitId);
-    const u=markUnitDone(unitId,{start:toHM(s),end:toHM(e),actual:e-s,offplan:!inPlan});
-    diaryAdd(u.title+'（'+toHM(s)+'–'+toHM(e)+' 已完成）');
-    return '✅ 记下了：<b>'+u.title+'</b> 你已经在 '+toHM(s)+'–'+toHM(e)+' 做完了（实际 '+(e-s)+' 分钟），我把它从今天的待办里勾掉了'+(inPlan?'':'（你这会儿做的不在今天原计划里，记成计划外完成）')+'，后面的安排顺好了。接下来从 '+toHM(nowMin())+' 往后排。';
-  }
-  /* 计划外的事（玩/刷手机/休息等）→ 加一块"已过去"的固定块，占住时间、避免重排时撞上 */
-  pushUndo('补记过去时段');
-  S.fixed.push({id:uid(),label,start:toHM(s),end:toHM(e),past:true});
-  reconcile();
-  diaryAdd(label+'（'+toHM(s)+'–'+toHM(e)+'）');
-  return '好，我把 '+toHM(s)+'–'+toHM(e)+' 记成「'+label+'」（这是已经过去的时段，占用了一块时间，后面的安排自动往后顺）。接下来从 '+toHM(nowMin())+' 往后排。';
-}
-/* 删除指定的日程/记录——她说"把投简历那条删掉"就真的删掉 */
-function handleDelete(t,opts){
-  opts=opts||{};
-  pushUndo('删除若干条');
-  const q=(opts.q||'').trim();
-  const unitHit=q?null:matchUnit(t);
-  const startQ=opts.start?String(opts.start):'';
-  const removed=[];
-  const hitTitle=(title,id)=>{
-    if(!title)return false;
-    if(q&&title.indexOf(q)>=0)return true;
-    if(unitHit&&id===unitHit)return true;
-    if(title.length>=2&&t.indexOf(title)>=0)return true; // 她话里点名的块，直接删
-    return false;
-  };
-  S.fixed=(S.fixed||[]).filter(f=>{
-    const hit=hitTitle(f.label,null)||(startQ&&f.start===startQ);
-    if(hit)removed.push('「'+f.label+'」'+(f.start||'')+((f.end&&f.end!=='—')?('–'+f.end):''));
-    return !hit;
-  });
-  S.done=(S.done||[]).filter(d=>{
-    const u=getUnit(d.unitId);const title=u?u.title:d.unitId;
-    const hit=hitTitle(title,d.unitId)||(startQ&&d.start===startQ);
-    if(hit)removed.push('完成记录「'+title+'」');
-    return !hit;
-  });
-  const filt=arr=>(arr||[]).filter(id=>{
-    const u=getUnit(id);const title=u?u.title:id;
-    const hit=hitTitle(title,id);
-    if(hit)removed.push('任务「'+title+'」');
-    return !hit;
-  });
-  S.remaining=filt(S.remaining);
-  S.deferred=filt(S.deferred);
-  if(!removed.length)return '我没找到你说的是哪一条 🤔 直接说名字或时间就行，比如"把投简历那条删掉""把 12:00 那条删掉"。';
-  const uniq=[...new Set(removed)];
-  reconcile();
-  return '🗑 删掉了 '+uniq.length+' 条：<br>· '+uniq.join('<br>· ')+'<br>剩下的我重新顺了一遍，你看看对不对。';
-}
-function setEnergy(e){
-  pushUndo('切换状态');
-  S.energy=e;buildRemaining();reconcile();
-  if(e==='low')return '状态差模式：重任务已替换为轻量任务（看视频/泛听/复习/整理），重活顺延。';
-  if(e==='high')return '状态不错：已按满格节奏排满今天。';
-  return '已恢复为正常节奏。';
-}
-function handleUrgent(t){
-  pushUndo('紧急插队');
-  const isTest=/笔试/.test(t);
-  const id=isTest?'U43':'U52';
-  const u=UNITS[id];
-  S.remaining=[id,...S.remaining.filter(x=>x!==id)];
-  const deadline=/明天|48|今日|今天|紧迫|急/.test(t);
-  reconcile();
-  let note='';
-  if(deadline)note='（你提到紧急，已尽量提前）';
-  if(S.plan.find(b=>b.unitId===id))
-    return '🚨 已插队：<b>'+u.title+'</b> 排入今天空档'+note+'。';
-  return '🚨 <b>'+u.title+'</b> 今天排不下了，已放入"顺延"队列，明天首位处理。建议你尽快手动补做。';
-}
-function setWindow(t){
-  pushUndo('调整学习窗口');
-  const ts=findTimes(t);
-  if(ts.length===0)return '没识别到时间，试试"学习时间8:30到21:30"或"今天从9点开始"。';
-  const changed=[];
-  if(ts.length>=2){
-    S.dayStart=toHM(ts[0]);S.dayEnd=toHM(ts[1]);
-    changed.push('开始'+S.dayStart+' 结束'+S.dayEnd);
-  }else if(ts.length===1){
-    if(/开始|起|从|起床|起学/.test(t)){S.dayStart=toHM(ts[0]);changed.push('开始'+S.dayStart);}
-    else{S.dayEnd=toHM(ts[0]);changed.push('结束'+S.dayEnd);}
-  }
-  reconcile();
-  return '⏰ 已更新学习时间窗口：<b>'+S.dayStart+'–'+S.dayEnd+'</b>。'+(changed.length?'（'+changed.join('，')+'）':'');
-}
-function recordRhythm(t){
-  const ts=findTimes(t);
-  if(!S.rhythm)S.rhythm={meals:[]};
-  if(/睡/.test(t)&&ts.length){S.rhythm.sleep=ts[0];return '🌙 已记录你约 '+toHM(ts[0])+' 入睡，我会在节奏里参考。';}
-  if(/(起床|起学|醒来|起)/.test(t)&&ts.length){S.rhythm.wake=ts[0];return '🌅 已记录你约 '+toHM(ts[0])+' 起床。';}
-  return showRhythm();
-}
-function showRhythm(){
-  if(!S.rhythm)S.rhythm={meals:[]};
-  let s='· 你常在 ';
-  if(S.rhythm.meals&&S.rhythm.meals.length){
-    const freq={};S.rhythm.meals.forEach(m=>{const h=Math.floor(m/60);freq[h]=(freq[h]||0)+1;});
-    const top=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]+'点('+e[1]+'次)').join('、');
-    s+=top+' 左右吃饭<br>';
-  }else{s+='还没记录到吃饭时间，告诉我"12点半吃饭"我来记。<br>';}
-  if(S.rhythm.wake)s+='· 最近起床约 '+toHM(S.rhythm.wake)+'<br>';
-  if(S.rhythm.sleep)s+='· 最近入睡约 '+toHM(S.rhythm.sleep)+'<br>';
-  s+='当前默认学习窗口：'+S.dayStart+'–'+S.dayEnd+'。规律够多了可让我"改成X点到Y点"微调。';
-  return s;
-}
-function isVent(t){
-  return /(好?难受|想哭|崩溃|委屈|emo|丧|摆烂|没动力|学不下去|不想学|刷.*小红书.*焦虑|小红书.*好焦虑|焦虑|压抑|压力|慌|迷茫|不知道自己?要?干嘛|不知道要|想放弃|没有目标|没方向|好难|难过)/.test(t);
-}
-function ventEmotion(t){
-  if(/焦虑|压抑|压力|慌|刷.*小红书|迷茫/.test(t))return 'anxiety';
-  if(/难受|想哭|崩溃|委屈|emo|丧|哭|想放弃|难过/.test(t))return 'sad';
-  if(/学不下去|不想学|没动力|摆烂/.test(t))return 'tired';
-  if(/不知道自己?要?干嘛|不知道要|没有目标|没方向/.test(t))return 'lost';
-  return 'default';
-}
-function handleVent(t){
-  pushUndo('情绪模式');
-  const emo=ventEmotion(t);
-  const lines={
-    anxiety:'先停一下。刷小红书看别人进度最容易焦虑——那是别人的剧本，不是你的。秋招本来就乱，慢一点≠掉队，没人能按标准答案走。',
-    sad:'难受就难受，别憋着。今天允许自己不完美，先让自己缓过来，比硬撑着学有用得多。',
-    tired:'累就歇，硬坐着也没效率。我帮你把今天的重活砍了，留点轻松的，剩下的明天再说。',
-    lost:'不知道要干嘛太正常了，大家都是边投边找的。我们先按"运营 / 数据 / 运维"主方向走，其他机会（销售/行政/文员…）碰到了也不放过——方向是试出来的，不是坐在那儿想出来的。',
-    default:'我听到了。今天先别逼自己，状态比计划重要。'
-  };
-  const msg=lines[emo]||lines.default;
-  return msg+'<br><br>想多说两句就多说，我听着，不急着学。<br>要是你想让我把今天调轻一点（看视频 / 泛听 / 整理这种），回我一句「帮我调轻」，我再动手；你没说，我就不动你的安排。';
-}
-function giveAdvice(){
-  const tips=[];
-  if(S.deferred.length)tips.push('今天有 '+S.deferred.length+' 项排不下，已顺延到明天首位——别焦虑，这说明你排得满，不是你慢。');
-  const td=S.done.filter(d=>getUnit(d.unitId).stream==='投递').length;
-  if(td===0)tips.push('秋招投递是命脉：今天至少挑 3–5 个岗投出去，投了才有面试、才有后续一切。');
-  if(S.energy==='low')tips.push('你今天状态偏低，已经是轻量模式——允许自己慢，重活明天补，不丢人。');
-  if(!tips.length)tips.push('节奏不错。记住：运营/数据岗都看重"用数据说话"，每个项目尽量带指标和结果。');
-  return '💡 今日建议：<br>· '+tips.join('<br>· ');
-}
-function handleAdvice(){return giveAdvice();}
-function reviewDay(){
-  const day=S.date;
-  const done=S.history.filter(h=>h.date===day&&h.type==='done');
-  if(done.length){
-    const ratio=done.reduce((a,h)=>a+(h.actual/h.planned),0)/done.length;
-    S.learnings.capacityFactor=Math.max(0.8,Math.min(1.6,+ratio.toFixed(2)));
-  }
-  const deferred=S.history.filter(h=>h.date===day&&h.type==='deferred');
-  const byStream={};done.forEach(h=>byStream[h.stream]=(byStream[h.stream]||0)+1);
-  S.learnings.lastSummary={date:day,done:done.length,deferred:deferred.length,byStream};
-  if(S.learnings.lastReviewed!==day){
-    const notes=[];
-    if(deferred.length)notes.push('今日有 '+deferred.length+' 项溢出（排太满），已自动加缓冲，下次同口径少排点。');
-    if(done.length)notes.push('今日完成 '+done.length+' 项，平均耗时约为计划的 '+Math.round(S.learnings.capacityFactor*100)+'%。');
-    if(notes.length)S.learnings.notes=[...notes,...S.learnings.notes].slice(0,5);
-    S.learnings.totalDays=(S.learnings.totalDays||0)+1;
-    S.learnings.lastReviewed=day;
-  }
-}
-function showLearnings(){
-  reviewDay();
-  const L=S.learnings;
-  let s='🧠 <b>我的规律（越用越准）</b><br>';
-  s+='· 累计记录：'+(L.totalDays||0)+' 天<br>';
-  s+='· 时间系数：你实际耗时≈计划的 '+Math.round((L.capacityFactor||1)*100)+'%（&gt;100% 说明常超时，排期已自动加缓冲；&lt;100% 说明你比计划快，会排更满）<br>';
-  if(L.lastSummary){const bs=Object.entries(L.lastSummary.byStream||{}).map(e=>e[0]+' '+e[1]).join('、');s+='· 上次复盘（'+L.lastSummary.date+'）：完成 '+L.lastSummary.done+'，溢出 '+L.lastSummary.deferred+(bs?'，分布：'+bs:'')+'<br>';}
-  if(L.notes&&L.notes.length)s+='· 最近提醒：<br>　· '+L.notes.join('<br>　· ')+'<br>';
-  const pos=S.positions||[];if(pos.length)s+='· 岗位库：'+pos.length+' 个（在「岗位库」查看）<br>';
-  s+='这些会反过来调我的排期——你用得越多，计划越贴合你真实节奏。';
-  return s;
-}
-function handleReview(){
-  reviewDay();
-  let s='📝 <b>今日复盘</b><br>· 完成 '+S.done.length+' 项、溢出 '+S.deferred.length+' 项、状态'+(S.energy==='low'?'偏低（已切轻量）':'正常')+'。';
-  const ov=S.plan.reduce((a,b)=>{const u=UNITS[b.unitId];return a+Math.round(u.min*(S.learnings.capacityFactor||1));},0);
-  s+='<br>· 今日计划总时长约 '+Math.round(ov/60*10)/10+' 小时（含缓冲系数）。<br><br>';
-  s+=showLearnings().replace(/^🧠.*?<br>/,'');
-  return s;
-}
-function handlePositionAdd(t){
-  pushUndo('添加岗位');
-  let r=t.replace(/记岗位|加岗位|添加岗位|岗位[:：]?/g,'').replace(/^[\s：:]*/,'').trim();
-  if(!r)return '说一下岗位，例如"记岗位 字节跳动 用户运营 北京"。多条用换行或分号隔开。';
-  const cityList=['北京','上海','广州','深圳','杭州','成都','南京','武汉','西安','天津','苏州','重庆','青岛','长沙','合肥','石家庄','雄安','廊坊','保定','济南','郑州','宁波','无锡','福州','厦门'];
-  const lines=r.split(/[\n；;]/).map(x=>x.trim()).filter(Boolean);
-  let added=0;
-  lines.forEach(line=>{
-    let city='',role='',company=line;
-    for(const c of cityList){if(line.includes(c)){city=c;company=line.replace(c,'').trim();break;}}
-    const parts=company.split(/[\s\-—]+/).filter(Boolean);
-    if(parts.length>=2){company=parts[0];role=parts.slice(1).join(' ');}else{role='待定';}
-    S.positions.push({id:uid(),company,role,city,status:'todo',created:S.date});
-    added++;
-  });
-  save();
-  return '已记 '+added+' 个岗位到「岗位库」✅（去「岗位库」查看；"投了<公司>"标记已投）。';
-}
-function listPositions(){
-  const ps=S.positions||[];
-  if(!ps.length)return '岗位库还是空的。用"记岗位 公司 岗位 城市"添加，或把高顿/牛客看到的岗位粘贴进来。';
-  let s='📋 <b>岗位库（'+ps.length+'）</b><br>';
-  ps.forEach((p,i)=>{s+=(i+1)+'. '+p.company+' · '+p.role+(p.city?' · '+p.city:'')+' ［'+(p.status==='applied'?'已投':p.status==='interview'?'面试中':'待投')+'］<br>';});
-  return s+'<br>标记已投："投了<公司名>"；标记面试："进面<公司名>"。';
-}
-function markPosition(t,kind){
-  pushUndo('标记岗位状态');
-  let m=t.match(/投了(.+?)(?:的|吗|呢|了|$)/)||t.match(/(?:进面|面试|面了)(.+?)(?:的|吗|呢|了|$)/);
-  if(!m)return '没听清公司名，说"投了字节"或"进面字节"这样。';
-  const name=m[1].trim();
-  const ps=S.positions||[];
-  const hit=ps.filter(p=>p.company.includes(name)||name.includes(p.company));
-  if(!hit.length)return '岗位库里没找到含"'+name+'"的岗位，先"记岗位"一下？';
-  hit.forEach(p=>p.status=kind);
-  save();
-  return '✅ 已将「'+hit.map(p=>p.company).join('、')+'」标记为'+(kind==='applied'?'已投':'面试中')+'。';
-}
-function handleUnknown(){
-  const qs=['你刚完成了某个任务？','接下来有事/想休息一会儿？','想调整某个任务的时间？','今天状态不好，想聊聊？'];
-  return '嗯，我没太 get 到 🤔 直接说人话就行——<br>'+qs.map((q,i)=>(i+1)+') '+q).join('<br>')+'<br>不用按格式，把真实想法打出来。';
-}
-function process(t){
-  t=t.trim();
-  if(!t)return;
-  const c=classify(t);let reply;
-  if(c==='vent')reply=handleVent(t);
-  else if(c==='delblock')reply=handleDelete(t);
-  else if(c==='undo')reply=handleUndo();
-  else if(c==='feedback')reply=handleFeedback(t);
-  else if(c==='advice')reply=handleAdvice(t);
-  else if(c==='urgent')reply=handleUrgent(t);
-  else if(c==='addtask')reply=handleAddTask(t);
-  else if(c==='retro')reply=handleRetro(t);
-  else if(c==='lognow')reply=actReplanNow();
-  else if(c==='recurring')reply=handleRecurring(t);
-  else if(c==='interrupt')reply=handleInterrupt(t);
-  else if(c==='energyLow')reply=setEnergy('low');
-  else if(c==='energyHigh')reply=setEnergy('high');
-  else if(c==='rhythm')reply=showRhythm();
-  else if(c==='rhythmLog')reply=recordRhythm(t);
-  else if(c==='setwindow')reply=setWindow(t);
-  else if(c==='log')reply=logProgress(t);
-  else if(c==='newplan')reply=actNewplan();
-  else if(c==='review')reply=handleReview();
-  else if(c==='learnings')reply=showLearnings();
-  else if(c==='positionAdd')reply=handlePositionAdd(t);
-  else if(c==='positionList')reply=listPositions();
-  else if(c==='markApplied')reply=markPosition(t,'applied');
-  else if(c==='markInterview')reply=markPosition(t,'interview');
-  else if(c==='diary')reply=handleDiary(t);
-  else reply=handleUnknown();
-  return reply;
+function buildItems(d){
+  const items = [
+    {k:'tech', lbl:'🛠 技术硬技能（'+WEEK_THEME[d.w]+'）', txt:d.tech},
+    {k:'en', lbl:'🇬🇧 英语 45-60min', txt:d.en},
+    {k:'xc', lbl:'📐 央国企行测 60min（不考公·不申论）', txt:d.xc},
+    {k:'it', lbl:'🎤 面试练习 60min', txt:d.inter}
+  ];
+  if(d.str) items.push({k:'str', lbl:'💪 力量训练 45-60min', txt:'居家自重/健身房分化训练（推/拉/腿或全身，国庆日居家自重）'});
+  if(d.g!==null) items.push({k:'gong', lbl:'🧬 6共性技能输入 30-45min', txt:GONG[d.g]});
+  items.push({k:'dl', lbl:'📨 投递', txt:(d.boss?'Boss 3-5家（上班时间9-18，'+ (d.w>=2?'运营A/数据B/央国企C':'运营A版') +'）+ ':'') + '官网/央国企网 2-3家' + (d.boss?'':'（⚠️今日不投Boss）')});
+  return items;
 }
 
-/* ============ AI 接入（BYOK） ============ */
-const SYSTEM_PROMPT=`你是「小陪」，刘雪的秋招陪跑搭子，要像真人朋友一样陪她，温暖、自然、会说人话。
-【背景】刘雪：二本软件工程2027届，河北，轻技术背景，不走开发。主方向：用户/数据/策略/增长运营、数据分析、运维（非开发）；其他非开发岗（销售/行政/文员等）也不排斥。外企书面型，京津冀优先。秋招有8条流并行：硬技能(Excel/SQL/Python)、简历、投递、行测(央国企笔试)、测评、面试(含无领导小组)、英语(听力+口语+阅读)、紧急插队(公司发测评/笔试链接)。
-【她手上有一份《一个月学习计划 9/12–10/12》，App 已内置】：每天六段固定动作——①08:30 投递(刷岗→挑岗→投3-4家) ②10:00 行测(粉笔限时+复盘) ③13:00 学习段 ④16:10 面试表达(写稿→口述→录音改3处) ⑤20:20 英语(每天1小时：背单词+听力/口语，四六级/外企都要) ⑥21:20 复盘三行。学习段按当周清单走：第1周 Excel基础+自我介绍；第2周 Excel小报告+SQL入门+方法论；第3周 SQL刷题+A/B+群面+STAR；第4周 作品集+模拟面试+冲量；最后收尾复盘。**这一个月只学四样：Excel、SQL、数据分析方法论、面试表达**——明确不学 Python/统计系统课/Tableau深入/计算机二级/申论。她问"今天学什么"时，直接照「今日学习清单」（stateSummary 里有）回答，并说清用谁的课（戴师兄/王佩丰/Mosh/牛客）、学到哪停。
-【她讨厌】死模板、听不懂人话的机器人。你要：①接住她的吐槽/焦虑/迷茫，像朋友一样共情回应；②准确理解她口语化的汇报，改对排期。
-【铁律·最重要，先读这条】
-· 她只是**吐槽 / 倾诉 / 闲聊 / 发泄情绪**时：**只回话陪她，一个 CMD 都不许发**。她说过"我跟他聊两句，他就给我硬塞两件事"——那是错的。**绝不能因为她说了句话就动她的日程**。
-· 只有当她的话**客观上改变了时间安排**（要去哪、做了多久、新任务、要重排）时才发 CMD；拿不准 → 先问一句，别擅自改。
-· 说话像朋友，别像系统播报；**不许用"级联/位移/重排/进队列"这类术语**，要说"后面的我往后挪了""剩下的明天弄"。
-· **绝不许为了"安慰她"就去插生活块/休息块**（她吐槽时被塞一个晚上 20:30 的块，她会完全看不懂）。interrupt 只在她明确说"我要去/去做某件具体的事"时才发，label 必须写清楚，**不许留空、不许写"事务"**。
-【回话规则】
-1) 先用自然、温暖的中文回应（可口语、可共情），像活人，不要列点像机器。
-2) 若她的消息涉及以下操作，在回话【最后】用单独一行发出命令，格式严格为 CMD:{json}（可多行多条，不要在其他地方夹带 CMD）：
-   · 记录完成：{"act":"log","q":"关键词(资料分析速算/英语/SQL/Excel/简历/投递/行测…)","min":实际分钟(可选)}
-   · 新增任务/测评(真的排进今天)：{"act":"addtask","title":"任务名(如 测评/字节笔试)","stream":"测评|投递|面试|行测|简历|英语|硬技能","min":预计分钟(默认60),"qty":数量(默认1),"deadline":"14天/9月20日(可空)"}
-   · 按她现在的时间重排今天：{"act":"replan_now"}
-   · 补记"过去那段时间干了啥"：{"act":"retro","label":"投简历/玩/休息/学X","start":"12:00","end":"17:00"}。⚠️ 如果她说的恰好是**今天计划里本来有的任务**（比如计划排了 2-4:28 投简历，她说"我12点到2点一直在投简历"），retro 会自动把那个计划任务**勾掉完成**（按她说的真实时间窗），而不是又新建一条导致重复——这正是她反复吐槽的 bug，必须这么处理；只有"玩/刷手机/休息"这种计划外的事才加一块"已过去"的占位块。
-   · 记日记（她说"我去了X""我做了X"这类生活事件）：{"act":"diary","text":"去了图书馆/做了力量训练"}
-   · 设周期事件（她说"我力量训练隔天做一次""一周练3次"）：{"act":"recurring","label":"力量训练","every":2}
-   · 调整任务时长：{"act":"feedback","q":"关键词","min":新分钟数}
-   · 撤销上一步：{"act":"undo"}
-   · **删除指定的某条日程/记录**（她说"把投简历那条删掉""把那个事务给我删了"）：{"act":"delblock","q":"要删的名字(如 投简历/事务/睡懒觉/超市)","start":"12:00(可选，按时间删)"}
-   · 插入生活/休息块（**只在她明确说"要去/在做"具体的事时才用**，如"下午去超市""我想歇半小时"）：{"act":"interrupt","label":"超市/吃饭/休息","start":"15:00(可选)","min":60}
-   · 改学习窗口：{"act":"window","start":"08:30","end":"21:30"} 或只改开始 {"act":"setwindow_start","start":"09:00"}
-   · 切状态：{"act":"energy","level":"low"或"high"或"normal"}
-   · 记岗位：{"act":"position","text":"公司 岗位 城市"}
-   · 标记已投/面试：{"act":"mark","q":"公司名","status":"applied"或"interview"}
-   · 复盘：{"act":"review"}  重排今天：{"act":"newplan"}
-3) 没有操作就不要发 CMD 行。
-【关键理解】
-· "我没做/撤销/刚才那条删了/不是我完成的" = undo。
-· 她说"把XX删掉/把这个删了/两个事务都删掉" = **发 delblock 真的删掉**；**绝不许用 undo 糊弄，更不许顺手再加一条或改时间**（她已经被"越删越乱"气到过）。
-· "资料分析时间太短/给我多排点" = feedback 延长。
-· "接下来一小时不干活/我先歇会儿" = interrupt 休息。
-· 她焦虑/难受/吐槽：**只共情、只陪聊，绝不自动切轻量、绝不改日程**。最多问一句"要不要我把今天调轻一点？"，她答应了才发 energy low。
-· "我还有两个测评/测评是14天的/加个XX任务" = 一定要发 addtask 把它排进今天，别只在嘴上答应。
-· 她说"现在都X点了/我才开始/上午荒废了" = 先接住，再发 {"act":"replan_now"} 把今天从当前时间重排；如果她讲的是**过去干了什么**（"我12点到5点都在投简历"），发 retro——但 retro 会把对应的计划任务直接勾掉完成（不会留重复块），只有计划外的事才占位。
-· 她说"X做完了/投完了/我搞定了"且能认出是哪个任务（投简历/行测/面试/复盘/SQL/Excel…）= 发 {"act":"log","q":"投简历"} 把它勾掉；别只说"好的"不动她的日程。勾掉后后面的安排会自己顺好，就是她要的"重排下一项"。
-【怎么帮她排才人性化（她反复强调的）】
-· 她的真实进度最重要：**没学过的绝不能写"复习"**，要说"看个入门短视频，从0开始，不用有基础"。
-· 她累了 / 已经下午了 / 刚投完很久简历 → 只排 30 分钟以内的"轻起步"（看视频、泛听、翻简历、整理记录），别塞硬课。
-· 按"现在到晚上能承受的量"排，**宁少勿多**，一次别塞一堆。
-· 她说"我12点到5点都在投简历"这种：先夸一句（投了5小时很拼），把这段记下来，再说"接下来轻松点"。
-【求职方法论（顺手用，别背术语，话说得像个懂行的朋友）】
-· 漏斗真相：简历关挂70%、笔试/测评关挂50%、群面挂80%、业务面挂70%——投递只是最前端，笔/面/复盘要同步做。
-· 投递策略：分层投——练习区最早投(拿来练手)、核心区主力投(必须拿下的基本盘)、冲刺区状态最好时再投；背景一般要投 80-100 份打底；看JD，60% 沾边就大胆投；双非一定要在 BOSS直聘 也投一份(官网量大可能机筛学历)。
-· 简历：用 STAR(情境-任务-行动-结果)+数字；写"分析/优化/复盘了"，别只"撰写/整理了"；别写宏大叙事，写到具体做了什么。
-· 面试：录音复盘是提分最大杠杆；运营业务题用"目标-指标-动作-验证"四步；自我介绍用 PREP(观点-理由-例子-结论)。
-· 运营岗避坑：避开"啥都干"的低段位(社群/新媒体/纯内容运营)，主攻用户/数据/策略/增长运营；往"用户标签表/漏斗诊断/数据看板/专题分析"这些高段位证据上靠。
-· 心态：没消息≠你不行，可能HR漏了或HC锁了；允许崩一晚，第二天继续投下一家。
-{stateSummary}`;
-function stateSummary(){
-  const L=[];
-  L.push('现在时间：'+toHM(nowMin())+'（'+S.date+'）。排期会自动从"现在"往后算，已过去的时段不再重复显示。');
-  L.push('学习窗口 '+S.dayStart+'–'+S.dayEnd+'，状态 '+(S.energy==='low'?'偏低':S.energy==='high'?'满格':'正常'));
-  L.push('今日计划：'+ (S.plan.length? S.plan.map(b=>getUnit(b.unitId).title+'('+b.start+'-'+b.end+')').join('、') :'（空）'));
-  L.push('已完成：'+ (S.done.length? S.done.map(d=>getUnit(d.unitId).title).join('、'):'无'));
-  L.push('顺延：'+ (S.deferred.length? S.deferred.map(id=>getUnit(id).title).join('、'):'无'));
-  L.push('岗位库：'+ (S.positions.length? S.positions.length+'个':'空'));
-  L.push('时间系数：'+ Math.round((S.learnings.capacityFactor||1)*100)+'%');
-  const p=getDayPlan(S.date);
-  if(p)L.push('今日计划学习（第'+p.weekNo+'周 · '+p.theme+'）：'+(p.items&&p.items.length?p.items.map(x=>x.title).join('、'):'固定六段'));
-  const due=dueRecurring();
-  if(due.length)L.push('今天该做的周期事件：'+due.map(r=>r.label).join('、'));
-  if(S.recurring&&S.recurring.length)L.push('已设周期：'+S.recurring.map(r=>r.label+' 每 '+r.every+' 天（下次 '+r.next+'）').join('、'));
-  if(S.diary&&S.diary[S.date]&&S.diary[S.date].length)L.push('今天已记日记：'+S.diary[S.date].map(x=>x.text).join('；'));
-  return L.join('\n');
-}
-function execCmd(c){
-  let r='';
-  switch(c.act){
-    case 'log': r=logProgress((c.q||'')+(c.min?(' 用了'+c.min+'分钟'):'')); break;
-    case 'feedback': r=handleFeedback((c.q||'')+' 改到'+(c.min||'')+'分钟'); break;
-    case 'undo': r=handleUndo(); break;
-    case 'delblock': r=handleDelete((c.q||'')+(c.start?(' '+c.start):''),{q:c.q,start:c.start}); break;
-    case 'recurring': r=handleRecurring((c.label||'')+(c.every?(' 每'+c.every+'天'):' 隔天')); break;
-    case 'diary': r=handleDiary(c.text||c.q||''); break;
-    case 'interrupt': r=handleInterrupt((c.label||'')+(c.start?(' '+c.start):'')+(c.min?(' '+(c.min/60)+'小时'):'')); break;
-    case 'window': r=setWindow('学习时间'+(c.start||'')+'到'+(c.end||'')); break;
-    case 'setwindow_start': r=setWindow('今天从'+(c.start||'')+'开始'); break;
-    case 'energy': r=setEnergy(c.level||'normal'); break;
-    case 'position': r=handlePositionAdd('记岗位 '+(c.text||'')); break;
-    case 'mark': r=markPosition('投了'+(c.q||''), c.status||'applied'); break;
-    case 'addtask': r=handleAddTask(c.title||c.q||'',{title:c.title||c.q,stream:c.stream,min:c.min,qty:c.qty,deadline:c.deadline}); break;
-    case 'retro': r=handleRetro((c.label||'')+' '+(c.start||'')+'到'+(c.end||''),{label:c.label,start:c.start,end:c.end}); break;
-    case 'replan_now': r=actReplanNow(); break;
-    case 'review': r=handleReview(); break;
-    case 'newplan': r=actNewplan(); break;
-  }
-  return r;
-}
-async function callLLM(userText){
-  const st=S.settings||{};
-  const isSF=st.provider==='siliconflow';
-  const url=isSF?'https://api.siliconflow.cn/v1/chat/completions':'https://openrouter.ai/api/v1/chat/completions';
-  const headers={'Content-Type':'application/json','Authorization':'Bearer '+st.apiKey};
-  if(!isSF){headers['HTTP-Referer']='https://liuxue-coach.local';headers['X-Title']='秋招陪跑';}
-  const msgs=[{role:'system',content:SYSTEM_PROMPT.replace('{stateSummary}',stateSummary())}];
-  (S.chat||[]).slice(-16).forEach(m=>msgs.push(m));
-  msgs.push({role:'user',content:userText});
-  const body={model:st.model||'openai/gpt-4o-mini',messages:msgs,temperature:0.7,max_tokens:600};
-  const r=await fetch(url,{method:'POST',headers,body:JSON.stringify(body)});
-  if(!r.ok){const tx=await r.text().catch(()=> '');throw new Error('HTTP '+r.status+' '+tx.slice(0,160));}
-  const j=await r.json();
-  return (j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)||'';
-}
-let lastAiEl=null;
-function pushChat(who,text){
-  if(!S.chat)S.chat=[];
-  S.chat.push({role:who==='me'?'user':'assistant',content:text});
-  if(S.chat.length>60)S.chat=S.chat.slice(-60);
-  const el=document.getElementById('chatlog');
-  const d=document.createElement('div');d.className='bub '+(who==='me'?'me':'ai');
-  d.innerHTML=text;el.appendChild(d);
-  el.scrollTop=el.scrollHeight;
-  if(who==='ai')lastAiEl=d;
-}
-function updateLastAi(text){
-  if(lastAiEl){lastAiEl.innerHTML=text;const el=document.getElementById('chatlog');el.scrollTop=el.scrollHeight;}
-  if(S.chat&&S.chat.length){S.chat[S.chat.length-1].content=text;}
-}
-async function sendChat(){
-  const i=document.getElementById('msg');const v=i.value.trim();if(!v)return;i.value='';
-  if(!S.chat||!S.chat.length)renderChat();
-  pushChat('me',v);
-  const st=S.settings||{};
-  if(!st.apiKey){
-    const reply=process(v);
-    pushChat('ai',reply);
-    save();render();
-    return;
-  }
-  pushChat('ai','…');
-  try{
-    const reply=await callLLM(v);
-    const display=reply.replace(/CMD:\{[\s\S]*?\}/g,'').replace(/\n{2,}/g,'\n').replace(/^\s+|\s+$/g,'');
-    const cmds=[...reply.matchAll(/CMD:(\{[\s\S]*?\})/g)].map(m=>{try{return JSON.parse(m[1]);}catch(e){return null;}}).filter(Boolean);
-    let notes=[];
-    cmds.forEach(c=>{const r=execCmd(c);if(r)notes.push('· '+stripTags(r));});
-    /* —— 兜底（解决"AI 嘴上改了、行程却没动"）：
-       LLM 经常"用漂亮话总结行动却忘了发 CMD"，导致 S 没变、行程页不刷新。
-       若她的话是"做完X / 补记过去时段"(classify=log|retro) 且 LLM 没发 log/retro 指令，
-       就用规则引擎把这次汇报真正落到 S+reconcile（markUnitDone/handleRetro 幂等，不重复）。
-       吐槽/提问不会命中 log|retro，所以不会误改日程。 —— */
-    const cv=classify(v);
-    const llHandledLogRetro=cmds.some(c=>c.act==='log'||c.act==='retro');
-    if(!llHandledLogRetro&&(cv==='log'||cv==='retro')){ process(v); }
-    let finalText=display || '好嘞，我记下了。';
-    if(notes.length)finalText+='\n\n📌 已帮你：\n'+notes.join('\n');
-    updateLastAi(finalText);
-    save();render();
-  }catch(e){
-    updateLastAi('⚠️ AI 调用失败（多半是 Key 无效，或手机/网络拦了跨域请求）。已切回规则模式帮你处理：\n\n'+process(v));
-    save();render();
-  }
-}
-
-/* ============ 渲染 ============ */
-function pushLog(who,text){ // 非对话型日志（按钮触发）
-  pushChat(who,text);
-}
-function renderHeader(){
-  const ab=document.getElementById('appbar');if(ab)ab.textContent='🤝 秋招陪跑 · 小陪 '+APP_VERSION;
-  const vs=document.getElementById('verSide');if(vs)vs.textContent=APP_VERSION;
-  const vt=document.getElementById('verTag');if(vt)vt.textContent=APP_VERSION+'（'+APP_BUILT+' 构建）';
-  document.getElementById('topMeta').textContent=S.date+' ｜ '+S.dayStart+'–'+S.dayEnd+' ｜ 完成 '+S.done.length+' 项';
-  const aiOn=(S.settings&&S.settings.apiKey);
-  document.getElementById('sideStatus').innerHTML='<span class="dot '+(aiOn?'on':'off')+'"></span>'+(aiOn?'AI 已接入 · 活人模式':'规则模式 · 去设置填 Key');
-  const aiState=document.getElementById('aiState');
-  if(aiState)aiState.innerHTML=aiOn?'✅ 当前是<b>真·活人 AI</b>模式，随便说人话都接得住。':'⚠️ 还没填 Key，现在用的是规则模式（听不懂口语）。去上面填 Key 解锁活人模式。';
-}
-function renderProgress(){
-  const pr=document.getElementById('progress');if(!pr)return;pr.innerHTML='';
-  STREAMS.forEach(s=>{
-    const total=Object.values(UNITS).filter(u=>u.stream===s).length;
-    const done=S.totals[s]||0;
-    const pct=total?Math.min(100,Math.round(done/total*100)):0;
-    pr.innerHTML+='<div class="pbar"><span class="nm">'+s+'</span><span class="tr"><span class="fl" style="width:'+pct+'%;background:'+COLOR[s]+'"></span></span><span class="ct">'+done+'</span></div>';
-  });
-}
-function renderSchedule(){
-  const sc=document.getElementById('schedule');if(!sc)return;sc.innerHTML='';
-  const items=[];
-  S.fixed.forEach(f=>items.push({type:'fixed',...f}));
-  S.done.forEach(d=>items.push({type:'done',title:getUnit(d.unitId).title,stream:getUnit(d.unitId).stream,start:d.start,end:d.end,actual:d.actual,offplan:d.offplan}));
-  S.plan.forEach(b=>items.push({type:'todo',unitId:b.unitId,start:b.start,end:b.end}));
-  /* 顺延的不再逐条列出来（看着像一堆没做完的，吓人），只在最后提示一行 */
-  const keyv=x=>{if(x==='顺延'||!x)return 9999;const n=toMin(x);return isNaN(n)?9998:n;};
-  items.sort((a,b)=>keyv(a.start)-keyv(b.start));
+function renderDay(){
+  const d = DAYS[cur];
+  document.getElementById('dlabel').innerHTML = d.d+' <span class="wkbadge '+WKCOLOR[d.w]+'">W'+d.w+'</span> '+d.wd;
+  document.getElementById('prev').disabled = cur===0;
+  document.getElementById('next').disabled = cur===29;
+  const items = buildItems(d);
+  const st = load(d);
+  let html='', done=0;
   items.forEach(it=>{
-    if(it.type==='fixed'){
-      sc.innerHTML+='<div class="blk fixed"><div class="top"><span class="time">'+it.start+'–'+it.end+'</span><span class="st" style="background:'+COLOR.fixed+'">生活</span></div><div class="ti">'+it.label+'</div></div>';
-    }else if(it.type==='done'){
-      const dt=it.offplan?'计划外':(it.start+'–'+it.end);
-      sc.innerHTML+='<div class="blk done"><div class="top"><span class="time">'+dt+'</span><span class="st" style="background:'+COLOR[it.stream]+'">'+it.stream+'</span></div><div class="ti">'+it.title+(it.offplan?' <span class="tag warn">计划外完成</span>':' ✓')+'</div>'+(it.actual?'<div class="pp">实际 '+it.actual+' 分钟</div>':'')+'</div>';
-    }else{
-      const u=getUnit(it.unitId)||{};
-      const title=u.title||it.unitId||'任务';
-      const stream=u.stream||'硬技能';
-      const note=u.note?('<div class="pp">📖 '+u.note+'</div>'):(u.purpose?('<div class="pp">目的：'+u.purpose+'</div>'):'');
-      const how=u.how?('<div class="ht">🛠 '+u.how+'</div>'):(HOWTO[it.unitId]?('<div class="ht">📘 怎么学：'+HOWTO[it.unitId]+'</div>'):'');
-      const acc=u.accept?('<div class="ac">✓ 验收：'+u.accept+'</div>'):'';
-      sc.innerHTML+='<div class="blk"><div class="top"><span class="time">'+it.start+'–'+it.end+'</span><span class="st" style="background:'+(COLOR[stream]||'#94a3b8')+'">'+stream+'</span></div><div class="ti">'+title+'</div>'+note+how+acc+'</div>';
-    }
+    const checked = !!st[it.k];
+    if(checked) done++;
+    html += '<label class="item'+(checked?' done':'')+'">'
+      + '<input type="checkbox" '+(checked?'checked':'')+' onchange="toggle(\''+it.k+'\','+checked+')">'
+      + '<div class="body"><div class="lbl">'+it.lbl+'</div><div class="txt">'+it.txt+'</div></div></label>';
   });
-  if(items.length===0)sc.innerHTML='<div class="empty">今天还没安排，点「重新规划今天」或去「陪跑」说点什么。</div>';
-  if(S.deferred&&S.deferred.length){
-    sc.innerHTML+='<div style="font-size:12px;color:#9aa3b0;text-align:center;padding:12px 6px 4px;">另有 '+S.deferred.length+' 项今天排不下，已经顺延到明天了，不用管它 👌</div>';
-  }
-}
-function renderLearnings(){
-  const el=document.getElementById('learnings');if(!el)return;
-  el.innerHTML=showLearnings();
-  const rb=document.getElementById('rhythmBox');if(rb)rb.innerHTML=showRhythm();
-}
-/* ============ 一个月计划：今日学习清单 ============ */
-function planDayIndex(dstr){
-  const s=new Date(PLAN_START+'T00:00:00'),d=new Date(dstr+'T00:00:00');
-  return Math.round((d-s)/86400000);
-}
-function getDayPlan(dstr){
-  const i=planDayIndex(dstr);
-  if(i<0||i>=WEEK_PLAN.length*7)return null;
-  const w=Math.floor(i/7),di=i%7;
-  const wk=WEEK_PLAN[w];if(!wk)return null;
-  return {weekNo:w+1,theme:wk.theme,items:(wk.days&&wk.days[di]&&wk.days[di].items)||[]};
-}
-function renderTodayLearn(){
-  const el=document.getElementById('todayLearn');if(!el)return;
-  const p=getDayPlan(S.date);
-  const card=(t,o)=>'<div style="margin:7px 0;padding:9px 11px;background:#f7f9fc;border:1px solid var(--line);border-radius:10px;line-height:1.6;">'
-    +'<div style="font-weight:600;font-size:13.5px;">'+t+'</div>'
-    +(o.note?'<div style="font-size:12px;color:#5b6478;margin-top:3px;">📖 '+o.note+'</div>':'')
-    +(o.how?'<div style="font-size:12px;color:#4a5b8c;margin-top:3px;">🛠 '+o.how+'</div>':'')
-    +(o.accept?'<div style="font-size:11.5px;color:#16a34a;margin-top:3px;">✓ 验收：'+o.accept+'</div>':'')
-    +'</div>';
-  let h='<div class="panel"><h3>📌 今日学习清单'+(p?(' <span class="tag">第'+p.weekNo+'周</span>'):'')+'</h3>';
-  const due=dueRecurring();
-  if(due.length)h+='<div class="hintbox" style="margin:0 0 8px;">🔁 今天该做：<b>'+due.map(r=>r.label).join('、')+'</b>（周期事件，做完跟我说一声）</div>';
-  if(!p){
-    h+='<div class="note">今天不在「9/12–10/12 一个月计划」范围内，照下面的日程走就行，不用硬套计划。</div>';
-    h+='<details style="margin-top:8px;"><summary style="cursor:pointer;font-size:12.5px;color:#48557a;">+ 每天固定六段（点开看）</summary>';
-    DAY_TEMPLATE.forEach(t=>{h+=card(t.title,{note:t.note,how:t.how,accept:t.accept});});
-    h+='</details></div>';
-    el.innerHTML=h;return;
-  }
-  h+='<div class="note" style="margin-bottom:6px;">本周主题：'+p.theme+'</div>';
-  if(p.items.length){
-    h+='<div style="font-size:12.5px;font-weight:600;color:#0f766e;margin:4px 0;">今天要学的（③学习段）：</div>';
-    p.items.forEach(o=>{h+=card('· '+o.title,o);});
-  }else{
-    h+='<div class="note">今天没有额外学习内容，按固定六段走（含每天 1 小时英语）。</div>';
-  }
-  h+='<details style="margin-top:8px;"><summary style="cursor:pointer;font-size:12.5px;color:#48557a;">+ 每天固定六段（点开看）</summary>';
-  DAY_TEMPLATE.forEach(t=>{h+=card(t.title,{note:t.note,how:t.how,accept:t.accept});});
-  h+='</details></div>';
-  el.innerHTML=h;
-}
-/* ============ 日记本 ============ */
-function niceDate(d){if(!d)return '—';const p=String(d).split('-');return (+p[1])+'/'+(+p[2]);}
-function daysBetween(a,b){const d1=new Date(a+'T00:00:00'),d2=new Date(b+'T00:00:00');return Math.round((d2-d1)/86400000);}
-function addDays(dstr,n){const d=new Date(dstr+'T00:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function diaryAdd(text,dateStr){
-  const t=(text||'').trim();if(!t)return;
-  const d=dateStr||S.date;
-  S.diary=S.diary||{};
-  if(!S.diary[d])S.diary[d]=[];
-  if(S.diary[d].some(x=>x.text===t))return;
-  S.diary[d].push({t:Date.now(),text:t});
-}
-function diaryAddManual(){
-  const i=document.getElementById('diaryInput');if(!i)return;
-  const v=i.value.trim();if(!v)return;
-  i.value='';
-  const rc=(S.recurring||[]).find(r=>v.indexOf(r.label)>=0);
-  diaryAdd(v);
-  if(rc){rc.last=S.date;rc.next=addDays(S.date,rc.every);}
-  save();renderDiary();renderTodayLearn();renderSchedule();
-}
-function renderDiary(){
-  const el=document.getElementById('diaryList');if(!el)return;
-  const D=S.diary||{};
-  const days=Object.keys(D).sort().reverse();
-  const arch=S.chatArchive||{};
-  let h='';
-  if(!days.length){h='<div class="empty" style="padding:20px;">还没有记录。在「陪跑」里说「今天去了图书馆」，我就记下来。</div>';}
-  else{
-    h=days.map(d=>{
-      const items=D[d]||[];
-      return '<div style="margin-bottom:14px;"><div style="font-weight:600;font-size:13px;color:#334155;margin-bottom:5px;">📅 '+niceDate(d)+'（'+items.length+' 条）</div>'
-        +items.map(x=>'<div style="font-size:13px;color:#475569;padding:5px 0 5px 10px;border-left:2px solid #e7eaf2;">'+x.text+'</div>').join('')
-        +(arch[d]?'<details style="margin-top:4px;"><summary style="cursor:pointer;font-size:11.5px;color:#8a93a6;">那天的聊天记录</summary><div style="font-size:12px;color:#8a93a6;line-height:1.7;padding-left:8px;">'+arch[d].map(m=>(m.role==='user'?'我：':'小陪：')+stripTags(m.content).slice(0,120)).join('<br>')+'</div></details>':'')
-        +'</div>';
-    }).join('');
-  }
-  el.innerHTML=h;
-}
-/* ============ 周期事件（如力量训练隔天一次） ============ */
-function dueRecurring(){return (S.recurring||[]).filter(r=>r.next&&daysBetween(S.date,r.next)<=0);}
-function renderRecurring(){
-  const el=document.getElementById('recurringBox');if(!el)return;
-  const rs=S.recurring||[];
-  if(!rs.length){el.innerHTML='<div class="note">还没有周期事件。在「陪跑」里说「我力量训练隔天做一次」，我就记住并在到日子提醒你。</div>';return;}
-  el.innerHTML=rs.map(r=>{
-    const left=daysBetween(S.date,r.next);
-    const st=left<=0?'<span class="pill interview">今天该做</span>':(left===1?'<span class="pill todo">明天</span>':'<span class="pill todo">还有 '+left+' 天</span>');
-    return '<div class="job"><div><div class="c">'+r.label+'</div><div class="m">每 '+(r.every===1?'天':r.every+' 天')+'一次 · 上次 '+niceDate(r.last)+' · 下次 '+niceDate(r.next)+'</div></div>'+st+'</div>';
-  }).join('');
-}
-function addRecurring(label,every,fromDate){
-  S.recurring=S.recurring||[];
-  const today=fromDate||S.date;
-  const ex=S.recurring.find(r=>r.label===label);
-  const next=addDays(today,every);
-  if(ex){ex.every=every;ex.last=today;ex.next=next;}
-  else S.recurring.push({label,every,last:today,next});
-}
-function handleRecurring(t){
-  const m=t.match(/每隔?([\d一二三四五六七八九十]+)天|隔天|每隔?一?天|一周([\d一二三四五])次|每天/);
-  let every=2;
-  if(m){
-    if(m[2])every=Math.max(1,Math.round(7/(cnNum(m[2])||1)));
-    else if(m[1])every=cnNum(m[1])||2;
-    else every=2;
-  }
-  const kw=['力量训练','健身','跑步','游泳','瑜伽','练肩','练背','练腿','有氧','无氧','深蹲','运动','背单词','英语'];
-  let label=kw.find(k=>t.indexOf(k)>=0);
-  if(!label){
-    const mm=t.match(/([\u4e00-\u9fa5]{2,6})(?:每隔|隔天|一周|每天)/);
-    label=mm?mm[1]:'';
-  }
-  if(!label)return '要给哪件事设周期？比如「力量训练隔天做一次」。';
-  addRecurring(label,every);
-  diaryAdd('设定周期：'+label+'（每 '+every+' 天一次）');
-  return '🔁 记下了：<b>'+label+'</b> 每 '+every+' 天一次，下次是 '+niceDate(addDays(S.date,every))+'。到日子我会在「今日日程」提醒你。';
-}
-function handleDiary(t){
-  let text=t.trim().replace(/^(我)?(今天|今天上午|今天下午|今天晚上|上午|下午|晚上)?/,'').trim();
-  if(!text)text=t.trim();
-  const rc=(S.recurring||[]).find(r=>t.indexOf(r.label)>=0);
-  diaryAdd(text);
-  if(rc){rc.last=S.date;rc.next=addDays(S.date,rc.every);return '📔 记进日记了：'+text+'<br>🔁「'+rc.label+'」下次是 '+niceDate(rc.next)+'。';}
-  return '📔 记进日记了：'+text+'（在「📔 日记」页能看到）。';
-}
-/* 换天：把昨天的聊天归档、清空聊天框（但行程和日记都留着） */
-function archiveChat(){
-  if(!S.chat||!S.chat.length)return;
-  S.chatArchive=S.chatArchive||{};
-  const d=S.chatDate||S.date;
-  S.chatArchive[d]=S.chat.slice(-40);
-  const ks=Object.keys(S.chatArchive).sort();
-  if(ks.length>30)ks.slice(0,ks.length-30).forEach(k=>delete S.chatArchive[k]);
-}
-function renderPositions(){
-  const el=document.getElementById('positions');if(!el)return;
-  const ps=S.positions||[];
-  if(!ps.length){el.innerHTML='<div class="empty" style="padding:20px;">空空如也。去「陪跑」说「记岗位 字节跳动 用户运营 北京」。</div>';return;}
-  el.innerHTML=ps.map(p=>{
-    const st=p.status==='applied'?'<span class="pill applied">已投</span>':p.status==='interview'?'<span class="pill interview">面试中</span>':'<span class="pill todo">待投</span>';
-    return '<div class="job"><div><div class="c">'+p.company+' · '+p.role+'</div><div class="m">'+(p.city||'城市未填')+'</div></div>'+st+'</div>';
-  }).join('');
-}
-function render(){
-  renderHeader();renderTodayLearn();renderProgress();renderSchedule();renderLearnings();renderPositions();renderDiary();renderRecurring();
-}
-function renderChat(){
-  const el=document.getElementById('chatlog');el.innerHTML='';lastAiEl=null;
-  (S.chat||[]).forEach(m=>{
-    const d=document.createElement('div');d.className='bub '+(m.role==='user'?'me':'ai');
-    d.innerHTML=m.content;el.appendChild(d);
-    if(m.role==='assistant')lastAiEl=d;
-  });
-  el.scrollTop=el.scrollHeight;
+  document.getElementById('items').innerHTML = html;
+  const total = items.length;
+  document.getElementById('pcount').textContent = '完成 '+done+' / '+total + (done===total?' 🎉':'');
+  document.getElementById('bar').style.width = (done/total*100)+'%';
+  document.getElementById('daynote').textContent = d.note ? ('📌 今日重点：'+d.note) : '';
 }
 
-/* ============ 持久化 ============ */
-function save_local(){localStorage.setItem(KEY,JSON.stringify(S));}
-function save(){save_local();syncToCloud();}
-function load(){
-  const raw=localStorage.getItem(KEY);
-  if(!raw){initState();return;}
-  try{S=JSON.parse(raw);}catch(e){initState();return;}
-  if(!S.date||!S.plan){initState();return;}
-  if(!S.rhythm)S.rhythm={meals:[]};
-  if(!S.history)S.history=[];
-  if(!S.learnings)S.learnings={capacityFactor:1,notes:[],totalDays:0,lastReviewed:null,lastSummary:null};
-  if(!S.positions)S.positions=[];
-  if(!S.undoStack)S.undoStack=[];
-  if(!S.unitOverrides)S.unitOverrides={};
-  if(!S.chat)S.chat=[];
-  if(!S.cloud)S.cloud={enabled:false,token:'',gistId:'',lastSync:null};
-  if(!S.settings)S.settings={provider:'openrouter',apiKey:'',model:'openai/gpt-4o-mini'};
-  if(!S.customUnits)S.customUnits={};
-  Object.assign(UNITS,S.customUnits); // 恢复自定义任务单元
-  /* 数据迁移：清掉早期 bug 硬塞的「事务」垃圾块 / 非法块，它们会挤占当日空档让任务全变"顺延" */
-  if(Array.isArray(S.fixed)){
-    S.fixed=S.fixed.filter(f=>f&&f.label&&f.label!=='事务'&&f.start&&f.end&&f.start!=='—'&&f.end!=='—');
-  }
-  if(S.dayEnd==='21:30')S.dayEnd='22:00'; // 计划里复盘到 22:00，窗口跟上，免得最后一段总排不下
-  if(!S.diary)S.diary={};
-  if(!S.recurring)S.recurring=[];
-  if(!S.chatArchive)S.chatArchive={};
-  if(!S.chatDate)S.chatDate=S.date;
-  buildRemaining(); // 每次打开都按最新计划重建今日日程（她手动加的任务 C* 会保留）
-  /* 迁移：插入"英语"段后，旧浮动的 P4/P5 等编号已不对应新模板，清掉失效的 P 类完成记录，
-     否则 renderSchedule 取 getUnit('P4') 会 undefined 导致行程渲染崩。PE/PR 是英语/复盘的稳定 id，保留。 */
-  S.done=(S.done||[]).filter(d=>{
-    if(d&&typeof d.unitId==='string'&&d.unitId.indexOf('P')===0&&d.unitId!=='PE'&&d.unitId!=='PR'&&!S.customUnits[d.unitId])return false;
-    return true;
-  });
-  /* 迁移：V1.7 前 matchUnit 串台，可能把"投递完简历"误记成 U20「简历一百问」的"计划外完成"脏数据。
-     U20 从不是今日固定计划任务，清掉它在 done/plan/remaining/deferred 里的残留，
-     免得行程里凭空多出一条"简历一百问"。 */
-  S.done=(S.done||[]).filter(d=>!(d&&d.unitId==='U20'));
-  S.plan=(S.plan||[]).filter(b=>!(b&&b.unitId==='U20'));
-  S.remaining=(S.remaining||[]).filter(id=>id!=='U20');
-  S.deferred=(S.deferred||[]).filter(id=>id!=='U20');
-  if(S.date!==todayStr()){ actNewday(); }                 // 换天：归档聊天+清空聊天框
-  else if(S.chatDate!==todayStr()){                        // 同一天但聊天是昨天的
-    archiveChat(); S.chat=[]; S.chatDate=todayStr(); reconcile();
-  }
-  else { reconcile(); } // 打开就按"现在"对齐一次，不再显示已过的时段
+function toggle(k, wasChecked){
+  const d = DAYS[cur];
+  const st = load(d);
+  if(wasChecked){ delete st[k]; } else { st[k]=true; }
+  save(d, st);
+  renderDay();
 }
-function exportState(){
-  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='刘雪_陪跑进度_'+S.date+'.json';a.click();
-}
-function importState(e){
-  const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();r.onload=()=>{try{S=JSON.parse(r.result);if(!S.rhythm)S.rhythm={meals:[]};save();render();renderChat();if(lastAiEl){}pushChat('ai','已导入进度 ✓');}catch(err){alert('导入失败');}};r.readAsText(f);
-}
-function resetAll(){localStorage.removeItem(KEY);initState();renderChat();pushChat('ai','已重置。今天从 08:30–21:30 重新排起（实验时段，随时可改）。');render();}
-
-/* ============ 云端同步（GitHub Gist：免费·私有·跨设备防丢） ============ */
-const GH_API='https://api.github.com';
-const GIST_FILE='liuxue_coach_data.json';
-async function ghReq(method,url,token,body){
-  const headers={'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28'};
-  const r=await fetch(url,{method,headers,body:body?JSON.stringify(body):undefined});
-  if(!r.ok){let m='';try{m=(await r.json()).message;}catch(e){}throw new Error('GitHub '+r.status+(m?': '+m:''));}
-  return r.json();
-}
-async function ensureGist(){
-  if(S.cloud.gistId)return S.cloud.gistId;
-  const data=await ghReq('POST',GH_API+'/gists',S.cloud.token,{description:'刘雪·秋招陪跑 进度云端备份（自动同步，勿删）',public:false,files:{[GIST_FILE]:{content:JSON.stringify(S,null,2)}}});
-  S.cloud.gistId=data.id;S.cloud.lastSync=Date.now();
-  return data.id;
-}
-async function syncToCloud(){
-  try{
-    if(!S||!S.cloud||!S.cloud.enabled||!S.cloud.token)return;
-    const id=await ensureGist();
-    await ghReq('PATCH',GH_API+'/gists/'+id,S.cloud.token,{files:{[GIST_FILE]:{content:JSON.stringify(S,null,2)}}});
-    S.cloud.lastSync=Date.now();showCloudStatus();
-  }catch(e){console.warn('云同步失败(本地已存):',e.message);}
-}
-async function pullFromCloud(){
-  try{
-    if(!S||!S.cloud||!S.cloud.enabled||!S.cloud.token||!S.cloud.gistId)return false;
-    const data=await ghReq('GET',GH_API+'/gists/'+S.cloud.gistId,S.cloud.token);
-    const f=data.files&&data.files[GIST_FILE];
-    if(!f||!f.content)return false;
-    const remote=JSON.parse(f.content);
-    const tk=S.cloud.token,gid=S.cloud.gistId;
-    S=remote;
-    if(!S.customUnits)S.customUnits={};
-    Object.assign(UNITS,S.customUnits);
-    if(!S.cloud)S.cloud={};
-    S.cloud.enabled=true;S.cloud.token=tk;S.cloud.gistId=gid;S.cloud.lastSync=Date.now();
-    save_local();showCloudStatus();
-    return true;
-  }catch(e){console.warn('云拉取失败:',e.message);return false;}
-}
-function showCloudStatus(){
-  const el=document.getElementById('cloudStatus');if(!el)return;
-  if(S.cloud&&S.cloud.enabled&&S.cloud.gistId){
-    const t=S.cloud.lastSync?new Date(S.cloud.lastSync).toLocaleString('zh-CN'):'—';
-    el.innerHTML='✅ 云端同步已开启 · 最后同步：'+t;
-  }else{el.innerHTML='⚪ 未开启云端同步';}
-}
-async function connectCloud(){
-  const token=document.getElementById('setCloudToken').value.trim();
-  if(!token){alert('请先填写 GitHub Token');return;}
-  S.cloud=S.cloud||{};S.cloud.enabled=true;S.cloud.token=token;
-  pushChat('me','开启云端同步');
-  pushChat('ai','正在连接 GitHub 并创建私有备份…');
-  try{
-    await ensureGist();S.cloud.lastSync=Date.now();save_local();showCloudStatus();
-    pushChat('ai','✅ 云端同步已开启！进度现在自动存到 GitHub 私有 Gist，<b>换手机/清缓存都不会丢</b>。新设备只需填同一个 Token 即可恢复全部进度。');
-  }catch(e){
-    S.cloud.enabled=false;save_local();
-    pushChat('ai','❌ 连接失败：'+e.message+'。请确认 Token 勾选了 gist 权限、且未过期。');
-  }
-  switchTab('chat');render();
-}
-function disconnectCloud(){
-  S.cloud.enabled=false;save_local();showCloudStatus();
-  pushChat('me','关闭云端同步');pushChat('ai','已关闭云端同步（本地数据仍在手机里）。');
-  switchTab('chat');render();
+function goDay(n){ cur = Math.max(0, Math.min(29, cur+n)); renderDay(); window.scrollTo(0,0); }
+function goToday(){ cur = todayOffset(); renderDay(); window.scrollTo(0,0); }
+function resetDay(){
+  if(confirm('清空 '+DAYS[cur].d+' 的全部勾选？')){ localStorage.removeItem(key(DAYS[cur])); renderDay(); }
 }
 
-/* ============ 交互 ============ */
-const TAB_TITLE={chat:'陪跑',today:'今日日程',learn:'我的规律',jobs:'岗位库',diary:'日记',set:'设置'};
-function switchTab(name){
-  document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.tab===name));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.add('hidden'));
-  document.getElementById('tab-'+name).classList.remove('hidden');
-  document.getElementById('topTitle').textContent=TAB_TITLE[name];
-}
-function quick(t){document.getElementById('msg').value=t;send();}
-function send(){sendChat();}
-function doAct(type){
-  if(!S.chat||!S.chat.length)renderChat();
-  if(type==='newplan'){pushChat('me','重新规划今天');pushChat('ai',actNewplan());}
-  if(type==='newday'){pushChat('me','新的一天');pushChat('ai',actNewday());}
-  if(type==='review'){pushChat('me','复盘');pushChat('ai',handleReview());}
-  render();save();
-}
-function onProviderChange(){
-  const p=document.getElementById('setProvider').value;
-  const hint=document.getElementById('modelHint');
-  if(p==='openrouter'){hint.innerHTML='推荐：<b>openai/gpt-4o-mini</b>（便宜好用）｜ 免费可试 <b>meta-llama/llama-3.1-8b-instruct</b> 或 <b>google/gemini-flash-1.5</b>';if(!document.getElementById('setModel').value||document.getElementById('setModel').value.indexOf('deepseek')>=0)document.getElementById('setModel').value='openai/gpt-4o-mini';}
-  else{hint.innerHTML='推荐：<b>deepseek-ai/DeepSeek-V3</b> 或 <b>Qwen/Qwen2.5-72B-Instruct</b>（国产便宜）';if(!document.getElementById('setModel').value||document.getElementById('setModel').value.indexOf('gpt')>=0)document.getElementById('setModel').value='deepseek-ai/DeepSeek-V3';}
-}
-function saveSettings(){
-  S.settings=S.settings||{};
-  S.settings.provider=document.getElementById('setProvider').value;
-  S.settings.apiKey=document.getElementById('setKey').value.trim();
-  S.settings.model=document.getElementById('setModel').value.trim()||'openai/gpt-4o-mini';
-  save();renderHeader();
-  if(S.settings.apiKey)pushChat('ai','✅ Key 已保存，现在我是<b>真·活人 AI</b>了！随便说人话都接得住～');
-  else pushChat('ai','已保存，但还没填 Key，仍是规则模式。');
-  switchTab('chat');
-}
-function saveWindow(){
-  const a=document.getElementById('setStart').value.trim();
-  const b=document.getElementById('setEnd').value.trim();
-  const t='学习时间'+a+'到'+b;
-  if(!findTimes(t).length){alert('时间格式不对，例如 08:30 / 21:30');return;}
-  pushChat('me','改窗口 '+a+'–'+b);
-  pushChat('ai',setWindow(t));
-  render();save();
-}
-function fillSettings(){
-  document.getElementById('setProvider').value=S.settings.provider||'openrouter';
-  document.getElementById('setKey').value=S.settings.apiKey||'';
-  document.getElementById('setModel').value=S.settings.model||'openai/gpt-4o-mini';
-  document.getElementById('setStart').value=S.dayStart;
-  document.getElementById('setEnd').value=S.dayEnd;
-  if(document.getElementById('setCloudToken'))document.getElementById('setCloudToken').value=(S.cloud&&S.cloud.token)||'';
-  showCloudStatus();
-  onProviderChange();
-}
-
-/* ============ 入口 ============ */
-load();
-renderChat();
-if(!S.chat||!S.chat.length){
-  pushChat('ai','嗨，我是小陪，你的秋招陪跑搭子 🤝 主方向：运营 / 数据分析 / 运维（非开发），其他非开发岗也不排斥。默认实验时段 08:30–21:30，随时能改。\n\n你可以随便说人话：做了啥、接下来要去哪、想调哪个任务、状态不好想吐槽，都行。说错了就说"撤销/我没完成"，我改。\n\n👉 想去「设置」里填个 AI Key——填了我就变成真·活人，随便聊都接得住；不填也能用，只是会"听不懂人话"。');
-}
-fillSettings();
-render();
-/* 长时间挂着页面时，每 10 分钟静默对齐一次"现在"（不打扰你） */
-setInterval(refreshPlanForNow,10*60*1000);
-/* 云端优先：开启同步则拉取最新覆盖本地（换设备/清缓存后恢复） */
-if(S.cloud&&S.cloud.enabled&&S.cloud.token&&S.cloud.gistId){
-  pullFromCloud().then(ok=>{if(ok){save_local();render();renderChat();}});
-}
+renderDay();
 </script>
 </body>
 </html>
