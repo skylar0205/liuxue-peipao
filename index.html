@@ -14,9 +14,9 @@
   .head{background:linear-gradient(135deg,#2f6bff,#7a52d6);color:#fff;border-radius:16px;padding:18px 16px;margin-bottom:12px}
   .head h1{font-size:19px;font-weight:800}
   .head p{font-size:12.5px;opacity:.92;margin-top:5px}
-  .tabs{display:flex;gap:8px;margin-bottom:12px}
-  .tab{flex:1;text-align:center;padding:10px 0;border-radius:12px;background:var(--card);border:1px solid var(--line);
-    font-weight:700;font-size:14px;color:var(--sub);cursor:pointer;user-select:none}
+  .tabs{display:flex;gap:6px;margin-bottom:12px}
+  .tab{flex:1;text-align:center;padding:10px 1px;border-radius:12px;background:var(--card);border:1px solid var(--line);
+    font-weight:700;font-size:13px;color:var(--sub);cursor:pointer;user-select:none}
   .tab.on{background:var(--blue);color:#fff;border-color:var(--blue)}
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;margin-bottom:12px;box-shadow:0 1px 3px rgba(20,30,60,.04)}
   .card h2{font-size:16px;margin-bottom:9px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
@@ -69,6 +69,24 @@
   .chip{display:inline-block;background:#eef3ff;color:var(--blue);border:1px solid #d6e2ff;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:600;margin:3px 3px 0 0}
   details{margin-top:8px}
   summary{cursor:pointer;font-weight:700;color:var(--blue);font-size:13.5px}
+  /* ===== 打卡总览 ===== */
+  .statrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .stat{background:#f7f8fc;border:1px solid var(--line);border-radius:10px;padding:7px 12px;font-size:12.5px}
+  .stat b{font-size:17px;color:var(--blue)}
+  .hm{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:4px}
+  .hm .hd{font-size:11px;text-align:center;color:var(--sub);font-weight:700;padding-bottom:2px}
+  .cell{border-radius:8px;border:1px solid var(--line);padding:5px 2px;text-align:center;cursor:pointer;background:#fff}
+  .cell .dt{font-size:10.5px;font-weight:800;line-height:1.3}
+  .cell .pr{font-size:9px;opacity:.85;line-height:1.3}
+  .cell.full{background:#1f9d6b;border-color:#1f9d6b;color:#fff}
+  .cell.over{background:#ffe0dc;border-color:#e0665c;color:#a12a20}
+  .cell.over0{background:#f6b8b1;border-color:#d8453a;color:#7d1f16}
+  .cell.today{background:#eef3ff;border-color:#2f6bff;color:#2f6bff}
+  .cell.future{background:#f4f5f8;border-color:#e7e9ef;color:#9aa1b1}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--sub);margin-top:8px}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+  tr.over td{background:#fff4f2}
+  .mchip{display:inline-block;background:#fff0ee;color:var(--red);border:1px solid #f4c9c4;padding:1px 7px;border-radius:10px;font-size:11.5px;margin:1px 3px 0 0}
 </style>
 </head>
 <body>
@@ -89,6 +107,7 @@
   <div class="tab on" id="tab-day" onclick="showTab('day')">📅 日计划</div>
   <div class="tab" id="tab-week" onclick="showTab('week')">🗓️ 周计划</div>
   <div class="tab" id="tab-month" onclick="showTab('month')">📆 月计划</div>
+  <div class="tab" id="tab-check" onclick="showTab('check')">✅ 打卡总览</div>
 </div>
 
 <!-- ======= 日视图 ======= -->
@@ -173,6 +192,29 @@
     </ul>
     <div class="rule"><b>铁律：</b>① 投递——Boss/猎聘<b>仅工作日9-18</b>，官网/央国企网<b>随时</b>；② 行测只刷不考公、不碰申论；③ 每周3次力量训练、3次共性技能输入；④ 每次作品集提交必回头改一次简历（只换技能标签/优势首句/自我评价三处）。</div>
     <div class="vac"><b>红线：</b>投递量决定有没有面试，技能只决定面试时说不说得出来——顺序别搞反。10月上旬0面试→把私企也放进来。</div>
+  </div>
+</div>
+
+<!-- ======= 打卡总览视图 ======= -->
+<div id="view-check" class="hidden">
+  <div class="card">
+    <h2>✅ 打卡总览（30天一眼看哪没完成）</h2>
+    <div class="lead">不用一天天往回点啦——下面<b>热力图＋明细表</b>直接告诉你<b>哪几天有任务没打勾</b>。点任意格子或表格行，会跳到那一天去补勾。</div>
+    <div class="statrow" id="ck-stat"></div>
+    <div class="hm" id="ck-hm"></div>
+    <div class="legend">
+      <span><i style="background:#1f9d6b"></i>全部完成</span>
+      <span><i style="background:#ffe0dc;border:1px solid #e0665c"></i>过期·没做完</span>
+      <span><i style="background:#f6b8b1;border:1px solid #d8453a"></i>过期·一项没动</span>
+      <span><i style="background:#eef3ff;border:1px solid #2f6bff"></i>今天</span>
+      <span><i style="background:#f4f5f8;border:1px solid #e7e9ef"></i>还没到</span>
+    </div>
+    <h3 style="margin:16px 0 2px;font-size:15px">📋 未完成明细（哪天的哪几项没做）</h3>
+    <label style="font-size:12.5px;color:var(--sub);display:inline-flex;align-items:center;gap:5px;margin:4px 0">
+      <input type="checkbox" id="ck-hidefuture" checked onchange="renderCheck()"> 只看到期的和今天（隐藏还没到的日子）
+    </label>
+    <div id="ck-table"></div>
+    <div class="note" id="ck-hint"></div>
   </div>
 </div>
 
@@ -307,12 +349,12 @@ let cur = todayOffset();
 const WKCOLOR = {1:'t-blue',2:'t-green',3:'t-amber',4:'t-pur',5:'t-teal'};
 
 function showTab(t){
-  document.getElementById('tab-day').className='tab'+(t==='day'?' on':'');
-  document.getElementById('tab-week').className='tab'+(t==='week'?' on':'');
-  document.getElementById('tab-month').className='tab'+(t==='month'?' on':'');
-  document.getElementById('view-day').className = t==='day'?'':'hidden';
-  document.getElementById('view-week').className = t==='week'?'':'hidden';
-  document.getElementById('view-month').className = t==='month'?'':'hidden';
+  ['day','week','month','check'].forEach(k=>{
+    const tab=document.getElementById('tab-'+k), view=document.getElementById('view-'+k);
+    if(tab) tab.className='tab'+(t===k?' on':'');
+    if(view) view.className = t===k?'':'hidden';
+  });
+  if(t==='check') renderCheck();
 }
 
 function key(d){ return 'lxx30_'+d.d; }
@@ -367,7 +409,70 @@ function resetDay(){
   if(confirm('清空 '+DAYS[cur].d+' 的全部勾选？')){ localStorage.removeItem(key(DAYS[cur])); renderDay(); }
 }
 
+// ===== 打卡总览 =====
+const SHORT = {tech:'技术',en:'英语',xc:'行测',it:'面试',str:'力量',gong:'共性',dl:'投递'};
+function rawOff(){ return Math.floor((new Date()-START)/86400000); }
+function dayStat(i){
+  const d=DAYS[i], items=buildItems(d), st=load(d);
+  let done=0; const miss=[];
+  items.forEach(it=>{ if(st[it.k]) done++; else miss.push(SHORT[it.k]||it.k); });
+  return {i:i, d:d, done:done, total:items.length, miss:miss};
+}
+function jumpTo(i){ cur=Math.max(0,Math.min(29,i)); showTab('day'); renderDay(); window.scrollTo(0,0); }
+
+function renderCheck(){
+  const off=rawOff();
+  const idxToday=(off>=0&&off<=29)?off:(off<0?-1:30);
+  const stats=DAYS.map((_,i)=>dayStat(i));
+  let elapsed=0, fullDays=0, overdue=0, todayS=null;
+  stats.forEach(s=>{
+    if(idxToday>=0 && s.i<=idxToday){ elapsed++; if(s.done===s.total) fullDays++; }
+    if(s.i<idxToday && s.done<s.total) overdue++;
+    if(s.i===idxToday) todayS=s;
+  });
+  let sum='<div class="stat">已走 <b>'+elapsed+'</b> 天</div>'
+    +'<div class="stat">🎉 全勤 <b style="color:var(--green)">'+fullDays+'</b> 天</div>'
+    +'<div class="stat">🔴 欠账 <b style="color:var(--red)">'+overdue+'</b> 天</div>';
+  if(todayS) sum+='<div class="stat">今天 '+todayS.d.d+'：<b>'+todayS.done+'/'+todayS.total+'</b></div>';
+  document.getElementById('ck-stat').innerHTML=sum;
+
+  let hm=''; ['日','一','二','三','四','五','六'].forEach(x=>hm+='<div class="hd">'+x+'</div>');
+  stats.forEach(s=>{
+    let cls;
+    if(s.done===s.total) cls='full';
+    else if(s.i<idxToday) cls=(s.done===0?'over0':'over');
+    else if(s.i===idxToday) cls='today';
+    else cls='future';
+    hm+='<div class="cell '+cls+'" title="'+s.d.d+' 周'+s.d.wd+' 完成'+s.done+'/'+s.total+'" onclick="jumpTo('+s.i+')">'
+      +'<div class="dt">'+s.d.d+'</div><div class="pr">'+s.done+'/'+s.total+'</div></div>';
+  });
+  document.getElementById('ck-hm').innerHTML=hm;
+
+  const hideF=document.getElementById('ck-hidefuture').checked;
+  let rows='';
+  stats.forEach(s=>{
+    if(s.done===s.total) return;
+    if(hideF && s.i>idxToday) return;
+    let stxt, scl;
+    if(s.i<idxToday){ stxt='🔴 已过期'; scl='over'; }
+    else if(s.i===idxToday){ stxt='🔵 今天'; scl=''; }
+    else { stxt='⚪ 没到'; scl=''; }
+    const chips=s.miss.map(m=>'<span class="mchip">'+m+'</span>').join('');
+    rows+='<tr class="'+scl+'" onclick="jumpTo('+s.i+')" style="cursor:pointer">'
+      +'<td><b>'+s.d.d+'</b> 周'+s.d.wd+'</td><td>'+stxt+'</td><td>'+s.done+'/'+s.total+'</td><td>'+chips+'</td></tr>';
+  });
+  document.getElementById('ck-table').innerHTML = rows
+    ? '<table><thead><tr><th>日期</th><th>状态</th><th>进度</th><th>没完成的任务</th></tr></thead><tbody>'+rows+'</tbody></table>'
+    : '<div class="lead" style="border-color:var(--green);background:#f1fbf6">🎉 到期范围内全部完成，没有欠账！</div>';
+
+  const firstOver=stats.filter(s=>s.i<idxToday && s.done<s.total)[0];
+  document.getElementById('ck-hint').innerHTML = firstOver
+    ? '💡 最早欠账在 <b>'+firstOver.d.d+'</b>（差 '+firstOver.miss.length+' 项：'+firstOver.miss.join('、')+'）。建议从最早的一天补起，<b>点那一行或上面的格子即可跳过去打勾</b>。'
+    : (todayS && todayS.done<todayS.total ? '💡 今天还差：'+todayS.miss.join('、')+'。点上面「今天」那格跳过去打勾。' : '');
+}
+
 renderDay();
+renderCheck();
 </script>
 </body>
 </html>
